@@ -1,20 +1,27 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Manifest {
-    pub format: String,
-
-    pub version: String,
-
+pub struct Metadata {
     pub title: String,
 
     pub creator: String,
 
-    pub created: String,
+    pub version: String,
+}
+use crate::grid::GridFile;
+use crate::package::SofPackage;
+use crate::repository::Repository;
 
-    pub grid: Option<String>,
+pub struct GridRepository<'a> {
+    package: &'a SofPackage,
+}
 
-    pub boundary: Option<String>,
+impl<'a> Repository<GridFile> for GridRepository<'a> {
+    fn load(&self) -> anyhow::Result<GridFile> {
+        todo!()
+    }
 
-    pub restart: Option<String>,
+    fn save(&self, grid: &GridFile) -> anyhow::Result<()> {
+        todo!()
+    }
 }
