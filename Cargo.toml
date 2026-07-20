@@ -9,8 +9,9 @@ members = [
     "crates/physics",
     "crates/solver",
     "crates/s-io",
+    "crates/s-sof",
     "crates/math",
-    "crates/renderer",
+    "crates/s-renderer",
     "crates/gui",
     "crates/util",
 ]
