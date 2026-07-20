@@ -2,21 +2,45 @@
 name = "s-renderer"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+publish = false
+
+[lib]
+name = "s_renderer"
+path = "src/lib.rs"
 
 [dependencies]
-s-core = { path = "../s-core" }
-s-grid = { path = "../s-grid" }
+anyhow = "1"
+thiserror = "2"
+
+serde = { version = "1", features = ["derive"] }
+
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
+ndarray = "0.16"
 
 wgpu = "26"
 winit = "0.30"
-pollster = "0.4"
 
 bytemuck = { version = "1", features = ["derive"] }
 
-nalgebra = "0.34"
-
-anyhow = "1"
-
-thiserror = "2"
+pollster = "0.4"
 
 log = "0.4"
+
+raw-window-handle = "0.6"
+
+[features]
+default = []
+
+validation = []
+
+trace = []
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"
