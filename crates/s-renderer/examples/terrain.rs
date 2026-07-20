@@ -4,7 +4,7 @@ use anyhow::Result;
 
 use winit::{event::*, event_loop::EventLoop, window::WindowAttributes};
 
-use s_renderer::{Renderer, TerrainMesh, TerrainVertex};
+use s_renderer::{HeightMap, Renderer, TerrainMesh, TerrainVertex};
 
 const SHADER: &str = include_str!("../src/shader.wgsl");
 
@@ -17,13 +17,11 @@ async fn main() -> Result<()> {
 
     let mut renderer = Renderer::new(window.clone(), SHADER, &[TerrainVertex::layout()]).await?;
 
-    let terrain = TerrainMesh::new(128);
+    let heightmap = HeightMap::test();
 
-    println!(
-        "vertices={} indices={}",
-        terrain.vertices.len(),
-        terrain.indices.len()
-    );
+    println!("height {:?}", heightmap.min_max());
+
+    let terrain = TerrainMesh::from_heightmap(&heightmap, 1.0);
 
     let gpu_mesh = terrain.upload(renderer.device());
 

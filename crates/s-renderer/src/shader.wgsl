@@ -16,6 +16,9 @@ struct VertexInput {
 
     @location(1)
     normal: vec3<f32>,
+
+    @location(2)
+    height: f32,
 };
 
 
@@ -37,8 +40,8 @@ struct VertexOutput {
 @vertex
 fn vs_main(
     input: VertexInput
-) -> VertexOutput {
-
+)
+-> VertexOutput {
 
     var output: VertexOutput;
 
@@ -56,7 +59,7 @@ fn vs_main(
 
 
     output.height =
-        input.position.y;
+        input.height;
 
 
     return output;
@@ -72,41 +75,81 @@ fn fs_main(
 -> @location(0) vec4<f32>
 {
 
+    let h = input.height;
+
+
+    var color: vec3<f32>;
+
 
     //
-    // 簡易高度カラー
+    // 高度・水深カラー
+    //
+    // h > 0    陸地
+    // h = 0    海面
+    // h < 0    海底
     //
 
-    let h =
-        clamp(
-            input.height / 10.0,
-            0.0,
-            1.0
-        );
+
+    if h < -30.0 {
+
+        // 深海
+
+        color =
+            vec3<f32>(
+                0.0,
+                0.03,
+                0.25
+            );
 
 
-    let sea =
-        vec3<f32>(
-            0.0,
-            0.25,
-            0.55
-        );
+    } else if h < -5.0 {
+
+        // 中深度
+
+        color =
+            vec3<f32>(
+                0.0,
+                0.25,
+                0.65
+            );
 
 
-    let land =
-        vec3<f32>(
-            0.15,
-            0.65,
-            0.25
-        );
+    } else if h < 0.0 {
+
+        // 浅瀬
+
+        color =
+            vec3<f32>(
+                0.0,
+                0.65,
+                0.9
+            );
 
 
-    let color =
-        mix(
-            sea,
-            land,
-            h
-        );
+    } else if h < 5.0 {
+
+        // 海岸
+
+        color =
+            vec3<f32>(
+                0.75,
+                0.7,
+                0.4
+            );
+
+
+    } else {
+
+        // 陸地
+
+        color =
+            vec3<f32>(
+                0.2,
+                0.65,
+                0.2
+            );
+    }
+
 
 
     //
@@ -117,14 +160,17 @@ fn fs_main(
         max(
             dot(
                 normalize(input.normal),
-                vec3<f32>(
-                    0.3,
-                    1.0,
-                    0.5
+                normalize(
+                    vec3<f32>(
+                        0.3,
+                        1.0,
+                        0.5
+                    )
                 )
             ),
-            0.2
+            0.25
         );
+
 
 
     return vec4<f32>(
