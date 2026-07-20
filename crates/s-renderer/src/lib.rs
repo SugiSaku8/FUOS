@@ -2,6 +2,7 @@ pub mod buffer;
 pub mod camera;
 pub mod context;
 pub mod depth;
+pub mod error;
 pub mod frame;
 pub mod mesh;
 pub mod pipeline;

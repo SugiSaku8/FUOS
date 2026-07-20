@@ -127,7 +127,10 @@ where
     T: Pod,
 {
     buffer: GpuBuffer,
+
     length: usize,
+
+    marker: std::marker::PhantomData<T>,
 }
 
 impl<T> StorageBuffer<T>
@@ -153,6 +156,8 @@ where
         Self {
             buffer,
             length: data.len(),
+
+            marker: std::marker::PhantomData,
         }
     }
 
