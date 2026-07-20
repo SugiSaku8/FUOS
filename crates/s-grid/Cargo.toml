@@ -1,0 +1,20 @@
+[package]
+name = "s-grid"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+S-core = { path = "../S-core" }
+
+ndarray = "0.16"
+nalgebra = "0.34"
+
+serde = { version = "1", features = ["derive"] }
+
+geo = "0.31"
+geo-types = "0.7"
+
+thiserror = "2"
+anyhow = "1"
+
+log = "0.4"

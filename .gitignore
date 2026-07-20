@@ -1,0 +1,22 @@
+# Rust
+target/
+
+# Cargo
+Cargo.lock
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Cache
+assets/cache/
+
+# Generated data
+simulation/restart/

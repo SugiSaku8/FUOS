@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "apps/simulator",
+
+    "crates/s-core",
+    "crates/s-grid",
+    "crates/physics",
+    "crates/solver",
+    "crates/s-io",
+    "crates/math",
+    "crates/renderer",
+    "crates/gui",
+    "crates/util",
+]
