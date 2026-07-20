@@ -331,3 +331,21 @@ impl<'window> Renderer<'window> {
         &mut self.camera
     }
 }
+#[inline]
+pub fn context(
+    &self,
+)
+    -> &RenderContext
+{
+    &self.context
+}
+
+
+#[inline]
+pub fn surface_size(
+    &self,
+)
+    -> PhysicalSize<u32>
+{
+    self.surface.size()
+}

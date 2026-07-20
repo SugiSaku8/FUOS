@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-S-core = { path = "../S-core" }
-S-grid = { path = "../S-grid" }
+s-core = { path = "../s-core" }
+s-grid = { path = "../s-grid" }
 
 netcdf = "0.10"
 

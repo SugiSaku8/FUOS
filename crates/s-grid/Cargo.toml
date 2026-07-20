@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-S-core = { path = "../S-core" }
+s-core = { path = "../s-core" }
 
 ndarray = "0.16"
 nalgebra = "0.34"
