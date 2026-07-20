@@ -1,8 +1,18 @@
-#[derive(Clone)]
-pub struct CellGeometry {
-    pub dx: f32,
+pub struct Geometry<V> {
+    pub vertices: Vec<V>,
+    pub indices: Vec<u32>,
+}
 
-    pub dy: f32,
+impl<V> Geometry<V> {
+    pub fn new() -> Self {
+        Self {
+            vertices: Vec::new(),
+            indices: Vec::new(),
+        }
+    }
 
-    pub dz: f32,
+    pub fn clear(&mut self) {
+        self.vertices.clear();
+        self.indices.clear();
+    }
 }

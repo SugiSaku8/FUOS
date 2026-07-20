@@ -1,54 +1,41 @@
-use crate::bathymetry::Bathymetry;
-use crate::geometry::CellGeometry;
-use crate::grid::OceanGrid;
-use crate::mask::OceanMask;
+use crate::{grid::OceanGrid, mesh::TerrainMesh, vertex::TerrainVertex};
 
-pub struct GridBuilder {
-    bathymetry: Bathymetry,
+pub struct TerrainBuilder;
 
-    dz: f32,
-}
+impl TerrainBuilder {
+    pub fn build(grid: &OceanGrid) -> TerrainMesh {
+        let mut mesh = TerrainMesh::new();
 
-impl GridBuilder {
-    pub fn new(bathymetry: Bathymetry) -> Self {
-        Self {
-            bathymetry,
+        let width = grid.width();
+        let height = grid.height();
 
-            dz: 20.0,
+        for y in 0..height {
+            for x in 0..width {
+                let depth = grid.depth(x, y);
+
+                mesh.vertices.push(TerrainVertex {
+                    position: [x as f32, y as f32, -depth],
+
+                    normal: [0.0, 0.0, 1.0],
+                });
+            }
         }
-    }
 
-    pub fn vertical_resolution(mut self, dz: f32) -> Self {
-        self.dz = dz;
+        for y in 0..height - 1 {
+            for x in 0..width - 1 {
+                let i = (y * width + x) as u32;
 
-        self
-    }
-
-    pub fn build(self) -> OceanGrid {
-        let nx = self.bathymetry.width();
-
-        let ny = self.bathymetry.height();
-
-        let nz = 300;
-
-        OceanGrid {
-            mask: OceanMask::from_bathymetry(&self.bathymetry.elevation),
-
-            geometry: CellGeometry {
-                dx: 500.0,
-
-                dy: 500.0,
-
-                dz: self.dz,
-            },
-
-            bathymetry: self.bathymetry,
-
-            nx,
-
-            ny,
-
-            nz,
+                mesh.indices.extend_from_slice(&[
+                    i,
+                    i + 1,
+                    i + width as u32,
+                    i + 1,
+                    i + width as u32 + 1,
+                    i + width as u32,
+                ]);
+            }
         }
+
+        mesh
     }
 }
