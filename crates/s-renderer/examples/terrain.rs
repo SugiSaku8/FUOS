@@ -4,8 +4,7 @@ use anyhow::Result;
 
 use winit::{event::*, event_loop::EventLoop, window::WindowAttributes};
 
-use s_renderer::{HeightMap, Renderer, TerrainMesh, TerrainVertex};
-
+use s_renderer::{HeightMapLoader, Renderer, TerrainMesh, TerrainVertex};
 const SHADER: &str = include_str!("../src/shader.wgsl");
 
 #[tokio::main]
@@ -17,8 +16,9 @@ async fn main() -> Result<()> {
 
     let mut renderer = Renderer::new(window.clone(), SHADER, &[TerrainVertex::layout()]).await?;
 
-    let heightmap = HeightMap::test();
-
+    let heightmap = HeightMapLoader::load_gebco(
+        "/Users/sugisaku/Desktop/Developer/Suruga-Wan/crates/s-renderer/examples/suruga.nc",
+    )?;
     println!("height {:?}", heightmap.min_max());
 
     let terrain = TerrainMesh::from_heightmap(&heightmap, 1.0);

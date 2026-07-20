@@ -4,7 +4,9 @@ pub mod context;
 pub mod depth;
 pub mod error;
 pub mod frame;
+pub mod gebco;
 pub mod heightmap;
+pub mod heightmap_loader;
 pub mod mesh;
 pub mod pipeline;
 pub mod renderer;
@@ -32,5 +34,7 @@ pub mod test_mesh;
 pub use test_mesh::{TestVertex, create_triangle};
 pub mod terrain;
 
+pub use gebco::GebcoLoader;
 pub use heightmap::HeightMap;
+pub use heightmap_loader::HeightMapLoader;
 pub use terrain::{TerrainMesh, TerrainVertex};

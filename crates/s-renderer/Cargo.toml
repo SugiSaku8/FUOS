@@ -11,8 +11,7 @@ path = "src/lib.rs"
 
 
 [dependencies]
-
-# Error handling
+netcdf = { version = "0.10", features = ["static"] }# Error handling
 anyhow = "1.0"
 thiserror = "2.0"
 pollster = "0.4"
