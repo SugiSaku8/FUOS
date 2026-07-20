@@ -26,9 +26,7 @@ pub struct Renderer {
 impl Renderer {
     pub async fn new(
         window: Arc<Window>,
-
         shader_source: &str,
-
         vertex_layouts: &[wgpu::VertexBufferLayout<'static>],
     ) -> Result<Self> {
         let context = RenderContext::new().await?;
@@ -94,10 +92,6 @@ impl Renderer {
     where
         V: bytemuck::Pod,
     {
-        //
-        // Camera update
-        //
-
         self.camera_buffer
             .uniform
             .update(self.camera.build_matrix());
@@ -129,11 +123,8 @@ impl Renderer {
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
                             r: 0.02,
-
                             g: 0.08,
-
                             b: 0.15,
-
                             a: 1.0,
                         }),
 

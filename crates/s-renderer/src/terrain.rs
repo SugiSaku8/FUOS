@@ -1,54 +1,44 @@
+use std::mem;
+
+use bytemuck::{Pod, Zeroable};
+
 use crate::mesh::{GpuMesh, Mesh};
 
-use wgpu;
-
+//
+// GPUへ送る地形頂点
+//
 #[repr(C)]
-#[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
+#[derive(Clone, Copy, Debug, Pod, Zeroable)]
 pub struct TerrainVertex {
     pub position: [f32; 3],
 
     pub normal: [f32; 3],
-
-    pub uv: [f32; 2],
 }
+
+//
+// Vertex属性
+// staticに保持する
+//
+const TERRAIN_ATTRIBUTES: [wgpu::VertexAttribute; 2] = wgpu::vertex_attr_array![
+    0 => Float32x3,
+    1 => Float32x3
+];
 
 impl TerrainVertex {
     pub fn layout() -> wgpu::VertexBufferLayout<'static> {
-        use std::mem;
-
         wgpu::VertexBufferLayout {
             array_stride: mem::size_of::<TerrainVertex>() as wgpu::BufferAddress,
 
             step_mode: wgpu::VertexStepMode::Vertex,
 
-            attributes: &[
-                wgpu::VertexAttribute {
-                    offset: 0,
-
-                    shader_location: 0,
-
-                    format: wgpu::VertexFormat::Float32x3,
-                },
-                wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
-
-                    shader_location: 1,
-
-                    format: wgpu::VertexFormat::Float32x3,
-                },
-                wgpu::VertexAttribute {
-                    offset: (mem::size_of::<[f32; 3]>() + mem::size_of::<[f32; 3]>())
-                        as wgpu::BufferAddress,
-
-                    shader_location: 2,
-
-                    format: wgpu::VertexFormat::Float32x2,
-                },
-            ],
+            attributes: &TERRAIN_ATTRIBUTES,
         }
     }
 }
 
+//
+// CPU側 Terrain Mesh
+//
 pub struct TerrainMesh {
     pub vertices: Vec<TerrainVertex>,
 
@@ -56,63 +46,53 @@ pub struct TerrainMesh {
 }
 
 impl TerrainMesh {
-    pub fn new() -> Self {
-        Self {
-            vertices: Vec::new(),
-
-            indices: Vec::new(),
-        }
-    }
-
-    pub fn from_heightmap(width: usize, height: usize, heights: &[f32], scale: f32) -> Self {
-        let mut vertices = Vec::with_capacity(width * height);
+    pub fn new(size: usize) -> Self {
+        let mut vertices = Vec::new();
 
         let mut indices = Vec::new();
 
         //
-        // vertices
+        // 簡易地形生成
         //
+        for z in 0..=size {
+            for x in 0..=size {
+                let xf = x as f32 / size as f32;
 
-        for z in 0..height {
-            for x in 0..width {
-                let h = heights[z * width + x];
+                let zf = z as f32 / size as f32;
 
-                let px = x as f32 * scale;
-
-                let pz = z as f32 * scale;
+                let height = (xf * 10.0).sin() * (zf * 10.0).cos() * 3.0;
 
                 vertices.push(TerrainVertex {
-                    position: [px, h, pz],
+                    position: [x as f32, height, z as f32],
 
                     normal: [0.0, 1.0, 0.0],
-
-                    uv: [x as f32 / width as f32, z as f32 / height as f32],
                 });
             }
         }
 
         //
-        // indices
+        // index生成
         //
+        for z in 0..size {
+            for x in 0..size {
+                let i = z * (size + 1) + x;
 
-        for z in 0..height - 1 {
-            for x in 0..width - 1 {
-                let i = (z * width + x) as u32;
+                indices.push(i as u32);
+                indices.push((i + 1) as u32);
+                indices.push((i + size + 1) as u32);
 
-                indices.extend_from_slice(&[
-                    i,
-                    i + 1,
-                    i + width as u32,
-                    i + 1,
-                    i + width as u32 + 1,
-                    i + width as u32,
-                ]);
+                indices.push((i + 1) as u32);
+                indices.push((i + size + 2) as u32);
+                indices.push((i + size + 1) as u32);
             }
         }
 
         Self { vertices, indices }
     }
 
+    //
+    // GPUへアップロード
+    //
     pub fn upload(&self, device: &wgpu::Device) -> GpuMesh<TerrainVertex> {
         let mesh = Mesh {
             vertices: self.vertices.clone(),

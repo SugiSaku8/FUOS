@@ -17,10 +17,7 @@ pub struct Camera {
 impl Camera {
     pub fn new(width: u32, height: u32) -> Self {
         Self {
-            //
-            // 上空から地形を見る
-            //
-            position: Point3::new(64.0, 80.0, 64.0),
+            position: Point3::new(64.0, 40.0, 120.0),
 
             target: Point3::new(64.0, 0.0, 64.0),
 
@@ -30,7 +27,7 @@ impl Camera {
 
             znear: 0.1,
 
-            zfar: 1000.0,
+            zfar: 500.0,
         }
     }
 

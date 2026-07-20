@@ -8,65 +8,49 @@ use s_renderer::{Renderer, TerrainMesh, TerrainVertex};
 
 const SHADER: &str = include_str!("../src/shader.wgsl");
 
-fn main() -> Result<()> {
-    pollster::block_on(run())
-}
-
-async fn run() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let event_loop = EventLoop::new()?;
 
     let window =
         Arc::new(event_loop.create_window(WindowAttributes::default().with_title("SOS Terrain"))?);
 
-    let layouts = vec![TerrainVertex::layout()];
+    let mut renderer = Renderer::new(window.clone(), SHADER, &[TerrainVertex::layout()]).await?;
 
-    let mut renderer = Renderer::new(window.clone(), SHADER, &layouts).await?;
+    let terrain = TerrainMesh::new(128);
 
-    //
-    // Test heightmap
-    //
-
-    let size = 128usize;
-
-    let mut heights = Vec::with_capacity(size * size);
-
-    for z in 0..size {
-        for x in 0..size {
-            let xf = x as f32 / size as f32;
-
-            let zf = z as f32 / size as f32;
-
-            let h = 1.0;
-
-            heights.push(h);
-        }
-    }
-
-    let terrain = TerrainMesh::from_heightmap(size, size, &heights, 1.0);
+    println!(
+        "vertices={} indices={}",
+        terrain.vertices.len(),
+        terrain.indices.len()
+    );
 
     let gpu_mesh = terrain.upload(renderer.device());
 
     event_loop.run(move |event, target| match event {
-        Event::WindowEvent { event, .. } => match event {
-            WindowEvent::CloseRequested => {
-                target.exit();
-            }
+        Event::WindowEvent {
+            event: WindowEvent::CloseRequested,
+            ..
+        } => {
+            target.exit();
+        }
 
-            WindowEvent::Resized(size) => {
-                renderer.resize(size);
-            }
-
-            WindowEvent::RedrawRequested => {
-                if let Err(e) = renderer.render(&gpu_mesh) {
-                    eprintln!("render error: {e:?}");
-                }
-            }
-
-            _ => {}
-        },
+        Event::WindowEvent {
+            event: WindowEvent::Resized(size),
+            ..
+        } => {
+            renderer.resize(size);
+        }
 
         Event::AboutToWait => {
             window.request_redraw();
+        }
+
+        Event::WindowEvent {
+            event: WindowEvent::RedrawRequested,
+            ..
+        } => {
+            renderer.render(&gpu_mesh).unwrap();
         }
 
         _ => {}
