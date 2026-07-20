@@ -17,9 +17,9 @@ pub struct Camera {
 impl Camera {
     pub fn new(width: u32, height: u32) -> Self {
         Self {
-            position: Point3::new(64.0, 40.0, 120.0),
+            position: Point3::new(0.0, 7000000.0, 7000000.0),
 
-            target: Point3::new(64.0, 0.0, 64.0),
+            target: Point3::new(0.0, 6371000.0, 0.0),
 
             aspect: width as f32 / height as f32,
 

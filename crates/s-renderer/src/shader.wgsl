@@ -15,9 +15,6 @@ struct VertexInput {
     position: vec3<f32>,
 
     @location(1)
-    normal: vec3<f32>,
-
-    @location(2)
     height: f32,
 };
 
@@ -29,9 +26,6 @@ struct VertexOutput {
     position: vec4<f32>,
 
     @location(0)
-    normal: vec3<f32>,
-
-    @location(1)
     height: f32,
 };
 
@@ -40,13 +34,12 @@ struct VertexOutput {
 @vertex
 fn vs_main(
     input: VertexInput
-)
--> VertexOutput {
+) -> VertexOutput {
 
-    var output: VertexOutput;
+    var out: VertexOutput;
 
 
-    output.position =
+    out.position =
         camera.view_proj *
         vec4<f32>(
             input.position,
@@ -54,18 +47,11 @@ fn vs_main(
         );
 
 
-    output.normal =
-        input.normal;
+    out.height = input.height;
 
 
-    output.height =
-        input.height;
-
-
-    return output;
+    return out;
 }
-
-
 
 
 @fragment
@@ -78,103 +64,59 @@ fn fs_main(
     let h = input.height;
 
 
-    var color: vec3<f32>;
+    // 深海
+    if h < -2000.0 {
 
-
-    //
-    // 高度・水深カラー
-    //
-    // h > 0    陸地
-    // h = 0    海面
-    // h < 0    海底
-    //
-
-
-    if h < -30.0 {
-
-        // 深海
-
-        color =
-            vec3<f32>(
-                0.0,
-                0.03,
-                0.25
-            );
-
-
-    } else if h < -5.0 {
-
-        // 中深度
-
-        color =
-            vec3<f32>(
-                0.0,
-                0.25,
-                0.65
-            );
-
-
-    } else if h < 0.0 {
-
-        // 浅瀬
-
-        color =
-            vec3<f32>(
-                0.0,
-                0.65,
-                0.9
-            );
-
-
-    } else if h < 5.0 {
-
-        // 海岸
-
-        color =
-            vec3<f32>(
-                0.75,
-                0.7,
-                0.4
-            );
-
-
-    } else {
-
-        // 陸地
-
-        color =
-            vec3<f32>(
-                0.2,
-                0.65,
-                0.2
-            );
+        return vec4<f32>(
+            0.0,
+            0.05,
+            0.4,
+            1.0
+        );
     }
 
 
+    // 浅海
+    if h < -500.0 {
 
-    //
-    // 簡易ライティング
-    //
-
-    let light =
-        max(
-            dot(
-                normalize(input.normal),
-                normalize(
-                    vec3<f32>(
-                        0.3,
-                        1.0,
-                        0.5
-                    )
-                )
-            ),
-            0.25
+        return vec4<f32>(
+            0.0,
+            0.4,
+            0.8,
+            1.0
         );
+    }
 
 
+    // 海岸
+    if h < 0.0 {
 
+        return vec4<f32>(
+            0.8,
+            0.8,
+            0.4,
+            1.0
+        );
+    }
+
+
+    // 陸地
+    if h < 500.0 {
+
+        return vec4<f32>(
+            0.1,
+            0.6,
+            0.15,
+            1.0
+        );
+    }
+
+
+    // 山
     return vec4<f32>(
-        color * light,
+        0.8,
+        0.8,
+        0.8,
         1.0
     );
 }

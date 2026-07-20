@@ -1,6 +1,7 @@
 pub mod buffer;
 pub mod camera;
 pub mod context;
+pub mod coordinate;
 pub mod depth;
 pub mod error;
 pub mod frame;
@@ -14,6 +15,8 @@ pub mod shader;
 pub mod surface;
 pub mod texture;
 pub mod uniform;
+
+pub use coordinate::{GeoBounds, GeoConverter};
 // Public renderer API
 
 pub use renderer::Renderer;
