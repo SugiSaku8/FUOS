@@ -108,4 +108,3 @@ where
         pass.draw_indexed(0..self.index_count, 0, 0..1);
     }
 }
-

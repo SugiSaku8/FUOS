@@ -2,50 +2,60 @@
 name = "s-renderer"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
-publish = false
+
 
 [lib]
 name = "s_renderer"
 path = "src/lib.rs"
 
+
+
 [dependencies]
-anyhow = "1"
-thiserror = "2"
 
-serde = { version = "1", features = ["derive"] }
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+pollster = "0.4"
+env_logger = "0.11"
+# Serialization
+serde = {version = "1.0",features = ["derive"]}
 
-nalgebra = { version = "0.34", features = ["serde-serialize"] }
+
+# Math
+nalgebra = {version = "0.33",features = ["bytemuck"]}
+
+
+# Array / scientific computing
 ndarray = "0.16"
 
-wgpu = "26"
+
+
+# GPU
+wgpu = "26.0"
+
+
+# Window
 winit = "0.30"
 
-bytemuck = { version = "1", features = ["derive"] }
 
-pollster = "0.4"
+# GPU data conversion
+bytemuck = {version = "1.23",features = ["derive"]}
 
+
+
+# Logging
 log = "0.4"
 
-raw-window-handle = "0.6"
 
-[features]
-default = []
 
-validation = []
-
-trace = []
-
-[profile.dev]
-opt-level = 1
-
-[profile.release]
-opt-level = 3
-lto = "thin"
-codegen-units = 1
-strip = "debuginfo"
 [dev-dependencies]
 
 env_logger = "0.11"
 
 tokio = {version = "1",features = ["macros","rt-multi-thread"]}
+[[example]]
+name = "triangle"
+path = "examples/triangle.rs"
+[[example]]
+name = "terrain"
+path = "examples/terrain.rs"

@@ -9,7 +9,7 @@ pub struct TestVertex {
 }
 
 impl TestVertex {
-    pub fn layout() -> wgpu::VertexBufferLayout<'static> {
+    pub const fn layout() -> wgpu::VertexBufferLayout<'static> {
         wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Self>() as u64,
 

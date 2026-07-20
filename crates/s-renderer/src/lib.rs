@@ -27,3 +27,9 @@ pub use mesh::{GpuMesh, Mesh};
 // Surface
 
 pub use surface::RenderSurface;
+pub mod test_mesh;
+
+pub use test_mesh::{TestVertex, create_triangle};
+pub mod terrain;
+
+pub use terrain::{TerrainMesh, TerrainVertex};

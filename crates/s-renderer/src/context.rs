@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 
 /// GPU global context.
 ///
@@ -22,39 +22,30 @@ pub struct RenderContext {
 
 impl RenderContext {
     pub async fn new() -> Result<Self> {
-        let instance = wgpu::Instance::new(
-            &wgpu::InstanceDescriptor {
-                backends: wgpu::Backends::METAL,
-                ..Default::default()
-            },
-        );
+        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
+            backends: wgpu::Backends::METAL,
+            ..Default::default()
+        });
 
         let adapter = instance
-            .request_adapter(
-                &wgpu::RequestAdapterOptions {
-                    power_preference:
-                        wgpu::PowerPreference::HighPerformance,
-                    compatible_surface: None,
-                    force_fallback_adapter: false,
-                },
-            )
+            .request_adapter(&wgpu::RequestAdapterOptions {
+                power_preference: wgpu::PowerPreference::HighPerformance,
+                compatible_surface: None,
+                force_fallback_adapter: false,
+            })
             .await
             .map_err(|_| anyhow!("no compatible GPU adapter found"))?;
 
         let required_limits = wgpu::Limits::default();
 
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: Some("SOS Renderer Device"),
-                    required_features: wgpu::Features::empty(),
-                    required_limits,
-                    memory_hints:
-                        wgpu::MemoryHints::Performance,
-                    trace:
-                        wgpu::Trace::Off,
-                },
-            )
+            .request_device(&wgpu::DeviceDescriptor {
+                label: Some("SOS Renderer Device"),
+                required_features: wgpu::Features::empty(),
+                required_limits,
+                memory_hints: wgpu::MemoryHints::Performance,
+                trace: wgpu::Trace::Off,
+            })
             .await?;
 
         Ok(Self {

@@ -1,6 +1,4 @@
-use anyhow::{anyhow, Result};
-
-use crate::error::RendererError;
+use anyhow::{Result, anyhow};
 
 /// GPU texture resource.
 ///

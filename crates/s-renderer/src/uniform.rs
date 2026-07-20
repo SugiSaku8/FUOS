@@ -1,83 +1,54 @@
-use bytemuck::{Pod, Zeroable};
-
 use nalgebra::Matrix4;
 
-use crate::buffer::UniformBuffer;
+use wgpu::util::DeviceExt;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, Pod, Zeroable)]
+#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct CameraUniform {
-    pub view: [[f32; 4]; 4],
-
-    pub projection: [[f32; 4]; 4],
-
-    pub view_projection: [[f32; 4]; 4],
+    pub view_proj: [[f32; 4]; 4],
 }
 
 impl CameraUniform {
     pub fn new() -> Self {
         Self {
-            view: Matrix4::<f32>::identity().into(),
-
-            projection: Matrix4::<f32>::identity().into(),
-
-            view_projection: Matrix4::<f32>::identity().into(),
+            view_proj: Matrix4::<f32>::identity().into(),
         }
     }
 
-    pub fn update(&mut self, view: &Matrix4<f32>, projection: &Matrix4<f32>) {
-        self.view = (*view).into();
-
-        self.projection = (*projection).into();
-
-        self.view_projection = (*projection * *view).into();
+    pub fn update(&mut self, matrix: Matrix4<f32>) {
+        self.view_proj = matrix.into();
     }
 }
 
-#[derive(Debug)]
 pub struct CameraBuffer {
-    buffer: UniformBuffer<CameraUniform>,
+    pub buffer: wgpu::Buffer,
 
-    bind_group: wgpu::BindGroup,
+    pub bind_group: wgpu::BindGroup,
 
-    layout: wgpu::BindGroupLayout,
+    pub uniform: CameraUniform,
 }
 
 impl CameraBuffer {
-    pub fn new(device: &wgpu::Device) -> Self {
+    pub fn new(device: &wgpu::Device, layout: &wgpu::BindGroupLayout) -> Self {
         let uniform = CameraUniform::new();
 
-        let buffer = UniformBuffer::new(device, uniform, "camera_uniform");
+        let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("camera_uniform_buffer"),
 
-        let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            label: Some("camera_bind_group_layout"),
+            contents: bytemuck::bytes_of(&uniform),
 
-            entries: &[wgpu::BindGroupLayoutEntry {
-                binding: 0,
-
-                visibility: wgpu::ShaderStages::VERTEX,
-
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Uniform,
-
-                    has_dynamic_offset: false,
-
-                    min_binding_size: None,
-                },
-
-                count: None,
-            }],
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
 
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("camera_bind_group"),
 
-            layout: &layout,
+            layout,
 
             entries: &[wgpu::BindGroupEntry {
                 binding: 0,
 
-                resource: buffer.buffer().as_entire_binding(),
+                resource: buffer.as_entire_binding(),
             }],
         });
 
@@ -86,25 +57,11 @@ impl CameraBuffer {
 
             bind_group,
 
-            layout,
+            uniform,
         }
     }
 
-    pub fn update(&mut self, queue: &wgpu::Queue, view: &Matrix4<f32>, projection: &Matrix4<f32>) {
-        let mut uniform = CameraUniform::new();
-
-        uniform.update(view, projection);
-
-        self.buffer.update(queue, uniform);
-    }
-
-    #[inline]
-    pub fn bind_group(&self) -> &wgpu::BindGroup {
-        &self.bind_group
-    }
-
-    #[inline]
-    pub fn bind_group_layout(&self) -> &wgpu::BindGroupLayout {
-        &self.layout
+    pub fn update(&mut self, queue: &wgpu::Queue) {
+        queue.write_buffer(&self.buffer, 0, bytemuck::bytes_of(&self.uniform));
     }
 }
