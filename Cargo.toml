@@ -7,7 +7,7 @@ members = [
     "crates/s-core",
     "crates/s-grid",
     "crates/physics",
-    "crates/solver",
+    "crates/s-field",
     "crates/s-io",
     "crates/s-sof",
     "crates/math",
