@@ -49,7 +49,7 @@ impl Camera {
 
 
             yaw:
-                (-90.0_f32)
+                (90.0_f32)
                 .to_radians(),
 
 

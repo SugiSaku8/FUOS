@@ -80,13 +80,13 @@ impl GeoConverter {
             //
             // 表示用に縮小
             //
-            horizontal_scale: 0.3,
+            horizontal_scale: 1.0,
 
 
             //
             // 海底地形を見えるように10倍
             //
-            vertical_scale: 0.3,
+            vertical_scale: 1.0,
 
         }
 
@@ -123,18 +123,12 @@ impl GeoConverter {
         //
         // 地球曲率補正
         //
-        let x =
-            (
-                (lon-center_lon)
-                *
-                111_000.0
-                *
-                center_lat.to_radians().cos()
-            ) as f32
-            *
-            self.horizontal_scale;
-
-
+        let x = -(
+            (lon - center_lon)
+                * self.horizontal_scale as f64
+                * 111_000.0
+                * center_lat.to_radians().cos()
+        ) as f32;
 
         //
         // 緯度方向
