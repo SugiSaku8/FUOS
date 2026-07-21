@@ -1,108 +1,200 @@
 use anyhow::Result;
-
+use nalgebra::Point3;
 use std::sync::Arc;
 
 use winit::{
-    event::{Event, WindowEvent},
+    event::*,
     event_loop::EventLoop,
-    window::WindowAttributes,
+    window::{
+        WindowAttributes
+    },
 };
 
-use s_renderer::{GeoBounds, HeightMap, HeightMapLoader, Renderer, TerrainMesh, TerrainVertex};
 
-const SHADER: &str = include_str!("../src/shader.wgsl");
+use s_renderer::{
+    GeoBounds,
+    HeightMapLoader,
+    Renderer,
+    TerrainMesh,
+    TerrainVertex,
+};
 
-#[tokio::main]
-async fn main() -> Result<()> {
-    let event_loop = EventLoop::new()?;
 
-    let window = Arc::new(event_loop.create_window(
-        WindowAttributes::default().with_title("SOS Terrain - GEBCO Coordinate Test"),
-    )?);
+
+const SHADER:&str =
+include_str!("../src/shader.wgsl");
+
+
+
+
+fn main()->Result<()> {
+
+
+    env_logger::init();
+
+
+    let event_loop =
+        EventLoop::new()?;
+
+
+    let window =
+        Arc::new(
+            event_loop.create_window(
+                WindowAttributes::default()
+                .with_title(
+                    "Suruga Ocean Terrain"
+                )
+                .with_inner_size(
+                    winit::dpi::LogicalSize::new(
+                        1280,
+                        720
+                    )
+                )
+            )?
+        );
+
+
+
+    let mut renderer =
+        pollster::block_on(
+            Renderer::new(
+                window.clone(),
+                SHADER,
+                &[
+                    TerrainVertex::layout()
+                ],
+            )
+        )?;
+
+
 
     //
-    // Renderer
+    // 駿河湾範囲
     //
+    let bounds =
+        GeoBounds::new(
+            138.55,
+            138.95,
+            34.8,
+            35.15,
+        );
 
-    let mut renderer = Renderer::new(window.clone(), SHADER, &[TerrainVertex::layout()]).await?;
 
-    //
-    // HeightMap
-    //
-    // 現在はテスト地形
-    // 次段階で GEBCO Loader に置換
-    //
 
-    let heightmap = HeightMapLoader::load_gebco(
-        "/Users/sugisaku/Desktop/Developer/Suruga-Wan/crates/s-renderer/examples/suruga.nc",
-    )?;
-    let (min, max) = heightmap.min_max();
+    let heightmap =
+        HeightMapLoader::load_gebco(
+            "/Users/sugisaku/Desktop/Developer/Suruga-Wan/crates/s-renderer/examples/suruga.nc"
+        )?;
+
+
+
     println!(
-        "height range = {} ~ {}",
-        min,
-        max
-    );
-    //
-    // 駿河湾 GEBCO 範囲
-    //
-
-    let bounds = GeoBounds {
-        lon_min: 137.983333,
-
-        lon_max: 139.022,
-
-        lat_min: 34.583,
-
-        lat_max: 35.425,
-    };
-
-    //
-    // lon / lat → 3D terrain
-    //
-
-    let terrain = TerrainMesh::from_heightmap(&heightmap, bounds);
-
-    println!(
-        "vertices={} indices={}",
-        terrain.vertices.len(),
-        terrain.indices.len()
+        "GEBCO size: {} x {}",
+        heightmap.width,
+        heightmap.height
     );
 
+
+
+    let terrain =
+        TerrainMesh::from_heightmap(
+            &heightmap,
+            bounds
+        );
+
+
+
+    let gpu_mesh =
+        terrain.upload(
+            renderer.device()
+        );
+
+
+
     //
-    // GPU Upload
+    // 南側から見る
     //
+    renderer.camera_mut().position =
+        Point3::new(
+            0.0,
+            2500.0,
+            -5000.0
+        );
 
-    let gpu_mesh = terrain.upload(renderer.device());
 
-    //
-    // Render Loop
-    //
+    renderer.camera.target =
+        nalgebra::Point3::new(
+            0.0,
+            0.0,
+            0.0,
+        );
 
-    event_loop.run(move |event, target| match event {
-        Event::WindowEvent { event, .. } => match event {
-            WindowEvent::CloseRequested => {
-                target.exit();
-            }
 
-            WindowEvent::Resized(size) => {
-                renderer.resize(size);
-            }
 
-            WindowEvent::RedrawRequested => {
-                if let Err(e) = renderer.render(&gpu_mesh) {
-                    eprintln!("render error: {:?}", e);
+
+    event_loop.run(
+        move |event,target|
+        {
+
+            match event {
+
+
+                Event::WindowEvent {
+                    event,
+                    ..
+                } => {
+
+                    match event {
+
+
+                        WindowEvent::CloseRequested =>
+                        {
+                            target.exit();
+                        }
+
+
+
+                        WindowEvent::Resized(size)=>
+                        {
+                            renderer.resize(size);
+                        }
+
+
+
+                        WindowEvent::RedrawRequested =>
+                        {
+
+                            renderer
+                                .render(
+                                    &gpu_mesh
+                                )
+                                .unwrap();
+
+                        }
+
+
+                        _=>{}
+
+                    }
+
                 }
+
+
+
+                Event::AboutToWait =>
+                {
+                    window.request_redraw();
+                }
+
+
+
+                _=>{}
+
             }
 
-            _ => {}
-        },
-
-        Event::AboutToWait => {
-            window.request_redraw();
         }
+    )?;
 
-        _ => {}
-    })?;
 
     Ok(())
 }

@@ -15,7 +15,8 @@ pub mod shader;
 pub mod surface;
 pub mod texture;
 pub mod uniform;
-
+pub mod camera_controller;
+pub use camera_controller::CameraController;
 pub use coordinate::{GeoBounds, GeoConverter};
 // Public renderer API
 
