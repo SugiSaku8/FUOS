@@ -6,21 +6,22 @@ use nalgebra::{
 };
 
 
-
 pub struct Camera {
 
     pub position: Point3<f32>,
 
-    pub target: Point3<f32>,
+    pub yaw: f32,
 
-    aspect:f32,
+    pub pitch: f32,
 
-    fovy:f32,
 
-    znear:f32,
+    pub aspect: f32,
 
-    zfar:f32,
+    pub fovy: f32,
 
+    pub znear: f32,
+
+    pub zfar: f32,
 }
 
 
@@ -31,32 +32,30 @@ impl Camera {
     pub fn new(
         width:u32,
         height:u32
-    )->Self{
+    )->Self {
 
 
-        Self{
-
+        Self {
 
             //
-            // 南側上空
+            // 南側上空から北を見る
             //
             position:
                 Point3::new(
                     0.0,
-                    250000.0,
-                    -400000.0
+                    20000.0,
+                    30000.0
                 ),
 
 
-            //
-            // 駿河湾中心
-            //
-            target:
-                Point3::new(
-                    0.0,
-                    0.0,
-                    0.0
-                ),
+            yaw:
+                (-90.0_f32)
+                .to_radians(),
+
+
+            pitch:
+                (-35.0_f32)
+                .to_radians(),
 
 
             aspect:
@@ -65,16 +64,18 @@ impl Camera {
 
 
             fovy:
-                35.0_f32.to_radians(),
+                45.0_f32.to_radians(),
 
 
             znear:
-                10.0,
+                1.0,
 
 
+            //
+            // 駿河湾スケール
+            //
             zfar:
-                2000000.0,
-
+                200000.0,
 
         }
 
@@ -96,132 +97,42 @@ impl Camera {
 
 
 
-
-
-    //
-    // カメラ回転
-    //
-    pub fn rotate(
-        &mut self,
-        dx:f32,
-        dy:f32
-    ){
-
-
-        let offset =
-            self.position -
-            self.target;
-
-
-        let radius =
-            offset.norm();
-
-
-
-        let mut theta =
-            offset.z.atan2(offset.x);
-
-
-        let mut phi =
-            (offset.y / radius)
-            .acos();
-
-
-
-        theta += dx * 0.005;
-
-        phi -= dy * 0.005;
-
-
-
-        //
-        // 制限
-        //
-        phi =
-            phi.clamp(
-                0.15,
-                1.45
-            );
-
-
-
-        self.position =
-            Point3::new(
-
-                radius *
-                phi.sin() *
-                theta.cos(),
-
-                radius *
-                phi.cos(),
-
-                radius *
-                phi.sin() *
-                theta.sin()
-
-            )
-            +
-            self.target.coords;
-
-
-    }
-
-
-
-
-
-    //
-    // ズーム
-    //
-    pub fn zoom(
-        &mut self,
-        amount:f32
-    ){
-
-
-        let direction =
-            self.target -
-            self.position;
-
-
-
-        let distance =
-            direction.norm();
-
-
-
-        let new_distance =
-            (distance - amount)
-            .clamp(
-                20000.0,
-                1000000.0
-            );
-
-
-
-        self.position =
-            self.target -
-            direction.normalize()
-            *
-            new_distance;
-
-
-    }
-
-
-
-
-
     pub fn build_matrix(
         &self
     )->Matrix4<f32>{
+
+
+        let direction =
+            Vector3::new(
+
+                self.yaw.cos()
+                *
+                self.pitch.cos(),
+
+
+                self.pitch.sin(),
+
+
+                self.yaw.sin()
+                *
+                self.pitch.cos()
+
+            )
+            .normalize();
+
+
+
+        let target =
+            self.position
+            +
+            direction;
 
 
 
         let view =
             Matrix4::look_at_rh(
                 &self.position,
-                &self.target,
+                &target,
                 &Vector3::y_axis()
             );
 

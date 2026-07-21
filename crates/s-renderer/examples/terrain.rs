@@ -1,70 +1,79 @@
 use anyhow::Result;
-use nalgebra::Point3;
+
 use std::sync::Arc;
 
 use winit::{
-    event::*,
+    event::{
+        Event,
+        WindowEvent,
+    },
     event_loop::EventLoop,
     window::{
-        WindowAttributes
+        Window,
+        WindowAttributes,
     },
 };
 
 
 use s_renderer::{
+    CameraController,
     GeoBounds,
     HeightMapLoader,
     Renderer,
     TerrainMesh,
-    TerrainVertex,
 };
 
 
 
-const SHADER:&str =
-include_str!("../src/shader.wgsl");
+const SHADER: &str =
+    include_str!("../src/shader.wgsl");
 
 
 
+fn main() -> Result<()> {
 
-fn main()->Result<()> {
+    pollster::block_on(run())
+}
 
 
-    env_logger::init();
+
+async fn run() -> Result<()> {
 
 
     let event_loop =
         EventLoop::new()?;
 
 
+
     let window =
         Arc::new(
             event_loop.create_window(
                 WindowAttributes::default()
-                .with_title(
-                    "Suruga Ocean Terrain"
-                )
-                .with_inner_size(
-                    winit::dpi::LogicalSize::new(
-                        1280,
-                        720
+                    .with_title(
+                        "Suruga Ocean Terrain"
                     )
-                )
+                    .with_inner_size(
+                        winit::dpi::PhysicalSize::new(
+                            1280,
+                            720
+                        )
+                    )
             )?
         );
 
 
 
     let mut renderer =
-        pollster::block_on(
-            Renderer::new(
-                window.clone(),
-                SHADER,
-                &[
-                    TerrainVertex::layout()
-                ],
-            )
-        )?;
+        Renderer::new(
+            window.clone(),
+            SHADER,
+            &[
+                s_renderer::TerrainVertex::layout()
+            ]
+        )
+        .await?;
+
+
 
 
 
@@ -75,12 +84,15 @@ fn main()->Result<()> {
         GeoBounds::new(
             138.55,
             138.95,
-            34.8,
-            35.15,
+            34.55,
+            35.05,
         );
 
 
 
+    //
+    // GEBCO読み込み
+    //
     let heightmap =
         HeightMapLoader::load_gebco(
             "/Users/sugisaku/Desktop/Developer/Suruga-Wan/crates/s-renderer/examples/suruga.nc"
@@ -95,12 +107,19 @@ fn main()->Result<()> {
     );
 
 
-
     let terrain =
         TerrainMesh::from_heightmap(
             &heightmap,
             bounds
         );
+
+
+
+    println!(
+        "vertices={} indices={}",
+        terrain.vertices.len(),
+        terrain.indices.len()
+    );
 
 
 
@@ -111,32 +130,44 @@ fn main()->Result<()> {
 
 
 
-    //
-    // 南側から見る
-    //
-    renderer.camera_mut().position =
-        Point3::new(
-            0.0,
-            2500.0,
-            -5000.0
-        );
 
 
-    renderer.camera.target =
-        nalgebra::Point3::new(
-            0.0,
-            0.0,
-            0.0,
-        );
+    //
+    // Camera controller
+    //
+    let mut controller =
+        CameraController::new();
+
+
+
+    //
+    // 初期カメラ
+    //
+    {
+        let camera =
+            renderer.camera_mut();
+
+
+        camera.position =
+            nalgebra::Point3::new(
+                0.0,
+                4000.0,
+                2000.0
+            );
+
+
+    }
+
 
 
 
 
     event_loop.run(
-        move |event,target|
-        {
+        move |event, target| {
+
 
             match event {
+
 
 
                 Event::WindowEvent {
@@ -144,13 +175,25 @@ fn main()->Result<()> {
                     ..
                 } => {
 
+
+                    //
+                    // 入力処理
+                    //
+                    controller.process(
+                        &event
+                    );
+
+
+
                     match event {
+
 
 
                         WindowEvent::CloseRequested =>
                         {
                             target.exit();
                         }
+
 
 
 
@@ -161,8 +204,18 @@ fn main()->Result<()> {
 
 
 
-                        WindowEvent::RedrawRequested =>
+                        WindowEvent::RedrawRequested=>
                         {
+
+
+                            //
+                            // Camera更新
+                            //
+                            controller.update(
+                                renderer.camera_mut()
+                            );
+
+
 
                             renderer
                                 .render(
@@ -173,11 +226,15 @@ fn main()->Result<()> {
                         }
 
 
+
                         _=>{}
 
                     }
 
+
                 }
+
+
 
 
 
@@ -192,9 +249,11 @@ fn main()->Result<()> {
 
             }
 
+
         }
     )?;
 
 
     Ok(())
+
 }

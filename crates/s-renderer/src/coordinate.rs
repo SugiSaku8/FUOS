@@ -80,13 +80,13 @@ impl GeoConverter {
             //
             // 表示用に縮小
             //
-            horizontal_scale: 0.02,
+            horizontal_scale: 0.3,
 
 
             //
             // 海底地形を見えるように10倍
             //
-            vertical_scale: 1.0,
+            vertical_scale: 0.3,
 
         }
 

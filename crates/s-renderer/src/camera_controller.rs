@@ -1,44 +1,53 @@
-use winit::{
-    event::{
-        ElementState,
-        MouseButton,
-        MouseScrollDelta,
-        WindowEvent,
-    },
+use winit::event::{
+    ElementState,
+    MouseButton,
+    MouseScrollDelta,
+    WindowEvent,
 };
 
+use winit::keyboard::{
+    KeyCode,
+    PhysicalKey,
+};
 
 use crate::camera::Camera;
+
+use nalgebra::Vector3;
 
 
 
 pub struct CameraController {
 
 
-    //
-    // マウス感度
-    //
-    pub rotate_speed:f32,
+    speed:f32,
+
+    sensitivity:f32,
 
 
-    //
-    // ズーム感度
-    //
-    pub zoom_speed:f32,
+    forward:bool,
+    backward:bool,
+
+    left:bool,
+    right:bool,
 
 
-    //
-    // 左クリック状態
-    //
-    is_dragging:bool,
+    up:bool,
+    down:bool,
 
 
-    //
-    // 前回マウス位置
-    //
-    last_position:
+    mouse_pressed:bool,
+
+    last_mouse:
         Option<(f64,f64)>,
 
+
+
+    yaw_delta:f32,
+
+    pitch_delta:f32,
+
+
+    zoom:f32,
 
 }
 
@@ -47,29 +56,46 @@ pub struct CameraController {
 impl CameraController {
 
 
-    pub fn new()->Self{
+    pub fn new()->Self {
 
 
-        Self{
+        Self {
 
 
-            rotate_speed:
-                0.005,
+            //
+            // 駿河湾スケール
+            //
+            speed:5000.0,
 
 
-            zoom_speed:
-                0.1,
+            sensitivity:0.003,
 
 
-            is_dragging:
-                false,
+            forward:false,
+            backward:false,
+
+            left:false,
+            right:false,
 
 
-            last_position:
-                None,
+            up:false,
+            down:false,
 
+
+            mouse_pressed:false,
+
+            last_mouse:None,
+
+
+            yaw_delta:0.0,
+
+            pitch_delta:0.0,
+
+
+            zoom:0.0,
 
         }
+
 
     }
 
@@ -77,99 +103,148 @@ impl CameraController {
 
 
 
-    pub fn process_events(
+    pub fn process(
         &mut self,
-        event:&WindowEvent,
-        camera:&mut Camera,
-    )
-    -> bool{
+        event:&WindowEvent
+    ){
+
 
 
         match event {
 
 
-            //
-            // マウスボタン
-            //
-            WindowEvent::MouseInput{
-                button,
-                state,
+
+            WindowEvent::KeyboardInput{
+                event,
                 ..
             }=>{
 
 
-                if *button
-                    == MouseButton::Left
-                {
-
-
-                    self.is_dragging =
-                        *state
-                        == ElementState::Pressed;
+                let pressed =
+                    event.state
+                    ==
+                    ElementState::Pressed;
 
 
 
-                    if !self.is_dragging {
+                match event.physical_key {
 
-                        self.last_position =
-                            None;
 
+                    PhysicalKey::Code(
+                        KeyCode::KeyW
+                    )=>{
+                        self.forward=pressed;
                     }
 
 
-                    return true;
+                    PhysicalKey::Code(
+                        KeyCode::KeyS
+                    )=>{
+                        self.backward=pressed;
+                    }
+
+
+                    PhysicalKey::Code(
+                        KeyCode::KeyA
+                    )=>{
+                        self.left=pressed;
+                    }
+
+
+                    PhysicalKey::Code(
+                        KeyCode::KeyD
+                    )=>{
+                        self.right=pressed;
+                    }
+
+
+                    PhysicalKey::Code(
+                        KeyCode::Space
+                    )=>{
+                        self.up=pressed;
+                    }
+
+
+                    PhysicalKey::Code(
+                        KeyCode::ShiftLeft
+                    )=>{
+                        self.down=pressed;
+                    }
+
+
+                    _=>{}
 
                 }
-
 
             }
 
 
 
-            //
-            // マウス移動
-            //
+
+
+            WindowEvent::MouseInput{
+                state,
+                button,
+                ..
+            }=>{
+
+
+                if *button ==
+                    MouseButton::Right
+                {
+
+                    self.mouse_pressed =
+                        *state
+                        ==
+                        ElementState::Pressed;
+
+
+                    self.last_mouse=None;
+
+                }
+
+            }
+
+
+
+
+
             WindowEvent::CursorMoved{
                 position,
                 ..
             }=>{
 
 
-                if self.is_dragging {
+                if self.mouse_pressed {
 
 
                     if let Some(
-                        (lx,ly)
-                    )
-                    =
-                    self.last_position
+                        (x,y)
+                    )=
+                    self.last_mouse
                     {
 
 
-                        let dx =
-                            position.x-lx;
+                        self.yaw_delta +=
+                            (position.x-x)
+                            as f32
+                            *
+                            self.sensitivity;
 
 
-                        let dy =
-                            position.y-ly;
 
+                        self.pitch_delta +=
+                            (position.y-y)
+                            as f32
+                            *
+                            self.sensitivity;
 
-
-                        camera.rotate(
-
-                            -(dx as f32)
-                                *self.rotate_speed,
-
-
-                            -(dy as f32)
-                                *self.rotate_speed,
-
-                        );
 
                     }
 
 
-                    self.last_position =
+
+                    self.last_mouse =
                         Some(
                             (
                                 position.x,
@@ -178,8 +253,6 @@ impl CameraController {
                         );
 
 
-                    return true;
-
                 }
 
 
@@ -187,16 +260,16 @@ impl CameraController {
 
 
 
-            //
-            // ホイール
-            //
+
+
+
             WindowEvent::MouseWheel{
                 delta,
                 ..
             }=>{
 
 
-                let amount =
+                let y =
                     match delta {
 
 
@@ -208,21 +281,19 @@ impl CameraController {
 
                         MouseScrollDelta::PixelDelta(
                             p
-                        )=>p.y as f32 / 50.0,
-
+                        )=>
+                            p.y as f32 / 50.0,
 
                     };
 
 
 
-                camera.zoom(
-                    -amount*self.zoom_speed
-                );
+                self.zoom += y;
 
-
-                return true;
 
             }
+
+
 
 
 
@@ -231,8 +302,159 @@ impl CameraController {
         }
 
 
-        false
+    }
+
+
+
+
+
+    pub fn update(
+        &mut self,
+        camera:&mut Camera
+    ){
+
+
+        //
+        // 回転
+        //
+
+        camera.yaw -=
+            self.yaw_delta;
+
+
+        camera.pitch -=
+            self.pitch_delta;
+
+
+
+        camera.pitch =
+            camera.pitch.clamp(
+                -1.5,
+                1.5
+            );
+
+
+
+        self.yaw_delta=0.0;
+
+        self.pitch_delta=0.0;
+
+
+
+
+        //
+        // ズーム
+        //
+
+        if self.zoom != 0.0 {
+
+
+            let forward =
+                Vector3::new(
+                    camera.yaw.cos(),
+                    0.0,
+                    camera.yaw.sin()
+                )
+                .normalize();
+
+
+
+            camera.position +=
+                forward
+                *
+                self.zoom
+                *
+                10000.0;
+
+
+
+            self.zoom=0.0;
+
+        }
+
+
+
+
+
+
+
+        //
+        // 移動
+        //
+
+        let forward =
+            Vector3::new(
+                camera.yaw.cos(),
+                0.0,
+                camera.yaw.sin()
+            )
+            .normalize();
+
+
+
+        let right =
+            Vector3::new(
+                -forward.z,
+                0.0,
+                forward.x
+            );
+
+
+
+        let mut dir =
+            Vector3::zeros();
+
+
+
+        if self.forward {
+            dir+=forward;
+        }
+
+
+        if self.backward {
+            dir-=forward;
+        }
+
+
+        if self.left {
+            dir-=right;
+        }
+
+
+        if self.right {
+            dir+=right;
+        }
+
+
+        if self.up {
+            dir.y+=1.0;
+        }
+
+
+        if self.down {
+            dir.y-=1.0;
+        }
+
+
+
+
+
+        if dir.norm()>0.0 {
+
+
+            camera.position +=
+                dir.normalize()
+                *
+                self.speed
+                *
+                0.016;
+
+
+        }
+
+
 
     }
+
 
 }
