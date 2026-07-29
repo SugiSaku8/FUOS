@@ -1,4 +1,4 @@
-use crate::{GpuVelocityField, Gradient3D, GradientOperator, MetalContext, VelocityGradient};
+use crate::{GpuVelocityField, GradientOperator, MetalContext, VelocityGradient};
 
 pub struct VelocityGradientOperator {
     gradient: GradientOperator,

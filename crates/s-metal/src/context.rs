@@ -19,6 +19,9 @@ impl MetalContext {
         &self.device
     }
 
+    pub fn command_queue(&self) -> &CommandQueue {
+        &self.queue
+    }
     pub fn queue(&self) -> &CommandQueue {
         &self.queue
     }

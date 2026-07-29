@@ -163,6 +163,18 @@ impl<T> Field4D<T> {
 
         Some(&self.as_slice()[start..start + len])
     }
+    #[inline]
+    pub fn time_slice_mut(&mut self, t: usize) -> Option<&mut [T]> {
+        if t >= self.time_steps() {
+            return None;
+        }
+
+        let len = self.width() * self.height() * self.depth();
+
+        let start = t * len;
+
+        Some(&mut self.as_mut_slice()[start..start + len])
+    }
 }
 
 impl<T> Field for Field4D<T> {

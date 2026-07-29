@@ -1,76 +1,88 @@
-use metal::{Buffer, MTLResourceOptions};
+//! Metal buffer wrapper.
 
-use crate::context::MetalContext;
+use metal::{Buffer, Device, MTLResourceOptions};
 
-use std::mem;
+use crate::MetalContext;
 
 pub struct MetalBuffer {
     buffer: Buffer,
-
-    length: usize,
 }
 
 impl MetalBuffer {
-    /// Vec<f32>からGPU Bufferを生成
-    pub fn from_f32(context: &MetalContext, data: &[f32]) -> Self {
-        let size = std::mem::size_of_val(data);
+    /// Wrap existing Metal buffer.
+    pub fn new(buffer: Buffer) -> Self {
+        Self { buffer }
+    }
 
-        let buffer = context.device().new_buffer_with_data(
-            data.as_ptr() as *const _,
-            size as u64,
+    /// Create buffer from f32 slice.
+    pub fn from_f32(device: &Device, data: &[f32]) -> Self {
+        let buffer = device.new_buffer_with_data(
+            data.as_ptr() as *const std::ffi::c_void,
+            (data.len() * std::mem::size_of::<f32>()) as u64,
             MTLResourceOptions::StorageModeShared,
         );
 
-        Self {
-            buffer,
-
-            length: data.len(),
-        }
+        Self { buffer }
     }
 
-    /// 空のGPU Bufferを生成
-    pub fn empty(context: &MetalContext, length: usize) -> Self {
-        let size = (length * mem::size_of::<f32>()) as u64;
-
-        let buffer = context
-            .device()
-            .new_buffer(size, MTLResourceOptions::StorageModeShared);
-
-        Self { buffer, length }
-    }
-
-    /// 任意の構造体をGPU Buffer化
+    /// Create empty GPU buffer.
     ///
-    /// GridInfoなど
-    /// #[repr(C)]構造体用
+    /// Used as compute shader output.
+    pub fn empty(device: &Device, count: usize) -> Self {
+        let size = count * std::mem::size_of::<f32>();
+
+        let buffer = device.new_buffer(size as u64, MTLResourceOptions::StorageModeShared);
+
+        Self { buffer }
+    }
+
+    /// Create buffer from small uniform struct.
+    ///
+    /// Used for:
+    ///
+    /// - GridInfo
+    /// - timestep
+    /// - constants
+    ///
     pub fn from_struct<T>(context: &MetalContext, value: &T) -> Self {
-        let size = mem::size_of::<T>();
+        let size = std::mem::size_of::<T>();
 
         let buffer = context.device().new_buffer_with_data(
-            value as *const T as *const _,
+            value as *const T as *const std::ffi::c_void,
             size as u64,
             MTLResourceOptions::StorageModeShared,
         );
 
-        Self {
-            buffer,
-
-            // f32単位として扱う
-            length: (size + 3) / 4,
-        }
+        Self { buffer }
     }
 
-    /// Metal Buffer取得
-    pub fn raw(&self) -> &Buffer {
+    /// Access raw Metal buffer.
+    #[inline]
+    pub fn buffer(&self) -> &Buffer {
         &self.buffer
     }
 
-    /// GPU BufferをVec<f32>へコピー
-    pub fn read_f32(&self) -> Vec<f32> {
-        let ptr = self.buffer.contents() as *const f32;
+    /// Mutable raw access.
+    #[inline]
+    pub fn buffer_mut(&mut self) -> &mut Buffer {
+        &mut self.buffer
+    }
 
-        let slice = unsafe { std::slice::from_raw_parts(ptr, self.length) };
+    /// GPU pointer.
+    #[inline]
+    pub fn contents(&self) -> *mut std::ffi::c_void {
+        self.buffer.contents()
+    }
 
-        slice.to_vec()
+    /// Buffer length in bytes.
+    #[inline]
+    pub fn size(&self) -> usize {
+        self.buffer.length() as usize
+    }
+
+    #[inline]
+
+    pub fn raw(&self) -> &Buffer {
+        &self.buffer
     }
 }
