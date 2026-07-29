@@ -1,13 +1,16 @@
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum IoError {
-    #[error("NetCDF Error: {0}")]
-    NetCDF(#[from] netcdf::Error),
+pub enum SioError {
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
 
-    #[error("Variable not found: {0}")]
-    VariableNotFound(String),
+    #[error("Serialization error: {0}")]
+    Serialization(#[from] serde_json::Error),
 
-    #[error("Dimension mismatch")]
-    DimensionMismatch,
+    #[error("Invalid SIO format")]
+    InvalidFormat,
+
+    #[error("Dataset not found: {0}")]
+    DatasetNotFound(String),
 }

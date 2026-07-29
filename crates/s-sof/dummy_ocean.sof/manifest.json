@@ -1,0 +1,15 @@
+{
+  "format": "SOF",
+  "version": "0.1.0",
+  "dataset": {
+    "name": "Dummy Suruga Bay Ocean",
+    "dataset_type": "Boundary"
+  },
+  "files": {
+    "grid": null,
+    "boundary": "boundary.snc",
+    "initial": null,
+    "restart": null,
+    "forcing": null
+  }
+}

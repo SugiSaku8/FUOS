@@ -1,27 +1,36 @@
+//! SOF package manifest.
+
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Metadata {
-    pub title: String,
-
-    pub creator: String,
-
+/// SOF package description.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SofManifest {
+    /// Format version.
     pub version: String,
-}
-use crate::grid::GridFile;
-use crate::package::SofPackage;
-use crate::repository::Repository;
 
-pub struct GridRepository<'a> {
-    package: &'a SofPackage,
+    /// Dataset name.
+    pub name: String,
+
+    /// Description.
+    pub description: String,
+
+    /// Available datasets.
+    pub datasets: Vec<String>,
 }
 
-impl<'a> Repository<GridFile> for GridRepository<'a> {
-    fn load(&self) -> anyhow::Result<GridFile> {
-        todo!()
+impl SofManifest {
+    /// Creates a new manifest.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            version: "0.1.0".to_string(),
+            name: name.into(),
+            description: String::new(),
+            datasets: Vec::new(),
+        }
     }
 
-    fn save(&self, grid: &GridFile) -> anyhow::Result<()> {
-        todo!()
+    /// Adds a dataset entry.
+    pub fn add_dataset(&mut self, name: impl Into<String>) {
+        self.datasets.push(name.into());
     }
 }
