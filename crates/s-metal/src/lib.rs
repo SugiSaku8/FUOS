@@ -1,0 +1,25 @@
+pub mod advection;
+pub mod buffer;
+pub mod compute;
+pub mod context;
+pub mod field;
+pub mod gradient;
+pub mod gradient_operator;
+pub mod grid;
+pub mod pipeline;
+pub mod slice;
+pub mod time;
+pub mod velocity;
+pub mod velocity_gradient;
+pub mod velocity_gradient_operator;
+
+pub use buffer::MetalBuffer;
+pub use context::MetalContext;
+pub use field::GpuField3D;
+pub use gradient::Gradient3D;
+pub use gradient_operator::GradientOperator;
+pub use grid::GridInfo;
+pub use time::EulerIntegrator;
+pub use velocity::GpuVelocityField;
+pub use velocity_gradient::VelocityGradient;
+pub use velocity_gradient_operator::VelocityGradientOperator;

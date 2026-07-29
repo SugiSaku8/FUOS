@@ -10,8 +10,9 @@ members = [
     "crates/s-field",
     "crates/s-io",
     "crates/s-sof",
-    "crates/math",
+    "crates/s-math",
     "crates/s-renderer",
     "crates/gui",
     "crates/util",
-]
+    "crates/s-metal"
+, "crates/s-solver"]

@@ -1,0 +1,11 @@
+[package]
+name = "s-metal"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+
+metal = "0.29"
+objc = "0.2"
+s-field = {path = "../s-field"}
