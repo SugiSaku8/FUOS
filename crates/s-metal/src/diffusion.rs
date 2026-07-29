@@ -1,6 +1,6 @@
 //! GPU diffusion operator.
 
-use crate::{GpuField3D, MetalBuffer, MetalContext};
+use crate::{GpuField3D, GpuVelocityField, MetalBuffer, MetalContext};
 
 use metal::MTLSize;
 
@@ -80,5 +80,29 @@ impl DiffusionOperator {
         command_buffer.wait_until_completed();
 
         output
+    }
+
+    pub fn compute_velocity(
+        &self,
+        context: &MetalContext,
+        velocity: &GpuVelocityField,
+        viscosity: f32,
+        dt: f32,
+    ) -> GpuVelocityField {
+        let u = self.compute(context, &velocity.u, viscosity, dt);
+
+        let v = self.compute(context, &velocity.v, viscosity, dt);
+
+        let w = self.compute(context, &velocity.w, viscosity, dt);
+
+        GpuVelocityField {
+            u,
+
+            v,
+
+            w,
+
+            grid: velocity.grid(),
+        }
     }
 }

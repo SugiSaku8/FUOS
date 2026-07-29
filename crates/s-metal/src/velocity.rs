@@ -19,7 +19,7 @@ pub struct GpuVelocityField {
 
     pub w: GpuField3D,
 
-    grid: GridInfo,
+    pub(crate) grid: GridInfo,
 }
 
 impl GpuVelocityField {
