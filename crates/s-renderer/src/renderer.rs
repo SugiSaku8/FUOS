@@ -5,9 +5,9 @@ use std::sync::Arc;
 use winit::{dpi::PhysicalSize, window::Window};
 
 use crate::{
-    camera::Camera, context::RenderContext, depth::DepthTexture, mesh::GpuMesh,
-    ocean::OceanRenderData, pipeline::RenderPipeline, shader::Shader, surface::RenderSurface,
-    uniform::CameraBuffer,
+    camera::Camera, context::RenderContext, depth::DepthTexture, flow_mesh::GpuFlowMesh,
+    flow_pipeline::FlowPipeline, mesh::GpuMesh, pipeline::RenderPipeline, shader::Shader,
+    surface::RenderSurface, uniform::CameraBuffer,
 };
 
 pub struct Renderer {
@@ -15,15 +15,21 @@ pub struct Renderer {
 
     surface: RenderSurface,
 
+    //
+    // Terrain
+    //
     pipeline: RenderPipeline,
+
+    //
+    // Flow
+    //
+    flow_pipeline: FlowPipeline,
 
     depth: DepthTexture,
 
     pub camera: Camera,
 
     camera_buffer: CameraBuffer,
-
-    ocean: Option<OceanRenderData>,
 }
 
 impl Renderer {
@@ -38,7 +44,10 @@ impl Renderer {
 
         let size = surface.size();
 
-        let shader = Shader::from_wgsl(context.device(), shader_source, "sos_shader")?;
+        //
+        // Terrain shader
+        //
+        let shader = Shader::from_wgsl(context.device(), shader_source, "terrain_shader")?;
 
         let pipeline = RenderPipeline::new(
             context.device(),
@@ -46,6 +55,19 @@ impl Renderer {
             Some(wgpu::TextureFormat::Depth32Float),
             vertex_layouts,
             shader.module(),
+        )?;
+
+        //
+        // Flow shader
+        //
+        let flow_shader =
+            Shader::from_wgsl(context.device(), include_str!("flow.wgsl"), "flow_shader")?;
+
+        let flow_pipeline = FlowPipeline::new(
+            context.device(),
+            surface.format(),
+            flow_shader.module(),
+            pipeline.camera_layout(),
         )?;
 
         let depth = DepthTexture::new(context.device(), size.width, size.height)?;
@@ -61,13 +83,13 @@ impl Renderer {
 
             pipeline,
 
+            flow_pipeline,
+
             depth,
 
             camera,
 
             camera_buffer,
-
-            ocean: None,
         })
     }
 
@@ -92,15 +114,18 @@ impl Renderer {
 
         self.depth
             .resize(self.context.device(), size.width, size.height)
-            .expect("depth resize failed");
+            .unwrap();
 
         self.camera.resize(size.width, size.height);
     }
 
-    pub fn render<V>(&mut self, mesh: &GpuMesh<V>) -> Result<()>
+    pub fn render<V>(&mut self, terrain: &GpuMesh<V>, flow: Option<&GpuFlowMesh>) -> Result<()>
     where
         V: bytemuck::Pod,
     {
+        //
+        // Camera update
+        //
         self.camera_buffer
             .uniform
             .update(self.camera.build_matrix());
@@ -109,15 +134,22 @@ impl Renderer {
 
         let frame = self.surface.get_current_texture()?;
 
-        let view = frame.texture.create_view(&Default::default());
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
 
         let mut encoder =
             self.context
                 .device()
                 .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                    label: Some("terrain_encoder"),
+                    label: Some("sos_render_encoder"),
                 });
 
+        //
+        // ============================
+        // Terrain Pass
+        // ============================
+        //
         {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("terrain_pass"),
@@ -162,11 +194,60 @@ impl Renderer {
 
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
 
-            pass.set_vertex_buffer(0, mesh.vertex_buffer().slice(..));
+            pass.set_vertex_buffer(0, terrain.vertex_buffer().slice(..));
 
-            pass.set_index_buffer(mesh.index_buffer().slice(..), wgpu::IndexFormat::Uint32);
+            pass.set_index_buffer(terrain.index_buffer().slice(..), wgpu::IndexFormat::Uint32);
 
-            pass.draw_indexed(0..mesh.index_count(), 0, 0..1);
+            pass.draw_indexed(0..terrain.index_count(), 0, 0..1);
+        }
+
+        //
+        // ============================
+        // Flow Pass
+        // ============================
+        //
+        if let Some(flow) = flow {
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("flow_pass"),
+
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: &view,
+
+                    resolve_target: None,
+
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+
+                        store: wgpu::StoreOp::Store,
+                    },
+
+                    depth_slice: None,
+                })],
+
+                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                    view: self.depth.view(),
+
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+
+                        store: wgpu::StoreOp::Store,
+                    }),
+
+                    stencil_ops: None,
+                }),
+
+                timestamp_writes: None,
+
+                occlusion_query_set: None,
+            });
+
+            pass.set_pipeline(self.flow_pipeline.pipeline());
+
+            pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
+
+            pass.set_vertex_buffer(0, flow.vertex_buffer().slice(..));
+
+            pass.draw(0..flow.vertex_count(), 0..1);
         }
 
         self.context.queue().submit(Some(encoder.finish()));
@@ -174,18 +255,6 @@ impl Renderer {
         frame.present();
 
         Ok(())
-    }
-
-    pub fn set_ocean(&mut self, ocean: OceanRenderData) {
-        self.ocean = Some(ocean);
-    }
-
-    pub fn clear_ocean(&mut self) {
-        self.ocean = None;
-    }
-
-    pub fn ocean(&self) -> Option<&OceanRenderData> {
-        self.ocean.as_ref()
     }
 
     pub fn update_camera(&mut self) {

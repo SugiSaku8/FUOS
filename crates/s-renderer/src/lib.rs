@@ -19,31 +19,21 @@ pub mod uniform;
 pub use camera_controller::CameraController;
 pub use coordinate::{GeoBounds, GeoConverter};
 pub mod flow;
+pub mod flow_generator;
 pub mod flow_mesh;
 pub mod flow_pipeline;
 pub mod ocean;
 
-pub use flow_mesh::FlowMesh;
-// Public renderer API
-
-pub use renderer::Renderer;
-
-// Camera control
-
 pub use camera::Camera;
-
-// GPU mesh
-
+pub use flow_generator::FlowGenerator;
+pub use flow_mesh::GpuFlowMesh;
 pub use mesh::{GpuMesh, Mesh};
-
-// Surface
-
+pub use renderer::Renderer;
 pub use surface::RenderSurface;
 pub mod test_mesh;
-
 pub use test_mesh::{TestVertex, create_triangle};
 pub mod terrain;
-
+pub use flow::FlowVertex;
 pub use gebco::GebcoLoader;
 pub use heightmap::HeightMap;
 pub use heightmap_loader::HeightMapLoader;

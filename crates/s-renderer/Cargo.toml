@@ -10,6 +10,7 @@ path = "src/lib.rs"
 
 
 
+
 [dependencies]
 netcdf = { version = "0.12", features = ["static"] }# Error handling
 anyhow = "1.0"
@@ -45,6 +46,8 @@ bytemuck = {version = "1.23",features = ["derive"]}
 # Logging
 log = "0.4"
 
+s-metal = {path = "../s-metal"}
+s-field = { path = "../s-field" }
 
 
 [dev-dependencies]

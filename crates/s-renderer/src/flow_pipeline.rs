@@ -7,11 +7,8 @@ pub struct FlowPipeline {
 impl FlowPipeline {
     pub fn new(
         device: &wgpu::Device,
-
         format: wgpu::TextureFormat,
-
         shader: &wgpu::ShaderModule,
-
         camera_layout: &wgpu::BindGroupLayout,
     ) -> Result<Self> {
         let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -32,6 +29,8 @@ impl FlowPipeline {
 
                 entry_point: Some("vs_main"),
 
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+
                 buffers: &[wgpu::VertexBufferLayout {
                     array_stride: std::mem::size_of::<[f32; 3]>() as u64,
 
@@ -51,6 +50,8 @@ impl FlowPipeline {
                 module: shader,
 
                 entry_point: Some("fs_main"),
+
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
 
                 targets: &[Some(wgpu::ColorTargetState {
                     format,

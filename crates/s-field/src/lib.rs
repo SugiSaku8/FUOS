@@ -7,7 +7,6 @@
 //! - 海洋物理量（流速・水温・塩分）
 //! - 座標系
 //! - OceanFieldデータセット
-
 pub mod boundary;
 pub mod coordinates;
 pub mod field;
@@ -15,13 +14,14 @@ pub mod field2d;
 pub mod field3d;
 pub mod field4d;
 pub mod field_storage;
+pub mod generator;
 pub mod grid;
 pub mod metadata;
 pub mod ocean;
+pub mod ocean_grid;
 pub mod salinity;
 pub mod temperature;
 pub mod velocity;
-// Public API
 pub use boundary::*;
 pub use coordinates::*;
 pub use field::*;
@@ -32,6 +32,7 @@ pub use field4d::Field4D;
 pub use grid::{Grid2D, Grid3D, Grid4D};
 pub use metadata::*;
 pub use ocean::OceanField;
+pub use ocean_grid::OceanGrid;
 pub use salinity::SalinityField;
 pub use temperature::TemperatureField;
 pub use velocity::VelocityField;

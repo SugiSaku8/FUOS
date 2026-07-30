@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::{error::Result, grid::GridData, package::SofPackage, reader::BoundaryReader};
+use crate::{error::Result, grid::GridData, reader::BoundaryReader};
 
 use s_field::OceanField;
 

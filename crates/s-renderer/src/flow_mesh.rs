@@ -1,12 +1,19 @@
 use wgpu::util::DeviceExt;
 
-pub struct FlowMesh {
+/// GPU用海流ラインメッシュ
+///
+/// LineListとして描画する。
+///
+/// vertices:
+/// [x,y,z]
+///
+pub struct GpuFlowMesh {
     vertex_buffer: wgpu::Buffer,
 
     vertex_count: u32,
 }
 
-impl FlowMesh {
+impl GpuFlowMesh {
     pub fn new(device: &wgpu::Device, vertices: &[[f32; 3]]) -> Self {
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("flow_vertex_buffer"),
