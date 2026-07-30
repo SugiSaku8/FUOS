@@ -1,5 +1,6 @@
 pub mod buffer;
 pub mod camera;
+pub mod camera_controller;
 pub mod context;
 pub mod coordinate;
 pub mod depth;
@@ -15,9 +16,14 @@ pub mod shader;
 pub mod surface;
 pub mod texture;
 pub mod uniform;
-pub mod camera_controller;
 pub use camera_controller::CameraController;
 pub use coordinate::{GeoBounds, GeoConverter};
+pub mod flow;
+pub mod flow_mesh;
+pub mod flow_pipeline;
+pub mod ocean;
+
+pub use flow_mesh::FlowMesh;
 // Public renderer API
 
 pub use renderer::Renderer;
