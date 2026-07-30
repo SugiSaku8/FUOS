@@ -6,8 +6,8 @@
 //! = -1/ρ ∇p + ν∇²u
 
 use crate::{
-    AdvectionOperator, DiffusionOperator, DivergenceOperator, GpuVelocityField,
-    GradientPressureOperator, MetalContext, PressureSolver,
+    AdvectionOperator, BoundaryOperator, DiffusionOperator, DivergenceOperator, GpuVelocityField,
+    GradientPressureOperator, LandMaskOperator, MetalContext, PressureSolver,
 };
 
 use s_field::OceanField;
@@ -24,6 +24,10 @@ pub struct OceanSolver {
     pressure: PressureSolver,
 
     gradient_pressure: GradientPressureOperator,
+
+    boundary: BoundaryOperator,
+
+    land_mask: LandMaskOperator,
 }
 
 impl OceanSolver {
@@ -38,6 +42,9 @@ impl OceanSolver {
 
         let gradient_pressure = GradientPressureOperator::new(&context);
 
+        let boundary = BoundaryOperator::new(&context);
+
+        let land_mask = LandMaskOperator::new(&context);
         Self {
             context,
 
@@ -50,6 +57,10 @@ impl OceanSolver {
             pressure,
 
             gradient_pressure,
+
+            boundary,
+
+            land_mask,
         }
     }
 
@@ -97,6 +108,18 @@ impl OceanSolver {
         velocity = self
             .gradient_pressure
             .compute(&self.context, &velocity, &pressure, dt, 1025.0);
+
+        let velocity = self.boundary.apply(
+            &self.context,
+            &velocity,
+            1.0, // 黒潮流入（仮）
+            0.0,
+            0.0,
+        );
+
+        velocity = self
+            .land_mask
+            .apply(&self.context, &velocity, &gpu_land_mask);
 
         //
         // GPU -> CPU
