@@ -9,13 +9,24 @@ pub mod boundary;
 pub mod builder;
 pub mod dataset;
 pub mod error;
+pub mod forcing;
 pub mod format;
 pub mod grid;
+pub mod initial;
 pub mod manifest;
 pub mod package;
 pub mod package_reader;
 pub mod reader;
+pub mod restart;
+pub mod velocity;
 pub mod writer;
+
+pub use initial::{InitialReader, InitialWriter};
+
+pub use restart::{RestartReader, RestartWriter};
+
+pub use forcing::{ForcingData, ForcingReader, ForcingWriter};
+pub use velocity::{VelocityReader, VelocityWriter};
 // -----------------------------------------------------------------------------
 // Re-exports
 // -----------------------------------------------------------------------------

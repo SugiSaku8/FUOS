@@ -45,8 +45,7 @@ impl TerrainMesh {
     // GEBCO HeightMapから生成
     //
     pub fn from_heightmap(heightmap: &HeightMap, bounds: GeoBounds) -> Self {
-        let converter = GeoConverter::new(bounds);
-
+        let converter = GeoConverter::new(bounds, 100000.0);
         let mut vertices = Vec::new();
 
         let mut indices = Vec::new();
@@ -68,8 +67,9 @@ impl TerrainMesh {
 
                 let elevation = heightmap.get(x, z);
 
-                let position = converter.convert(lon, lat, elevation);
+                let mut position = converter.geo_to_world(lon, lat);
 
+                position[1] = elevation;
                 vertices.push(TerrainVertex {
                     position,
 

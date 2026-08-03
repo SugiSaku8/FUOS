@@ -9,6 +9,8 @@ use crate::{
     boundary::{BoundaryReader, BoundaryWriter},
     error::Result,
     grid::{GridData, GridReader, GridWriter},
+    initial::InitialWriter,
+    restart::RestartWriter,
 };
 
 use s_field::{Grid4D, OceanField};
@@ -205,5 +207,16 @@ impl SofPackage {
         let mut reader = BoundaryReader::open(path.to_str().unwrap())?;
 
         reader.read()
+    }
+    pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+        let path = self.root.join("initial.snc");
+
+        InitialWriter::write(path, field)
+    }
+
+    pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+        let path = self.root.join("restart.snc");
+
+        RestartWriter::write(path, field)
     }
 }

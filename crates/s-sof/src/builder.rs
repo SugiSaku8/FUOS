@@ -1,44 +1,91 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use s_field::OceanField;
+use s_field::{Grid4D, OceanField};
 
 use crate::{
     boundary::BoundaryWriter,
     error::Result,
-    package::{PackageFiles, SofManifest, SofPackage},
+    forcing::ForcingWriter,
+    grid::GridWriter,
+    initial::InitialWriter,
+    package::{DatasetManifest, PackageFiles, SofManifest, SofPackage},
+    restart::RestartWriter,
 };
-/// Builder for creating SOF packages.
+
+/// Builder for creating complete SOF packages.
 pub struct SofPackageBuilder {
     name: String,
 
+    grid: Option<GridDataBuilder>,
+
     boundary: Option<OceanField>,
 
-    grid: Option<PathBuf>,
+    initial: Option<OceanField>,
 
-    forcing: Option<PathBuf>,
+    restart: Option<OceanField>,
 
-    restart: Option<PathBuf>,
+    forcing: Option<ForcingBuilder>,
+}
 
-    initial: Option<PathBuf>,
+/// Grid information used during package creation.
+struct GridDataBuilder {
+    grid: Grid4D,
+
+    latitude: Vec<f32>,
+
+    longitude: Vec<f32>,
+
+    depth: Vec<f32>,
+
+    bathymetry: Vec<f32>,
+}
+
+/// Surface forcing data.
+struct ForcingBuilder {
+    wind_u: Vec<f32>,
+
+    wind_v: Vec<f32>,
+
+    surface_heat: Vec<f32>,
 }
 
 impl SofPackageBuilder {
-    /// Creates a new builder.
+    /// Creates a new SOF builder.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
 
-            boundary: None,
-
             grid: None,
 
-            forcing: None,
+            boundary: None,
+
+            initial: None,
 
             restart: None,
 
-            initial: None,
+            forcing: None,
         }
+    }
+
+    /// Adds grid dataset.
+    pub fn grid(
+        mut self,
+        grid: Grid4D,
+        latitude: Vec<f32>,
+        longitude: Vec<f32>,
+        depth: Vec<f32>,
+        bathymetry: Vec<f32>,
+    ) -> Self {
+        self.grid = Some(GridDataBuilder {
+            grid,
+            latitude,
+            longitude,
+            depth,
+            bathymetry,
+        });
+
+        self
     }
 
     /// Adds boundary field.
@@ -48,30 +95,27 @@ impl SofPackageBuilder {
         self
     }
 
-    /// Adds grid file.
-    pub fn grid<P: AsRef<Path>>(mut self, path: P) -> Self {
-        self.grid = Some(path.as_ref().into());
+    /// Adds initial condition.
+    pub fn initial(mut self, field: OceanField) -> Self {
+        self.initial = Some(field);
 
         self
     }
 
-    /// Adds forcing file.
-    pub fn forcing<P: AsRef<Path>>(mut self, path: P) -> Self {
-        self.forcing = Some(path.as_ref().into());
+    /// Adds restart state.
+    pub fn restart(mut self, field: OceanField) -> Self {
+        self.restart = Some(field);
 
         self
     }
 
-    /// Adds restart file.
-    pub fn restart<P: AsRef<Path>>(mut self, path: P) -> Self {
-        self.restart = Some(path.as_ref().into());
-
-        self
-    }
-
-    /// Adds initial condition file.
-    pub fn initial<P: AsRef<Path>>(mut self, path: P) -> Self {
-        self.initial = Some(path.as_ref().into());
+    /// Adds forcing data.
+    pub fn forcing(mut self, wind_u: Vec<f32>, wind_v: Vec<f32>, surface_heat: Vec<f32>) -> Self {
+        self.forcing = Some(ForcingBuilder {
+            wind_u,
+            wind_v,
+            surface_heat,
+        });
 
         self
     }
@@ -81,6 +125,26 @@ impl SofPackageBuilder {
         let output = output.as_ref();
 
         fs::create_dir_all(output)?;
+
+        //
+        // grid.snc
+        //
+
+        if let Some(grid) = self.grid {
+            let path = output.join("grid.snc");
+
+            let mut writer = GridWriter::create(&path)?;
+
+            writer.write(
+                &grid.grid,
+                &grid.latitude,
+                &grid.longitude,
+                &grid.depth,
+                &grid.bathymetry,
+            )?;
+
+            writer.finish()?;
+        }
 
         //
         // boundary.snc
@@ -97,30 +161,64 @@ impl SofPackageBuilder {
         }
 
         //
-        // Manifest
+        // initial.snc
+        //
+
+        if let Some(field) = self.initial {
+            let path = output.join("initial.snc");
+
+            InitialWriter::write(&path, &field)?;
+        }
+
+        //
+        // restart.snc
+        //
+
+        if let Some(field) = self.restart {
+            let path = output.join("restart.snc");
+
+            RestartWriter::write(&path, &field)?;
+        }
+
+        //
+        // forcing.snc
+        //
+
+        if let Some(forcing) = self.forcing {
+            let path = output.join("forcing.snc");
+
+            let mut writer = ForcingWriter::create(&path)?;
+
+            writer.write(&forcing.wind_u, &forcing.wind_v, &forcing.surface_heat)?;
+
+            writer.finish()?;
+        }
+
+        //
+        // manifest
         //
 
         let files = PackageFiles {
-            grid: self.grid.map(|p| p.to_string_lossy().to_string()),
+            grid: Some("grid.snc".into()),
 
-            boundary: Some("boundary.snc".to_string()),
+            boundary: Some("boundary.snc".into()),
 
-            forcing: self.forcing.map(|p| p.to_string_lossy().to_string()),
+            initial: Some("initial.snc".into()),
 
-            restart: self.restart.map(|p| p.to_string_lossy().to_string()),
+            restart: Some("restart.snc".into()),
 
-            initial: self.initial.map(|p| p.to_string_lossy().to_string()),
+            forcing: Some("forcing.snc".into()),
         };
 
         let manifest = SofManifest {
-            format: "SOF".to_string(),
+            format: "SOF".into(),
 
-            version: "0.1.0".to_string(),
+            version: "0.1.0".into(),
 
-            dataset: crate::package::DatasetManifest {
+            dataset: DatasetManifest {
                 name: self.name,
 
-                dataset_type: "Boundary".to_string(),
+                dataset_type: "OceanDataset".into(),
             },
 
             files,

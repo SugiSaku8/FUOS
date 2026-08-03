@@ -91,12 +91,15 @@ impl BoundaryReader {
 
         let w = self.reader.read_dataset("velocity_w")?;
 
-        let velocity = VelocityField::from_fields(
-            Field4D::from_vec(*coordinates.grid(), u),
-            Field4D::from_vec(*coordinates.grid(), v),
-            Field4D::from_vec(*coordinates.grid(), w),
-        );
+        let mut velocity = VelocityField::new(*coordinates.grid());
 
+        velocity.u_mut().replace(u);
+
+        velocity.v_mut().replace(v);
+
+        velocity.w_mut().replace(w);
+
+        velocity.set_coordinates(coordinates.clone());
         //
         // Temperature
         //

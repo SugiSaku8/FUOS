@@ -1,112 +1,185 @@
 //! Velocity field.
-use crate::{Field4D, Grid4D};
-/// Three-dimensional velocity components.
+
+use crate::{Coordinates, Grid4D, ScalarField};
+
+/// 3次元流速場.
 ///
 /// Components:
 ///
-/// - u : east-west (x)
-/// - v : north-south (y)
-/// - w : vertical (z)
+/// u : east-west velocity
+/// v : north-south velocity
+/// w : vertical velocity
+///
 #[derive(Clone, Debug)]
 pub struct VelocityField {
-    u: Field4D<f32>,
-    v: Field4D<f32>,
-    w: Field4D<f32>,
+    grid: Grid4D,
+
+    coordinates: Option<Coordinates>,
+
+    u: ScalarField<f32>,
+
+    v: ScalarField<f32>,
+
+    w: ScalarField<f32>,
 }
 
 impl VelocityField {
-    /// Creates velocity fields initialized to zero.
-    #[inline]
+    /// Creates empty velocity field.
     pub fn new(grid: Grid4D) -> Self {
         Self {
-            u: Field4D::new(grid, 0.0),
-            v: Field4D::new(grid, 0.0),
-            w: Field4D::new(grid, 0.0),
+            u: ScalarField::zeros(grid.clone()),
+
+            v: ScalarField::zeros(grid.clone()),
+
+            w: ScalarField::zeros(grid.clone()),
+
+            coordinates: None,
+
+            grid,
         }
     }
 
-    /// Creates a velocity field from three components.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the component grids differ.
-    pub fn from_fields(u: Field4D<f32>, v: Field4D<f32>, w: Field4D<f32>) -> Self {
-        assert_eq!(u.grid().size(), v.grid().size());
-        assert_eq!(u.grid().size(), w.grid().size());
+    /// Creates velocity field with coordinates.
+    pub fn with_coordinates(grid: Grid4D, coordinates: Coordinates) -> Self {
+        Self {
+            u: ScalarField::zeros(grid.clone()),
 
-        Self { u, v, w }
+            v: ScalarField::zeros(grid.clone()),
+
+            w: ScalarField::zeros(grid.clone()),
+
+            coordinates: Some(coordinates),
+
+            grid,
+        }
     }
 
     #[inline]
     pub fn grid(&self) -> &Grid4D {
-        self.u.grid()
+        &self.grid
     }
 
     #[inline]
-    pub fn u(&self) -> &Field4D<f32> {
+    pub fn shape(&self) -> [usize; 3] {
+        [self.grid.width(), self.grid.height(), self.grid.depth()]
+    }
+
+    /// Returns grid spacing.
+
+    #[inline]
+
+    pub fn spacing(&self) -> [f32; 4] {
+        self.grid.spacing()
+    }
+
+    #[inline]
+    pub fn coordinates(&self) -> Option<&Coordinates> {
+        self.coordinates.as_ref()
+    }
+
+    #[inline]
+    pub fn coordinates_mut(&mut self) -> Option<&mut Coordinates> {
+        self.coordinates.as_mut()
+    }
+
+    #[inline]
+    pub fn set_coordinates(&mut self, coordinates: Coordinates) {
+        self.coordinates = Some(coordinates);
+    }
+
+    #[inline]
+    pub fn u(&self) -> &ScalarField<f32> {
         &self.u
     }
 
     #[inline]
-    pub fn v(&self) -> &Field4D<f32> {
+    pub fn v(&self) -> &ScalarField<f32> {
         &self.v
     }
 
     #[inline]
-    pub fn w(&self) -> &Field4D<f32> {
+    pub fn w(&self) -> &ScalarField<f32> {
         &self.w
     }
 
     #[inline]
-    pub fn u_mut(&mut self) -> &mut Field4D<f32> {
+    pub fn u_mut(&mut self) -> &mut ScalarField<f32> {
         &mut self.u
     }
 
     #[inline]
-    pub fn v_mut(&mut self) -> &mut Field4D<f32> {
+    pub fn v_mut(&mut self) -> &mut ScalarField<f32> {
         &mut self.v
     }
 
     #[inline]
-    pub fn w_mut(&mut self) -> &mut Field4D<f32> {
+    pub fn w_mut(&mut self) -> &mut ScalarField<f32> {
         &mut self.w
     }
 
-    /// Sets every component to zero.
-    #[inline]
-    pub fn clear(&mut self) {
-        self.u.fill(0.0);
-        self.v.fill(0.0);
-        self.w.fill(0.0);
-    }
-
-    /// Returns the velocity magnitude.
-    #[inline]
-    pub fn magnitude(&self, t: usize, z: usize, y: usize, x: usize) -> Option<f32> {
-        let u = *self.u.get(t, z, y, x)?;
-        let v = *self.v.get(t, z, y, x)?;
-        let w = *self.w.get(t, z, y, x)?;
-
-        Some((u * u + v * v + w * w).sqrt())
-    }
-
-    /// Returns one velocity vector.
-    #[inline]
-    pub fn vector(&self, t: usize, z: usize, y: usize, x: usize) -> Option<[f32; 3]> {
+    /// Returns velocity by linear index.
+    pub fn velocity_at_index(&self, time: usize, index: usize) -> Option<[f32; 3]> {
         Some([
-            *self.u.get(t, z, y, x)?,
-            *self.v.get(t, z, y, x)?,
-            *self.w.get(t, z, y, x)?,
+            *self.u.time_slice(time)?.get(index)?,
+            *self.v.time_slice(time)?.get(index)?,
+            *self.w.time_slice(time)?.get(index)?,
         ])
     }
 
-    #[inline]
-    pub fn shape(&self) -> [usize; 4] {
-        self.grid().size()
+    /// Returns velocity by grid index.
+    pub fn velocity(&self, time: usize, x: usize, y: usize, z: usize) -> Option<[f32; 3]> {
+        if x >= self.grid.width() || y >= self.grid.height() || z >= self.grid.depth() {
+            return None;
+        }
+
+        let index = z * self.grid.width() * self.grid.height() + y * self.grid.width() + x;
+
+        self.velocity_at_index(time, index)
     }
 
-    #[inline]
-    pub fn spacing(&self) -> [f32; 4] {
-        self.grid().spacing()
+    /// Samples velocity from physical coordinates.
+    ///
+    /// Coordinates:
+    ///
+    /// longitude
+    /// latitude
+    /// depth
+    ///
+    pub fn sample(&self, longitude: f64, latitude: f64, depth: f32, time: f64) -> Option<[f32; 3]> {
+        let coord = self.coordinates.as_ref()?;
+
+        let x = coord.nearest_longitude(longitude);
+
+        let y = coord.nearest_latitude(latitude);
+
+        let z = coord.nearest_depth(depth);
+
+        let t = coord.nearest_time(time);
+
+        self.velocity(t, x, y, z)
+    }
+
+    /// Clears all velocity values.
+    pub fn clear(&mut self) {
+        self.u.fill(0.0);
+
+        self.v.fill(0.0);
+
+        self.w.fill(0.0);
+    }
+    /// Creates velocity field from existing scalar fields.
+    pub fn from_fields(
+        grid: Grid4D,
+        u: ScalarField<f32>,
+        v: ScalarField<f32>,
+        w: ScalarField<f32>,
+    ) -> Self {
+        Self {
+            grid,
+            coordinates: None,
+            u,
+            v,
+            w,
+        }
     }
 }

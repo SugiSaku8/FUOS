@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-
+anyhow = "1"
 s-field = { path="../s-field" }
 
 s-io = { path="../s-io" }
@@ -14,3 +14,8 @@ serde = { version="1", features=["derive"] }
 serde_json = "1"
 
 thiserror = "1"
+
+
+[[example]]
+name = "create_suruga_test"
+path = "examples/create_suruga_test.rs"

@@ -1,13 +1,14 @@
-//
-// coordinate.rs
-//
+//! Geographic coordinate conversion for rendering.
 
+/// Geographic bounds.
 #[derive(Clone, Copy, Debug)]
 pub struct GeoBounds {
     pub lon_min: f64,
+
     pub lon_max: f64,
 
     pub lat_min: f64,
+
     pub lat_max: f64,
 }
 
@@ -20,72 +21,67 @@ impl GeoBounds {
             lat_max,
         }
     }
-
-    pub fn center_lon(&self) -> f64 {
-        (self.lon_min + self.lon_max) * 0.5
-    }
-
-    pub fn center_lat(&self) -> f64 {
-        (self.lat_min + self.lat_max) * 0.5
-    }
 }
 
+/// Converts geographic coordinates into renderer coordinates.
+///
+/// Coordinate system:
+///
+/// x : east
+/// y : height
+/// z : south
+///
+#[derive(Clone, Debug)]
 pub struct GeoConverter {
     bounds: GeoBounds,
 
-    /// 水平方向倍率
-    horizontal_scale: f32,
+    scale: f32,
 
-    /// 高さ倍率
-    vertical_scale: f32,
-
-    /// 緯度1度あたりの距離(m)
-    meters_per_deg_lat: f64,
-
-    /// 経度1度あたりの距離(m)
-    meters_per_deg_lon: f64,
+    sea_level: f32,
 }
 
 impl GeoConverter {
-    pub fn new(bounds: GeoBounds) -> Self {
-        let lat = bounds.center_lat().to_radians();
-
-        // WGS84近似式
-        let meters_per_deg_lat = 111132.92 - 559.82 * (2.0 * lat).cos() + 1.175 * (4.0 * lat).cos()
-            - 0.0023 * (6.0 * lat).cos();
-
-        let meters_per_deg_lon =
-            111412.84 * lat.cos() - 93.5 * (3.0 * lat).cos() + 0.118 * (5.0 * lat).cos();
-
+    pub fn new(bounds: GeoBounds, scale: f32) -> Self {
         Self {
             bounds,
 
-            horizontal_scale: 1.0,
+            scale,
 
-            // 地形を見やすくするため
-            vertical_scale: 3.0,
-
-            meters_per_deg_lat,
-            meters_per_deg_lon,
+            sea_level: 0.0,
         }
     }
 
-    pub fn convert(&self, lon: f64, lat: f64, height: f32) -> [f32; 3] {
-        let center_lon = self.bounds.center_lon();
-        let center_lat = self.bounds.center_lat();
+    /// Converts longitude and latitude to world coordinates.
+    pub fn geo_to_world(&self, longitude: f64, latitude: f64) -> [f32; 3] {
+        let x = ((longitude - self.bounds.lon_min) / (self.bounds.lon_max - self.bounds.lon_min))
+            as f32
+            * self.scale;
 
-        // 東西（東が+X）
-        let x =
-            -((lon - center_lon) * self.meters_per_deg_lon * self.horizontal_scale as f64) as f32;
+        let z = ((self.bounds.lat_max - latitude) / (self.bounds.lat_max - self.bounds.lat_min))
+            as f32
+            * self.scale;
 
-        // 南北（北が+Z）
-        let z =
-            ((lat - center_lat) * self.meters_per_deg_lat * self.horizontal_scale as f64) as f32;
+        [x, self.sea_level, z]
+    }
 
-        // 高度
-        let y = height * self.vertical_scale;
+    /// Converts ocean point.
+    ///
+    /// depth:
+    /// positive downward
+    ///
+    pub fn ocean_to_world(&self, longitude: f64, latitude: f64, depth: f32) -> [f32; 3] {
+        let mut p = self.geo_to_world(longitude, latitude);
 
-        [x, y, z]
+        //
+        // underwater
+        //
+        p[1] = -depth;
+
+        p
+    }
+
+    pub fn scale(&self) -> f32 {
+        self.scale
     }
 
     pub fn bounds(&self) -> GeoBounds {

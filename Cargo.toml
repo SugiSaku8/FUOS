@@ -3,7 +3,7 @@ resolver = "2"
 
 members = [
     "apps/simulator",
-
+    "crates/s-builder",
     "crates/s-core",
     "crates/s-grid",
     "crates/physics",
