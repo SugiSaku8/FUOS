@@ -9,7 +9,8 @@ impl HeightMapLoader {
     // テスト地形
     //
     pub fn load_test() -> HeightMap {
-        HeightMap::test()
+        HeightMap::load_sof("/Users/sugisaku/Desktop/Developer/Suruga-Wan/suruga_bay.sof/grid.snc")
+            .expect("REASON")
     }
 
     //

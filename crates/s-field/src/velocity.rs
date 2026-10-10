@@ -61,7 +61,7 @@ impl VelocityField {
 
     #[inline]
     pub fn shape(&self) -> [usize; 3] {
-        [self.grid.width(), self.grid.height(), self.grid.depth()]
+        [self.grid.depth(), self.grid.height(), self.grid.width()]
     }
 
     /// Returns grid spacing.

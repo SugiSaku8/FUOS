@@ -1,10 +1,7 @@
 #include <metal_stdlib>
-
 using namespace metal;
 
-
-struct GridInfo
-{
+struct GridInfo {
     uint nx;
     uint ny;
     uint nz;
@@ -14,210 +11,89 @@ struct GridInfo
     float dz;
 };
 
-
 inline uint index3d(
     uint x,
     uint y,
     uint z,
     constant GridInfo& grid
-)
-{
-    return
-        z * grid.nx * grid.ny
-        +
-        y * grid.nx
-        +
-        x;
+) {
+    return z * grid.nx * grid.ny
+         + y * grid.nx
+         + x;
 }
 
-
-
 kernel void gradient_pressure(
+    device const float* pressure [[buffer(0)]],
 
-    device const float* pressure
-        [[buffer(0)]],
+    device const float* u         [[buffer(1)]],
+    device const float* v         [[buffer(2)]],
+    device const float* w         [[buffer(3)]],
 
+    device float* u_out           [[buffer(4)]],
+    device float* v_out           [[buffer(5)]],
+    device float* w_out           [[buffer(6)]],
 
-    device const float* u
-        [[buffer(1)]],
+    constant GridInfo& grid       [[buffer(7)]],
 
-    device const float* v
-        [[buffer(2)]],
+    constant float& dt             [[buffer(8)]],
+    constant float& rho            [[buffer(9)]],
 
-    device const float* w
-        [[buffer(3)]],
+    uint3 gid                      [[thread_position_in_grid]]
+) {
+    const uint x = gid.x;
+    const uint y = gid.y;
+    const uint z = gid.z;
 
-
-    device float* out_u
-        [[buffer(4)]],
-
-    device float* out_v
-        [[buffer(5)]],
-
-    device float* out_w
-        [[buffer(6)]],
-
-
-    constant GridInfo& grid
-        [[buffer(7)]],
-
-
-    constant float& dt
-        [[buffer(8)]],
-
-    constant float& rho
-        [[buffer(9)]],
-
-
-    uint3 id
-        [[thread_position_in_grid]]
-
-)
-{
-
-    uint x=id.x;
-    uint y=id.y;
-    uint z=id.z;
-
-
-    if(
-        x>=grid.nx ||
-        y>=grid.ny ||
-        z>=grid.nz
-    )
-    {
+    if (
+        x >= grid.nx ||
+        y >= grid.ny ||
+        z >= grid.nz
+    ) {
         return;
     }
 
+    const uint i = index3d(x, y, z, grid);
 
-    uint i =
-        index3d(
-            x,
-            y,
-            z,
-            grid
-        );
+    const float factor = dt / rho;
 
-
+    // 各方向の前進差分を個別に計算する。
     //
-    // boundary
-    //
-    if(
-        x==0 ||
-        y==0 ||
-        z==0 ||
-        x==grid.nx-1 ||
-        y==grid.ny-1 ||
-        z==grid.nz-1
-    )
-    {
-        out_u[i]=u[i];
-        out_v[i]=v[i];
-        out_w[i]=w[i];
+    // 対応する方向に隣接セルが存在しない場合は、
+    // その速度成分を変更しない。
 
-        return;
+    // X direction
+    if (x + 1 < grid.nx) {
+        const uint ixp = index3d(x + 1, y, z, grid);
+
+        const float dp_dx =
+            (pressure[ixp] - pressure[i]) / grid.dx;
+
+        u_out[i] = u[i] - factor * dp_dx;
+    } else {
+        u_out[i] = u[i];
     }
 
+    // Y direction
+    if (y + 1 < grid.ny) {
+        const uint iyp = index3d(x, y + 1, z, grid);
 
+        const float dp_dy =
+            (pressure[iyp] - pressure[i]) / grid.dy;
 
-    uint ix1 =
-        index3d(
-            x+1,
-            y,
-            z,
-            grid
-        );
+        v_out[i] = v[i] - factor * dp_dy;
+    } else {
+        v_out[i] = v[i];
+    }
 
-    uint ix0 =
-        index3d(
-            x-1,
-            y,
-            z,
-            grid
-        );
+    // Z direction
+    if (z + 1 < grid.nz) {
+        const uint izp = index3d(x, y, z + 1, grid);
 
+        const float dp_dz =
+            (pressure[izp] - pressure[i]) / grid.dz;
 
-    uint iy1 =
-        index3d(
-            x,
-            y+1,
-            z,
-            grid
-        );
-
-    uint iy0 =
-        index3d(
-            x,
-            y-1,
-            z,
-            grid
-        );
-
-
-    uint iz1 =
-        index3d(
-            x,
-            y,
-            z+1,
-            grid
-        );
-
-    uint iz0 =
-        index3d(
-            x,
-            y,
-            z-1,
-            grid
-        );
-
-
-
-    float dp_dx =
-        (pressure[ix1]-pressure[ix0])
-        /
-        (2.0*grid.dx);
-
-
-
-    float dp_dy =
-        (pressure[iy1]-pressure[iy0])
-        /
-        (2.0*grid.dy);
-
-
-
-    float dp_dz =
-        (pressure[iz1]-pressure[iz0])
-        /
-        (2.0*grid.dz);
-
-
-
-    float factor =
-        dt / rho;
-
-
-
-    out_u[i]
-        =
-        u[i]
-        -
-        factor * dp_dx;
-
-
-
-    out_v[i]
-        =
-        v[i]
-        -
-        factor * dp_dy;
-
-
-
-    out_w[i]
-        =
-        w[i]
-        -
-        factor * dp_dz;
-
+        w_out[i] = w[i] - factor * dp_dz;
+    } else {
+        w_out[i] = w[i];
+    }
 }

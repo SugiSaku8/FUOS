@@ -48,7 +48,8 @@ log = "0.4"
 
 s-metal = {path = "../s-metal"}
 s-field = { path = "../s-field" }
-
+s-io = { path="../s-io" }
+s-sof = { path = "../s-sof" }
 
 [dev-dependencies]
 

@@ -1,14 +1,15 @@
 //! Ocean solver using Metal compute.
 
 use crate::{
-    AdvectionOperator, DiffusionOperator, DivergenceOperator, GpuVelocityField,
+    AdvectionOperator, BoundaryOperator, DiffusionOperator, DivergenceOperator, GpuOceanState,
     GradientPressureOperator, MetalContext, PressureSolver,
 };
-
-use s_field::OceanField;
+use std::sync::Arc;
 
 pub struct OceanSolver {
-    context: MetalContext,
+    context: Arc<MetalContext>,
+
+    boundary: BoundaryOperator,
 
     advection: AdvectionOperator,
 
@@ -20,9 +21,10 @@ pub struct OceanSolver {
 
     gradient_pressure: GradientPressureOperator,
 }
-
 impl OceanSolver {
-    pub fn new(context: MetalContext) -> Self {
+    pub fn new(context: Arc<MetalContext>) -> Self {
+        let boundary = BoundaryOperator::new(&context);
+
         let advection = AdvectionOperator::new(&context);
 
         let diffusion = DiffusionOperator::new(&context);
@@ -35,6 +37,8 @@ impl OceanSolver {
 
         Self {
             context,
+
+            boundary,
 
             advection,
 
@@ -67,57 +71,50 @@ impl OceanSolver {
     ///
     /// ν∇²u
     ///
-    pub fn step(&self, ocean: &mut OceanField, dt: f32) {
-        //
-        // CPU -> GPU
-        //
-        let velocity = GpuVelocityField::from_velocity(&self.context, ocean.velocity());
-
+    pub fn step(&self, state: &mut GpuOceanState, dt: f32) {
         //
         // 1. Advection
         //
-        let velocity = self.advection.compute(&self.context, &velocity, dt);
+        state.velocity = self.advection.compute(&self.context, &state.velocity, dt);
 
         //
         // 2. Diffusion
         //
-        let velocity = self
-            .diffusion
-            .compute_velocity(&self.context, &velocity, 0.000001, dt);
+        state.velocity =
+            self.diffusion
+                .compute_velocity(&self.context, &state.velocity, 0.000001, dt);
 
         //
-        // 3. Divergence
+        // 3. Boundary condition
         //
-        let divergence = self.divergence.compute(&self.context, &velocity);
-
-        //
-        // 4. Pressure Poisson solve
-        //
-        let pressure = self.pressure.solve(&self.context, &divergence, 40);
+        self.boundary
+            .apply_velocity(&self.context, &mut state.velocity);
 
         //
-        // 5. Pressure gradient correction
+        // 4. Divergence
         //
-        let velocity =
-            self.gradient_pressure
-                .compute(&self.context, &velocity, &pressure, dt, 1025.0);
+        // 速度場の発散を計算
+        let divergence = self.divergence.compute(&self.context, &state.velocity);
+
+        // 海水密度の代表値
+        let rho = 1025.0_f32;
+
+        // 圧力ポアソン方程式を解く
+        state.pressure = self.pressure.solve(&self.context, &divergence, dt, rho, 40);
+
+        // 圧力勾配によって速度場を補正
+        state.velocity = self.gradient_pressure.compute(
+            &self.context,
+            &state.velocity,
+            &state.pressure,
+            dt,
+            rho,
+        );
 
         //
-        // GPU -> CPU
+        // 7. Boundary correction
         //
-
-        let u = velocity.u.download(&self.context);
-
-        let v = velocity.v.download(&self.context);
-
-        let w = velocity.w.download(&self.context);
-
-        let field = ocean.velocity_mut();
-
-        field.u_mut().time_slice_mut(0).unwrap().copy_from_slice(&u);
-
-        field.v_mut().time_slice_mut(0).unwrap().copy_from_slice(&v);
-
-        field.w_mut().time_slice_mut(0).unwrap().copy_from_slice(&w);
+        self.boundary
+            .apply_velocity(&self.context, &mut state.velocity);
     }
 }

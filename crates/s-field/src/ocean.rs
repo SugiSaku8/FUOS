@@ -2,7 +2,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::{Coordinates, Field4D, Metadata, SalinityField, TemperatureField, VelocityField};
+use crate::{
+    BoundaryField, Coordinates, Field4D, Metadata, SalinityField, TemperatureField, VelocityField,
+};
 
 /// Complete ocean dataset.
 ///
@@ -25,7 +27,7 @@ pub struct OceanField {
     velocity: VelocityField,
     temperature: TemperatureField,
     salinity: SalinityField,
-
+    boundary: BoundaryField,
     scalar_fields: BTreeMap<String, Field4D<f32>>,
 }
 
@@ -37,13 +39,16 @@ impl OceanField {
         velocity: VelocityField,
         temperature: TemperatureField,
         salinity: SalinityField,
+        boundary: BoundaryField,
     ) -> Self {
+        let grid = velocity.grid().clone();
         Self {
             coordinates,
             metadata,
             velocity,
             temperature,
             salinity,
+            boundary,
             scalar_fields: BTreeMap::new(),
         }
     }
@@ -158,5 +163,12 @@ impl OceanField {
     #[inline]
     pub fn has_scalar_field(&self, name: &str) -> bool {
         self.scalar_fields.contains_key(name)
+    }
+    pub fn boundary(&self) -> &BoundaryField {
+        &self.boundary
+    }
+
+    pub fn boundary_mut(&mut self) -> &mut BoundaryField {
+        &mut self.boundary
     }
 }

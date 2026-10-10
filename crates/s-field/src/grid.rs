@@ -113,48 +113,55 @@ pub struct Grid4D {
 }
 
 impl Grid4D {
+    /// Axis order:
+    ///
+    /// time
+    /// depth
+    /// latitude
+    /// longitude
+    ///
     #[inline]
     pub const fn new(size: [usize; 4], spacing: [f32; 4]) -> Self {
         Self { size, spacing }
     }
 
     #[inline]
-    pub const fn width(&self) -> usize {
+    pub const fn time(&self) -> usize {
         self.size[0]
     }
 
     #[inline]
-    pub const fn height(&self) -> usize {
+    pub const fn depth(&self) -> usize {
         self.size[1]
     }
 
     #[inline]
-    pub const fn depth(&self) -> usize {
+    pub const fn latitude(&self) -> usize {
         self.size[2]
     }
 
     #[inline]
-    pub const fn time(&self) -> usize {
+    pub const fn longitude(&self) -> usize {
         self.size[3]
     }
 
     #[inline]
-    pub const fn dx(&self) -> f32 {
+    pub const fn dt(&self) -> f32 {
         self.spacing[0]
     }
 
     #[inline]
-    pub const fn dy(&self) -> f32 {
+    pub const fn dz(&self) -> f32 {
         self.spacing[1]
     }
 
     #[inline]
-    pub const fn dz(&self) -> f32 {
+    pub const fn dy(&self) -> f32 {
         self.spacing[2]
     }
 
     #[inline]
-    pub const fn dt(&self) -> f32 {
+    pub const fn dx(&self) -> f32 {
         self.spacing[3]
     }
 
@@ -169,7 +176,17 @@ impl Grid4D {
     }
 
     #[inline]
+    pub const fn width(&self) -> usize {
+        self.longitude()
+    }
+
+    #[inline]
+    pub const fn height(&self) -> usize {
+        self.latitude()
+    }
+
+    #[inline]
     pub const fn len(&self) -> usize {
-        self.width() * self.height() * self.depth() * self.time()
+        self.time() * self.depth() * self.latitude() * self.longitude()
     }
 }

@@ -1,5 +1,6 @@
 use s_field::{
-    Coordinates, Field4D, Grid4D, OceanField, SalinityField, TemperatureField, VelocityField,
+    BoundaryField, Coordinates, Field4D, Grid4D, OceanField, SalinityField, TemperatureField,
+    VelocityField,
 };
 
 use s_io::SioReader;
@@ -116,7 +117,7 @@ impl BoundaryReader {
         let salinity = self.reader.read_dataset("salinity")?;
 
         let salinity = SalinityField::from_field(Field4D::from_vec(*coordinates.grid(), salinity));
-
+        let boundary = BoundaryField::zeros(*coordinates.grid());
         //
         // OceanField
         //
@@ -127,6 +128,7 @@ impl BoundaryReader {
             velocity,
             temperature,
             salinity,
+            boundary,
         ))
     }
 }

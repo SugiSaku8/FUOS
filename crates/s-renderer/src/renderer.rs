@@ -4,10 +4,13 @@ use std::sync::Arc;
 
 use winit::{dpi::PhysicalSize, window::Window};
 
+use wgpu;
+
 use crate::{
     camera::Camera, context::RenderContext, depth::DepthTexture, flow_mesh::GpuFlowMesh,
     flow_pipeline::FlowPipeline, mesh::GpuMesh, pipeline::RenderPipeline, shader::Shader,
-    surface::RenderSurface, uniform::CameraBuffer,
+    surface::RenderSurface, uniform::CameraBuffer, velocity_mesh::GpuVelocityMesh,
+    velocity_pipeline::VelocityPipeline,
 };
 
 pub struct Renderer {
@@ -25,6 +28,14 @@ pub struct Renderer {
     //
     flow_pipeline: FlowPipeline,
 
+    //
+    // Velocity
+    //
+    pub velocity_pipeline: VelocityPipeline,
+
+    //
+    // Depth
+    //
     depth: DepthTexture,
 
     pub camera: Camera,
@@ -45,8 +56,9 @@ impl Renderer {
         let size = surface.size();
 
         //
-        // Terrain shader
+        // Terrain Pipeline
         //
+
         let shader = Shader::from_wgsl(context.device(), shader_source, "terrain_shader")?;
 
         let pipeline = RenderPipeline::new(
@@ -58,8 +70,9 @@ impl Renderer {
         )?;
 
         //
-        // Flow shader
+        // Flow Pipeline
         //
+
         let flow_shader =
             Shader::from_wgsl(context.device(), include_str!("flow.wgsl"), "flow_shader")?;
 
@@ -67,6 +80,23 @@ impl Renderer {
             context.device(),
             surface.format(),
             flow_shader.module(),
+            pipeline.camera_layout(),
+        )?;
+
+        //
+        // Velocity Pipeline
+        //
+
+        let velocity_shader = Shader::from_wgsl(
+            context.device(),
+            include_str!("velocity.wgsl"),
+            "velocity_shader",
+        )?;
+
+        let velocity_pipeline = VelocityPipeline::new(
+            context.device(),
+            surface.format(),
+            velocity_shader.module(),
             pipeline.camera_layout(),
         )?;
 
@@ -84,6 +114,8 @@ impl Renderer {
             pipeline,
 
             flow_pipeline,
+
+            velocity_pipeline,
 
             depth,
 
@@ -119,13 +151,18 @@ impl Renderer {
         self.camera.resize(size.width, size.height);
     }
 
-    pub fn render<V>(&mut self, terrain: &GpuMesh<V>, flow: Option<&GpuFlowMesh>) -> Result<()>
+    pub fn render<V>(
+        &mut self,
+
+        terrain: &GpuMesh<V>,
+
+        flow: Option<&GpuFlowMesh>,
+
+        velocity: Option<&GpuVelocityMesh>,
+    ) -> Result<()>
     where
         V: bytemuck::Pod,
     {
-        //
-        // Camera update
-        //
         self.camera_buffer
             .uniform
             .update(self.camera.build_matrix());
@@ -146,10 +183,9 @@ impl Renderer {
                 });
 
         //
-        // ============================
         // Terrain Pass
-        // ============================
         //
+
         {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("terrain_pass"),
@@ -200,11 +236,8 @@ impl Renderer {
 
             pass.draw_indexed(0..terrain.index_count(), 0, 0..1);
         }
-
         //
-        // ============================
         // Flow Pass
-        // ============================
         //
         if let Some(flow) = flow {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -250,6 +283,56 @@ impl Renderer {
             pass.draw(0..flow.vertex_count(), 0..1);
         }
 
+        //
+        // Velocity Pass
+        //
+        if let Some(velocity) = velocity {
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("velocity_pass"),
+
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: &view,
+
+                    resolve_target: None,
+
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+
+                        store: wgpu::StoreOp::Store,
+                    },
+
+                    depth_slice: None,
+                })],
+
+                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                    view: self.depth.view(),
+
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+
+                        store: wgpu::StoreOp::Store,
+                    }),
+
+                    stencil_ops: None,
+                }),
+
+                timestamp_writes: None,
+
+                occlusion_query_set: None,
+            });
+
+            pass.set_pipeline(self.velocity_pipeline.pipeline());
+
+            pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
+
+            pass.set_vertex_buffer(0, velocity.vertex_buffer().slice(..));
+
+            pass.draw(0..velocity.vertex_count(), 0..1);
+        }
+
+        //
+        // Submit
+        //
         self.context.queue().submit(Some(encoder.finish()));
 
         frame.present();
@@ -263,5 +346,84 @@ impl Renderer {
             .update(self.camera.build_matrix());
 
         self.camera_buffer.update(self.context.queue());
+    }
+
+    //
+    // Velocity only renderer
+    //
+    pub fn render_velocity(&mut self, velocity: &GpuVelocityMesh) -> Result<()> {
+        self.camera_buffer
+            .uniform
+            .update(self.camera.build_matrix());
+
+        self.camera_buffer.update(self.context.queue());
+
+        let frame = self.surface.get_current_texture()?;
+
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
+
+        let mut encoder =
+            self.context
+                .device()
+                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                    label: Some("velocity_encoder"),
+                });
+
+        {
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("velocity_only_pass"),
+
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: &view,
+
+                    resolve_target: None,
+
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.02,
+                            g: 0.05,
+                            b: 0.1,
+                            a: 1.0,
+                        }),
+
+                        store: wgpu::StoreOp::Store,
+                    },
+
+                    depth_slice: None,
+                })],
+
+                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                    view: self.depth.view(),
+
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+
+                        store: wgpu::StoreOp::Store,
+                    }),
+
+                    stencil_ops: None,
+                }),
+
+                timestamp_writes: None,
+
+                occlusion_query_set: None,
+            });
+
+            pass.set_pipeline(self.velocity_pipeline.pipeline());
+
+            pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
+
+            pass.set_vertex_buffer(0, velocity.vertex_buffer().slice(..));
+
+            pass.draw(0..velocity.vertex_count(), 0..1);
+        }
+
+        self.context.queue().submit(Some(encoder.finish()));
+
+        frame.present();
+
+        Ok(())
     }
 }

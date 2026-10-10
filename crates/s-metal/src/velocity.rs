@@ -85,8 +85,46 @@ impl GpuVelocityField {
         }
     }
 
+    /// Download GPU velocity field to CPU.
+    ///
+    /// Converts GPU resident velocity into s-field VelocityField.
+
     #[inline]
     pub fn grid(&self) -> GridInfo {
         self.grid
+    }
+
+    /// Download GPU velocity field to CPU arrays.
+    pub fn download(&self, context: &MetalContext) -> VelocityField {
+        let nx = self.grid.nx() as usize;
+        let ny = self.grid.ny() as usize;
+        let nz = self.grid.nz() as usize;
+
+        let grid = s_field::Grid4D::new(
+            [nx, ny, nz, 1],
+            [self.grid.dx(), self.grid.dy(), self.grid.dz(), 1.0],
+        );
+
+        //
+        // GPU -> CPU
+        //
+        let u = self.u.download(context);
+        let v = self.v.download(context);
+        let w = self.w.download(context);
+
+        //
+        // Vec -> ScalarField
+        //
+        let mut u_field = s_field::ScalarField::<f32>::zeros(grid.clone());
+
+        let mut v_field = s_field::ScalarField::<f32>::zeros(grid.clone());
+
+        let mut w_field = s_field::ScalarField::<f32>::zeros(grid.clone());
+
+        u_field.replace(u);
+        v_field.replace(v);
+        w_field.replace(w);
+
+        VelocityField::from_fields(grid, u_field, v_field, w_field)
     }
 }

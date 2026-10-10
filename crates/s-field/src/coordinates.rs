@@ -23,10 +23,6 @@ pub struct Coordinates {
 
 impl Coordinates {
     /// Creates a new coordinate system.
-    ///
-    /// # Panics
-    ///
-    /// Panics if axis lengths do not match the supplied grid.
     pub fn new(
         grid: Grid4D,
         latitude: Vec<f64>,
@@ -35,12 +31,16 @@ impl Coordinates {
         time: Vec<f64>,
     ) -> Self {
         assert_eq!(
-            grid.width(),
+            grid.latitude(),
+            latitude.len(),
+            "latitude axis size mismatch"
+        );
+
+        assert_eq!(
+            grid.longitude(),
             longitude.len(),
             "longitude axis size mismatch"
         );
-
-        assert_eq!(grid.height(), latitude.len(), "latitude axis size mismatch");
 
         assert_eq!(grid.depth(), depth.len(), "depth axis size mismatch");
 
@@ -102,12 +102,12 @@ impl Coordinates {
 
     #[inline]
     pub fn width(&self) -> usize {
-        self.grid.width()
+        self.grid.longitude()
     }
 
     #[inline]
     pub fn height(&self) -> usize {
-        self.grid.height()
+        self.grid.latitude()
     }
 
     #[inline]
@@ -120,7 +120,6 @@ impl Coordinates {
         self.grid.time()
     }
 
-    /// Returns true if coordinate axes are empty.
     pub fn is_empty(&self) -> bool {
         self.latitude.is_empty()
             || self.longitude.is_empty()
@@ -128,24 +127,18 @@ impl Coordinates {
             || self.time.is_empty()
     }
 
-    /// Returns true if coordinate is inside this dataset domain.
-    ///
-    /// Supports both ascending and descending axes.
     pub fn contains(&self, longitude: f64, latitude: f64, depth: f32) -> bool {
         if self.is_empty() {
             return false;
         }
 
         let lon_min = self.longitude[0].min(self.longitude[self.longitude.len() - 1]);
-
         let lon_max = self.longitude[0].max(self.longitude[self.longitude.len() - 1]);
 
         let lat_min = self.latitude[0].min(self.latitude[self.latitude.len() - 1]);
-
         let lat_max = self.latitude[0].max(self.latitude[self.latitude.len() - 1]);
 
         let dep_min = self.depth[0].min(self.depth[self.depth.len() - 1]);
-
         let dep_max = self.depth[0].max(self.depth[self.depth.len() - 1]);
 
         longitude >= lon_min
@@ -156,15 +149,6 @@ impl Coordinates {
             && depth <= dep_max
     }
 
-    /// Returns nearest indices.
-    ///
-    /// Order:
-    ///
-    /// longitude
-    /// latitude
-    /// depth
-    /// time
-    ///
     pub fn nearest(
         &self,
         longitude: f64,
@@ -180,22 +164,18 @@ impl Coordinates {
         )
     }
 
-    /// Returns nearest longitude index.
     pub fn nearest_longitude(&self, longitude: f64) -> usize {
         nearest_f64(&self.longitude, longitude)
     }
 
-    /// Returns nearest latitude index.
     pub fn nearest_latitude(&self, latitude: f64) -> usize {
         nearest_f64(&self.latitude, latitude)
     }
 
-    /// Returns nearest depth index.
     pub fn nearest_depth(&self, depth: f32) -> usize {
         nearest_f32(&self.depth, depth)
     }
 
-    /// Returns nearest time index.
     pub fn nearest_time(&self, time: f64) -> usize {
         nearest_f64(&self.time, time)
     }

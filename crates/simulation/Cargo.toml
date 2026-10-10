@@ -1,0 +1,20 @@
+[package]
+name = "simulation"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+s-field = { path="../s-field" }
+s-sof = { path="../s-sof" }
+s-metal = { path = "../s-metal" }
+s-io = { path="../s-io" }
+s-renderer = { path="../s-renderer" }
+winit = "0.30"
+pollster = "0.4"
+anyhow = "1"
+[[example]]
+
+name = "run_suruga"
+
+path = "examples/run_suruga.rs"

@@ -1,4 +1,9 @@
-#[derive(Clone)]
+use anyhow::Result;
+use std::path::Path;
+
+use s_sof::grid::GridReader;
+
+#[derive(Debug)]
 pub struct HeightMap {
     pub width: usize,
     pub height: usize,
@@ -7,7 +12,7 @@ pub struct HeightMap {
 
 impl HeightMap {
     pub fn new(width: usize, height: usize, data: Vec<f32>) -> Self {
-        assert_eq!(data.len(), width * height);
+        assert_eq!(width * height, data.len());
 
         Self {
             width,
@@ -17,46 +22,48 @@ impl HeightMap {
     }
 
     //
-    // テスト用地形
+    // SOF loader
     //
-    pub fn test() -> Self {
-        let width = 128;
-        let height = 128;
+    pub fn load_sof<P: AsRef<Path>>(path: P) -> Result<Self> {
+        let mut reader = GridReader::open(path)?;
 
-        let mut data = Vec::new();
+        let grid = reader.read()?;
 
-        for z in 0..height {
-            for x in 0..width {
-                let xf = x as f32 / width as f32;
+        let width = grid.longitude.len();
 
-                let zf = z as f32 / height as f32;
+        let height = grid.latitude.len();
 
-                let h = (xf * 12.0).sin() * (zf * 12.0).cos() * 20.0;
+        println!("SOF heightmap {} x {}", width, height);
 
-                data.push(h);
-            }
-        }
-
-        Self {
-            width,
-            height,
-            data,
-        }
+        Ok(Self::new(width, height, grid.bathymetry))
     }
 
+    //
+    // compatibility
+    //
     pub fn get(&self, x: usize, z: usize) -> f32 {
-        self.data[z * self.width + x]
+        let index = z * self.width + x;
+
+        self.data[index]
     }
 
     pub fn min_max(&self) -> (f32, f32) {
-        let mut min = f32::MAX;
-        let mut max = f32::MIN;
+        let min = self.data.iter().cloned().fold(f32::INFINITY, f32::min);
 
-        for v in &self.data {
-            min = min.min(*v);
-            max = max.max(*v);
-        }
+        let max = self.data.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
 
         (min, max)
+    }
+
+    //
+    // temporary
+    //
+    pub fn test() -> Self {
+        let width = 64;
+        let height = 64;
+
+        let data = vec![0.0; width * height];
+
+        Self::new(width, height, data)
     }
 }

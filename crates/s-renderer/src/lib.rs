@@ -23,7 +23,12 @@ pub mod flow_generator;
 pub mod flow_mesh;
 pub mod flow_pipeline;
 pub mod ocean;
-
+pub mod terrain_mesh;
+pub mod velocity;
+pub mod velocity_loader;
+pub mod velocity_mesh;
+pub mod velocity_pipeline;
+pub mod velocity_renderer;
 pub use camera::Camera;
 pub use flow_generator::FlowGenerator;
 pub use flow_mesh::GpuFlowMesh;
@@ -37,4 +42,3 @@ pub use flow::FlowVertex;
 pub use gebco::GebcoLoader;
 pub use heightmap::HeightMap;
 pub use heightmap_loader::HeightMapLoader;
-pub use terrain::{TerrainMesh, TerrainVertex};

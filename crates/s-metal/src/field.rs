@@ -18,8 +18,10 @@ impl GpuField3D {
     }
 
     pub fn empty(context: &MetalContext, grid: GridInfo) -> Self {
+        let zero = vec![0.0f32; grid.count()];
+
         Self {
-            data: MetalBuffer::empty(context.device(), grid.count()),
+            data: MetalBuffer::from_f32(context.device(), &zero),
 
             grid,
         }
@@ -62,5 +64,15 @@ impl GpuField3D {
         let ptr = buffer.contents() as *const f32;
 
         unsafe { std::slice::from_raw_parts(ptr, self.len()).to_vec() }
+    }
+
+    pub fn upload(&self, _context: &MetalContext, values: &[f32]) {
+        let buffer = self.data.raw();
+
+        unsafe {
+            let ptr = buffer.contents() as *mut f32;
+
+            std::ptr::copy_nonoverlapping(values.as_ptr(), ptr, values.len());
+        }
     }
 }
