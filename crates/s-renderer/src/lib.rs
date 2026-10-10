@@ -42,3 +42,5 @@ pub use flow::FlowVertex;
 pub use gebco::GebcoLoader;
 pub use heightmap::HeightMap;
 pub use heightmap_loader::HeightMapLoader;
+pub use terrain::TerrainMesh;
+pub use terrain_mesh::TerrainVertex;

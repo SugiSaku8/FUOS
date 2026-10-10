@@ -171,8 +171,7 @@ impl FlowParticleSystem {
         let bounds = converter.bounds();
 
         // フレームレートが落ちた場合の急激な移動を防ぐ。
-        let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0);
-
+        let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 100.0;
         if !dt.is_finite() || dt <= 0.0 {
             return;
         }
