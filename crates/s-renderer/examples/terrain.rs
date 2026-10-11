@@ -2,7 +2,8 @@ use anyhow::{Context, Result};
 use s_field::{Coordinates, Grid4D, VelocityField};
 use s_renderer::{
     GeoBounds, GeoConverter, GpuFlowMesh, HeightMap, Renderer, TerrainMesh, TerrainVertex,
-    flow_generator::FlowParticleSystem,
+    camera_controller::CameraController, flow_generator::FlowParticleSystem,
+    terrain::OceanSurfaceMesh,
 };
 use s_sof::grid::GridReader;
 use std::{fs, sync::Arc, time::Instant};
@@ -92,8 +93,7 @@ fn load_surface_velocity() -> Result<VelocityField> {
 
     velocity.u_mut().replace(u);
     velocity.v_mut().replace(v);
-    velocity.w_mut().fill(0.0);
-
+    velocity.w_mut().fill(0.05);
     println!(
         "Ocean velocity loaded: {} x {} grid, {} depth levels",
         GRID_WIDTH, GRID_HEIGHT, DEPTH_COUNT
@@ -152,7 +152,7 @@ fn generate_seeds(coordinates: &Coordinates, bounds: &GeoBounds) -> Vec<[f32; 3]
                 continue;
             }
 
-            seeds.push([lon as f32, lat as f32, 0.0]);
+            seeds.push([lon as f32, lat as f32, 100.0]);
         }
     }
 
@@ -244,6 +244,7 @@ async fn run() -> Result<()> {
     // --------------------------------------------------
 
     let terrain_mesh = TerrainMesh::from_heightmap(&heightmap, bounds, 5.0);
+    let ocean_mesh = OceanSurfaceMesh::new(bounds, width, height);
 
     println!("Terrain vertices: {}", terrain_mesh.vertex_count());
     println!("Terrain indices: {}", terrain_mesh.index_count());
@@ -260,6 +261,7 @@ async fn run() -> Result<()> {
     .await?;
 
     let gpu_terrain = terrain_mesh.upload(renderer.device());
+    let gpu_ocean = ocean_mesh.upload(renderer.device());
 
     let converter = GeoConverter::new(bounds, 100_000.0);
 
@@ -285,6 +287,8 @@ async fn run() -> Result<()> {
     let max_vertices = seeds.len() * (PARTICLE_TRAIL_POINTS - 1) * 2;
 
     let mut gpu_flow = GpuFlowMesh::with_capacity(renderer.device(), max_vertices);
+    let mut gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len());
+    let mut camera_controller = CameraController::new();
 
     println!("Flow seeds: {}", seeds.len());
     println!("Flow particles: {}", particles.particle_count());
@@ -344,6 +348,12 @@ async fn run() -> Result<()> {
                         flow_vertices.len()
                     );
                 }
+                let particle_vertices = particles.particle_vertices(&converter);
+                if !gpu_particle_dots.update_vertices(renderer.queue(), &particle_vertices) {
+                    eprintln!("Particle dot buffer capacity exceeded");
+                }
+
+                camera_controller.update_with_dt(renderer.camera_mut(), dt_seconds);
 
                 // 一定間隔で診断情報を出力する。
                 diagnostic_elapsed += dt_seconds;
@@ -361,9 +371,19 @@ async fn run() -> Result<()> {
                 }
 
                 // 地形と流線を描画する。
-                if let Err(error) = renderer.render(&gpu_terrain, Some(&gpu_flow), None) {
+                if let Err(error) = renderer.render_with_ocean_and_particles(
+                    &gpu_terrain,
+                    Some(&gpu_ocean),
+                    Some(&gpu_flow),
+                    Some(&gpu_particle_dots),
+                    None,
+                ) {
                     eprintln!("Render error: {error:#}");
                 }
+            }
+
+            Event::WindowEvent { event, .. } => {
+                camera_controller.process(&event);
             }
 
             _ => {}
@@ -371,4 +391,74 @@ async fn run() -> Result<()> {
     })?;
 
     Ok(())
+}
+/// 半透明表示用の海面メッシュ。
+///
+/// 海底地形とは別のメッシュとして作成し、
+/// 海面の描画時にアルファブレンディングを適用する。
+#[derive(Debug)]
+pub struct OceanSurfaceMesh {
+    mesh: Mesh<TerrainVertex>,
+}
+
+impl OceanSurfaceMesh {
+    /// 地理的な範囲を指定して水平な海面を生成する。
+    pub fn new(bounds: GeoBounds, width: usize, height: usize) -> Self {
+        assert!(width >= 2);
+        assert!(height >= 2);
+
+        let converter = GeoConverter::new(bounds, 100_000.0);
+
+        let mut vertices = Vec::with_capacity(width * height);
+
+        for z in 0..height {
+            let latitude =
+                bounds.lat_min + (bounds.lat_max - bounds.lat_min) * z as f64 / (height - 1) as f64;
+
+            for x in 0..width {
+                let longitude = bounds.lon_min
+                    + (bounds.lon_max - bounds.lon_min) * x as f64 / (width - 1) as f64;
+
+                // 海面の高さは海抜0m。
+                let position = converter.ocean_to_world(longitude, latitude, 0.0);
+
+                vertices.push(TerrainVertex {
+                    position,
+                    height: 0.0,
+                });
+            }
+        }
+
+        let mut indices = Vec::with_capacity((width - 1) * (height - 1) * 6);
+
+        for z in 0..height - 1 {
+            for x in 0..width - 1 {
+                let top_left = (z * width + x) as u32;
+
+                let top_right = top_left + 1;
+
+                let bottom_left = top_left + width as u32;
+
+                let bottom_right = bottom_left + 1;
+
+                indices.extend_from_slice(&[
+                    top_left,
+                    bottom_left,
+                    top_right,
+                    top_right,
+                    bottom_left,
+                    bottom_right,
+                ]);
+            }
+        }
+
+        Self {
+            mesh: Mesh::new(vertices, indices),
+        }
+    }
+
+    /// GPUへ海面メッシュを転送する。
+    pub fn upload(&self, device: &wgpu::Device) -> GpuMesh<TerrainVertex> {
+        GpuMesh::upload(device, &self.mesh)
+    }
 }

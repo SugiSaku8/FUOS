@@ -158,6 +158,95 @@ impl VelocityField {
 
         self.velocity(t, x, y, z)
     }
+    /// Samples velocity using 4D multilinear interpolation.
+    ///
+    /// Interpolates across longitude, latitude, depth, and time.
+    ///
+    /// Returns None when:
+    /// - Spatial coordinates are outside the dataset.
+    /// - The requested time is outside the available time range.
+    /// - Coordinates are invalid or non-monotonic.
+    /// - A required velocity value is non-finite.
+    pub fn sample_interpolated(
+        &self,
+        longitude: f64,
+        latitude: f64,
+        depth: f32,
+        time: f64,
+    ) -> Option<[f32; 3]> {
+        let coord = self.coordinates.as_ref()?;
+
+        if !longitude.is_finite()
+            || !latitude.is_finite()
+            || !depth.is_finite()
+            || !time.is_finite()
+        {
+            return None;
+        }
+
+        if !coord.contains(longitude, latitude, depth) {
+            return None;
+        }
+
+        // Find the two surrounding grid indices on each axis.
+        let (x0, x1, wx) = bracket_axis(coord.longitude(), longitude)?;
+
+        let (y0, y1, wy) = bracket_axis(coord.latitude(), latitude)?;
+
+        let depth_values: Vec<f64> = coord.depth().iter().map(|&value| value as f64).collect();
+
+        let (z0, z1, wz) = bracket_axis(&depth_values, depth as f64)?;
+
+        // A single time slice represents a time-independent field.
+        let (t0, t1, wt) = if coord.time_steps() == 1 {
+            (0, 0, 0.0)
+        } else {
+            bracket_axis(coord.time(), time)?
+        };
+
+        let xs = [(x0, 1.0 - wx), (x1, wx)];
+        let ys = [(y0, 1.0 - wy), (y1, wy)];
+        let zs = [(z0, 1.0 - wz), (z1, wz)];
+        let ts = [(t0, 1.0 - wt), (t1, wt)];
+
+        let mut result = [0.0_f64; 3];
+
+        for &(t, tw) in &ts {
+            for &(z, zw) in &zs {
+                for &(y, yw) in &ys {
+                    for &(x, xw) in &xs {
+                        let weight = tw * zw * yw * xw;
+
+                        // Avoid reading unnecessary corners when a query
+                        // lies exactly on a grid coordinate.
+                        if weight == 0.0 {
+                            continue;
+                        }
+
+                        let velocity = self.velocity(t, x, y, z)?;
+
+                        for component in 0..3 {
+                            let value = velocity[component];
+
+                            if !value.is_finite() {
+                                return None;
+                            }
+
+                            result[component] += value as f64 * weight;
+                        }
+                    }
+                }
+            }
+        }
+
+        let interpolated = [result[0] as f32, result[1] as f32, result[2] as f32];
+
+        if interpolated.iter().all(|value| value.is_finite()) {
+            Some(interpolated)
+        } else {
+            None
+        }
+    }
 
     /// Clears all velocity values.
     pub fn clear(&mut self) {
@@ -182,4 +271,86 @@ impl VelocityField {
             w,
         }
     }
+}
+
+/// Finds the surrounding indices and interpolation weight.
+///
+/// Supports ascending and descending monotonic axes.
+///
+/// Returns:
+/// (lower_index, upper_index, interpolation_weight)
+///
+/// The weight is 0 at the first index and 1 at the second index.
+fn bracket_axis(axis: &[f64], value: f64) -> Option<(usize, usize, f64)> {
+    if axis.is_empty() || !value.is_finite() {
+        return None;
+    }
+
+    if axis.iter().any(|coordinate| !coordinate.is_finite()) {
+        return None;
+    }
+
+    // A single-coordinate axis has no interval.
+    if axis.len() == 1 {
+        if value == axis[0] {
+            return Some((0, 0, 0.0));
+        }
+
+        return None;
+    }
+
+    let ascending = axis[1] > axis[0];
+
+    // Reject duplicate or non-monotonic coordinates.
+    for pair in axis.windows(2) {
+        if ascending {
+            if pair[1] <= pair[0] {
+                return None;
+            }
+        } else if pair[1] >= pair[0] {
+            return None;
+        }
+    }
+
+    // Reject values outside the axis range.
+    let first = axis[0];
+    let last = axis[axis.len() - 1];
+
+    if ascending {
+        if value < first || value > last {
+            return None;
+        }
+    } else if value > first || value < last {
+        return None;
+    }
+
+    // Exact endpoints need no interpolation.
+    if value == first {
+        return Some((0, 0, 0.0));
+    }
+
+    if value == last {
+        let index = axis.len() - 1;
+        return Some((index, index, 0.0));
+    }
+
+    // Locate the interval containing the requested value.
+    for i in 0..axis.len() - 1 {
+        let a = axis[i];
+        let b = axis[i + 1];
+
+        let inside = if ascending {
+            value >= a && value <= b
+        } else {
+            value <= a && value >= b
+        };
+
+        if inside {
+            let weight = (value - a) / (b - a);
+
+            return Some((i, i + 1, weight));
+        }
+    }
+
+    None
 }

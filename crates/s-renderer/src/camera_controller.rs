@@ -308,10 +308,12 @@ impl CameraController {
 
 
 
-    pub fn update(
-        &mut self,
-        camera:&mut Camera
-    ){
+    pub fn update(&mut self, camera: &mut Camera) {
+        self.update_with_dt(camera, 0.016);
+    }
+
+    /// フレーム経過時間に応じてカメラを更新し、FPSの変動による移動速度差を抑える。
+    pub fn update_with_dt(&mut self, camera: &mut Camera, dt_seconds: f32) {
 
 
         //
@@ -447,7 +449,7 @@ impl CameraController {
                 *
                 self.speed
                 *
-                0.016;
+                dt_seconds.clamp(0.0, 0.05);
 
 
         }

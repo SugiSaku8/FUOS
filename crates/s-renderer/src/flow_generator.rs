@@ -116,14 +116,15 @@ impl FlowGenerator {
 }
 
 /// 1つの流速粒子と、その粒子が通過した位置を保持する。
+/// 1つの流速粒子と、その粒子が通過した位置を保持する。
 struct FlowParticle {
     origin: [f64; 2],
+    origin_depth: f32,
     longitude: f64,
     latitude: f64,
     depth: f32,
     trail: Vec<[f32; 3]>,
 }
-
 /// 流速データを使って粒子を時間発展させるシステム。
 pub struct FlowParticleSystem {
     particles: Vec<FlowParticle>,
@@ -139,6 +140,7 @@ impl FlowParticleSystem {
             .iter()
             .map(|seed| FlowParticle {
                 origin: [seed[0] as f64, seed[1] as f64],
+                origin_depth: seed[2],
                 longitude: seed[0] as f64,
                 latitude: seed[1] as f64,
                 depth: seed[2],
@@ -190,23 +192,27 @@ impl FlowParticleSystem {
                 continue;
             }
 
-            let Some(vel) =
-                velocity.sample(particle.longitude, particle.latitude, particle.depth, time)
-            else {
+            let Some(vel) = velocity.sample_interpolated(
+                particle.longitude,
+                particle.latitude,
+                particle.depth,
+                time,
+            ) else {
                 Self::reset_particle(particle);
                 continue;
             };
 
             let u = vel[0] as f64;
             let v = vel[1] as f64;
+            let w = vel[2] as f64;
 
-            if !u.is_finite() || !v.is_finite() {
+            if !u.is_finite() || !v.is_finite() || !w.is_finite() {
                 Self::reset_particle(particle);
                 continue;
             }
 
-            // 静止に近い粒子は、その場に残す。
-            if u.hypot(v) < 0.02 {
+            // 3次元の流速が十分に小さい粒子は、その場に残す。
+            if u.hypot(v).hypot(w) < 0.02 {
                 continue;
             }
 
@@ -229,12 +235,16 @@ impl FlowParticleSystem {
 
             let next_latitude = particle.latitude + delta_lat;
 
-            let next_position_is_valid =
-                coordinates.contains(next_longitude, next_latitude, particle.depth)
-                    && next_longitude >= bounds.lon_min
-                    && next_longitude <= bounds.lon_max
-                    && next_latitude >= bounds.lat_min
-                    && next_latitude <= bounds.lat_max;
+            // 水深は海面を 0 とし、下向きを正とする。
+            // ここでは鉛直流速 w が上向き正であると仮定する。
+            let next_depth = particle.depth - (w * dt as f64) as f32;
+
+            let next_position_is_valid = next_depth.is_finite()
+                && coordinates.contains(next_longitude, next_latitude, next_depth)
+                && next_longitude >= bounds.lon_min
+                && next_longitude <= bounds.lon_max
+                && next_latitude >= bounds.lat_min
+                && next_latitude <= bounds.lat_max;
 
             if !next_position_is_valid {
                 Self::reset_particle(particle);
@@ -248,8 +258,7 @@ impl FlowParticleSystem {
 
             world_start[1] += 100.0;
 
-            let mut world_end =
-                converter.ocean_to_world(next_longitude, next_latitude, particle.depth);
+            let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, next_depth);
 
             world_end[1] += 100.0;
 
@@ -268,13 +277,16 @@ impl FlowParticleSystem {
 
             particle.longitude = next_longitude;
             particle.latitude = next_latitude;
+            particle.depth = next_depth;
         }
     }
 
     /// 粒子を初期位置に戻し、古い軌跡を消す。
+    /// 粒子を初期位置に戻し、古い軌跡を消す。
     fn reset_particle(particle: &mut FlowParticle) {
         particle.longitude = particle.origin[0];
         particle.latitude = particle.origin[1];
+        particle.depth = particle.origin_depth;
         particle.trail.clear();
     }
 
@@ -295,6 +307,22 @@ impl FlowParticleSystem {
         }
 
         vertices
+    }
+
+    /// 現在の粒子位置を、描画用の点頂点として返す。
+    pub fn particle_vertices(&self, converter: &GeoConverter) -> Vec<FlowVertex> {
+        self.particles
+            .iter()
+            .map(|particle| {
+                let mut position = converter.ocean_to_world(
+                    particle.longitude,
+                    particle.latitude,
+                    particle.depth,
+                );
+                position[1] += 100.0;
+                FlowVertex { position }
+            })
+            .collect()
     }
 
     /// 粒子の数を返す。

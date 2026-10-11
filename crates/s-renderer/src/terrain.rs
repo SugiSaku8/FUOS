@@ -88,3 +88,43 @@ impl TerrainMesh {
         GpuMesh::upload(device, &self.mesh)
     }
 }
+
+
+/// 海面を表す水平メッシュ。海底地形とは別に描画し、海面を透過させる。
+#[derive(Debug)]
+pub struct OceanSurfaceMesh {
+    mesh: Mesh<TerrainVertex>,
+}
+
+impl OceanSurfaceMesh {
+    pub fn new(bounds: GeoBounds, width: usize, height: usize) -> Self {
+        assert!(width >= 2 && height >= 2);
+        let converter = GeoConverter::new(bounds, 100_000.0);
+        let mut vertices = Vec::with_capacity(width * height);
+        for z in 0..height {
+            let latitude = bounds.lat_min
+                + (bounds.lat_max - bounds.lat_min) * z as f64 / (height - 1) as f64;
+            for x in 0..width {
+                let longitude = bounds.lon_min
+                    + (bounds.lon_max - bounds.lon_min) * x as f64 / (width - 1) as f64;
+                let position = converter.ocean_to_world(longitude, latitude, 0.0);
+                vertices.push(TerrainVertex { position, height: -1.0 });
+            }
+        }
+        let mut indices = Vec::with_capacity((width - 1) * (height - 1) * 6);
+        for z in 0..height - 1 {
+            for x in 0..width - 1 {
+                let tl = (z * width + x) as u32;
+                let tr = tl + 1;
+                let bl = tl + width as u32;
+                let br = bl + 1;
+                indices.extend_from_slice(&[tl, bl, tr, tr, bl, br]);
+            }
+        }
+        Self { mesh: Mesh::new(vertices, indices) }
+    }
+
+    pub fn upload(&self, device: &wgpu::Device) -> GpuMesh<TerrainVertex> {
+        GpuMesh::upload(device, &self.mesh)
+    }
+}
