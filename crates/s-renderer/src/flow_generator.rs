@@ -1,20 +1,11 @@
 use crate::{coordinate::GeoConverter, flow::FlowVertex};
+
 use s_field::VelocityField;
 
 /// 静的な流線を生成する。
 pub struct FlowGenerator;
 
 impl FlowGenerator {
-    /// 流速データから流線を生成する。
-    ///
-    /// # Arguments
-    ///
-    /// * `velocity` - 海流の速度場
-    /// * `converter` - 地理座標とワールド座標の変換器
-    /// * `seeds` - 粒子の初期位置 [経度, 緯度, 深度]
-    /// * `dt_seconds` - 1ステップあたりの時間
-    /// * `length` - 最大ステップ数
-    /// * `time` - 速度場の時間座標
     pub fn generate(
         velocity: &VelocityField,
         converter: &GeoConverter,
@@ -60,11 +51,9 @@ impl FlowGenerator {
                     break;
                 }
 
-                // 東西・南北方向の移動距離。
                 let east_m = u * dt_seconds as f64;
                 let north_m = v * dt_seconds as f64;
 
-                // 距離を緯度・経度の変化量に変換。
                 let delta_lat = north_m / 110_540.0;
 
                 let cos_lat = latitude.to_radians().cos();
@@ -94,7 +83,7 @@ impl FlowGenerator {
 
                 let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, depth);
 
-                // 海面上に描画するためのオフセット。
+                // 既存の海流表示と同じ高さ補正。
                 world_start[1] += 100.0;
                 world_end[1] += 100.0;
 
@@ -115,16 +104,18 @@ impl FlowGenerator {
     }
 }
 
-/// 1つの流速粒子と、その粒子が通過した位置を保持する。
-/// 1つの流速粒子と、その粒子が通過した位置を保持する。
+/// 1つの流速粒子と、その軌跡を保持する。
 struct FlowParticle {
     origin: [f64; 2],
     origin_depth: f32,
+
     longitude: f64,
     latitude: f64,
     depth: f32,
+
     trail: Vec<[f32; 3]>,
 }
+
 /// 流速データを使って粒子を時間発展させるシステム。
 pub struct FlowParticleSystem {
     particles: Vec<FlowParticle>,
@@ -134,16 +125,18 @@ pub struct FlowParticleSystem {
 impl FlowParticleSystem {
     /// 初期位置から粒子を作成する。
     ///
-    /// `seeds` は [経度, 緯度, 深度] の配列。
+    /// seedsは[経度、緯度、深度]。
     pub fn new(seeds: &[[f32; 3]], max_trail_points: usize) -> Self {
         let particles = seeds
             .iter()
             .map(|seed| FlowParticle {
                 origin: [seed[0] as f64, seed[1] as f64],
                 origin_depth: seed[2],
+
                 longitude: seed[0] as f64,
                 latitude: seed[1] as f64,
                 depth: seed[2],
+
                 trail: Vec::new(),
             })
             .collect();
@@ -155,9 +148,6 @@ impl FlowParticleSystem {
     }
 
     /// 全粒子を1フレーム分だけ移動させる。
-    ///
-    /// `dt_seconds` は実際のフレーム経過時間。
-    /// `speed_multiplier` はシミュレーション速度の倍率。
     pub fn update(
         &mut self,
         velocity: &VelocityField,
@@ -172,8 +162,8 @@ impl FlowParticleSystem {
 
         let bounds = converter.bounds();
 
-        // フレームレートが落ちた場合の急激な移動を防ぐ。
         let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 100.0;
+
         if !dt.is_finite() || dt <= 0.0 {
             return;
         }
@@ -186,7 +176,6 @@ impl FlowParticleSystem {
                     && particle.latitude >= bounds.lat_min
                     && particle.latitude <= bounds.lat_max;
 
-            // 領域外に出た粒子は初期位置に戻す。
             if !position_is_valid {
                 Self::reset_particle(particle);
                 continue;
@@ -211,12 +200,10 @@ impl FlowParticleSystem {
                 continue;
             }
 
-            // 3次元の流速が十分に小さい粒子は、その場に残す。
             if u.hypot(v).hypot(w) < 0.02 {
                 continue;
             }
 
-            // 流速[m/s] × 経過時間[s] = 移動距離[m]。
             let east_m = u * dt as f64;
             let north_m = v * dt as f64;
 
@@ -235,10 +222,8 @@ impl FlowParticleSystem {
 
             let next_latitude = particle.latitude + delta_lat;
 
-            // 水深は海面を 0 とし、下向きを正とする。
-            // ここでは鉛直流速 w が上向き正であると仮定する。
-            let next_depth = particle.depth - (w * dt as f64) as f32;
-
+            // 深度は海面0、下向きを正とする。
+            let next_depth = particle.depth - (w as f32) * dt;
             let next_position_is_valid = next_depth.is_finite()
                 && coordinates.contains(next_longitude, next_latitude, next_depth)
                 && next_longitude >= bounds.lon_min
@@ -251,15 +236,13 @@ impl FlowParticleSystem {
                 continue;
             }
 
-            // 移動前の位置も軌跡に加える。
-            // 最初のフレームから線分を生成できるようにする。
             let mut world_start =
                 converter.ocean_to_world(particle.longitude, particle.latitude, particle.depth);
 
-            world_start[1] += 100.0;
-
             let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, next_depth);
 
+            // 既存の海流表示と同じ高さ補正。
+            world_start[1] += 100.0;
             world_end[1] += 100.0;
 
             if particle.trail.is_empty() {
@@ -268,7 +251,6 @@ impl FlowParticleSystem {
 
             particle.trail.push(world_end);
 
-            // 軌跡の長さを制限する。
             if particle.trail.len() > self.max_trail_points {
                 let excess = particle.trail.len() - self.max_trail_points;
 
@@ -282,19 +264,29 @@ impl FlowParticleSystem {
     }
 
     /// 粒子を初期位置に戻し、古い軌跡を消す。
-    /// 粒子を初期位置に戻し、古い軌跡を消す。
     fn reset_particle(particle: &mut FlowParticle) {
         particle.longitude = particle.origin[0];
         particle.latitude = particle.origin[1];
         particle.depth = particle.origin_depth;
+
         particle.trail.clear();
     }
 
-    /// 各粒子の軌跡をGPU描画用の線分に変換する。
+    /// 軌跡と現在位置のマーカーを描画用頂点に変換する。
+    ///
+    /// 既存のLineListパイプラインで描画できるように、
+    /// 粒子は小さな十字形の線分として表現する。
     pub fn vertices(&self) -> Vec<FlowVertex> {
         let mut vertices = Vec::new();
 
+        // ワールド座標単位でのマーカーの半径。
+        let marker_size = 450.0_f32;
+
         for particle in &self.particles {
+            // ------------------------------------------
+            // 流線
+            // ------------------------------------------
+
             for segment in particle.trail.windows(2) {
                 vertices.push(FlowVertex {
                     position: segment[0],
@@ -304,28 +296,50 @@ impl FlowParticleSystem {
                     position: segment[1],
                 });
             }
+
+            // ------------------------------------------
+            // 粒子マーカー
+            // ------------------------------------------
+
+            let Some(&position) = particle.trail.last() else {
+                continue;
+            };
+
+            let x = position[0];
+            let y = position[1];
+            let z = position[2];
+
+            // X方向の線分。
+            vertices.push(FlowVertex {
+                position: [x - marker_size, y, z],
+            });
+
+            vertices.push(FlowVertex {
+                position: [x + marker_size, y, z],
+            });
+
+            // Y方向の線分。
+            vertices.push(FlowVertex {
+                position: [x, y - marker_size, z],
+            });
+
+            vertices.push(FlowVertex {
+                position: [x, y + marker_size, z],
+            });
+
+            // Z方向の線分。
+            vertices.push(FlowVertex {
+                position: [x, y, z - marker_size],
+            });
+
+            vertices.push(FlowVertex {
+                position: [x, y, z + marker_size],
+            });
         }
 
         vertices
     }
 
-    /// 現在の粒子位置を、描画用の点頂点として返す。
-    pub fn particle_vertices(&self, converter: &GeoConverter) -> Vec<FlowVertex> {
-        self.particles
-            .iter()
-            .map(|particle| {
-                let mut position = converter.ocean_to_world(
-                    particle.longitude,
-                    particle.latitude,
-                    particle.depth,
-                );
-                position[1] += 100.0;
-                FlowVertex { position }
-            })
-            .collect()
-    }
-
-    /// 粒子の数を返す。
     pub fn particle_count(&self) -> usize {
         self.particles.len()
     }

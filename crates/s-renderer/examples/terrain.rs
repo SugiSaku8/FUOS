@@ -341,17 +341,16 @@ async fn run() -> Result<()> {
 
                 let flow_vertices = particles.vertices();
 
-                // 更新された軌跡をGPUへ転送する。
+                // 軌跡と粒子マーカーをGPUへ転送する。
                 if !gpu_flow.update_vertices(renderer.queue(), &flow_vertices) {
                     eprintln!(
                         "Flow vertex buffer capacity exceeded: {} vertices",
                         flow_vertices.len()
                     );
                 }
-                let particle_vertices = particles.particle_vertices(&converter);
-                if !gpu_particle_dots.update_vertices(renderer.queue(), &particle_vertices) {
-                    eprintln!("Particle dot buffer capacity exceeded");
-                }
+
+                // vertices() に粒子マーカーも含まれるため、
+                // 独立した粒子用バッファへの更新は行わない。
 
                 camera_controller.update_with_dt(renderer.camera_mut(), dt_seconds);
 
@@ -391,74 +390,4 @@ async fn run() -> Result<()> {
     })?;
 
     Ok(())
-}
-/// 半透明表示用の海面メッシュ。
-///
-/// 海底地形とは別のメッシュとして作成し、
-/// 海面の描画時にアルファブレンディングを適用する。
-#[derive(Debug)]
-pub struct OceanSurfaceMesh {
-    mesh: Mesh<TerrainVertex>,
-}
-
-impl OceanSurfaceMesh {
-    /// 地理的な範囲を指定して水平な海面を生成する。
-    pub fn new(bounds: GeoBounds, width: usize, height: usize) -> Self {
-        assert!(width >= 2);
-        assert!(height >= 2);
-
-        let converter = GeoConverter::new(bounds, 100_000.0);
-
-        let mut vertices = Vec::with_capacity(width * height);
-
-        for z in 0..height {
-            let latitude =
-                bounds.lat_min + (bounds.lat_max - bounds.lat_min) * z as f64 / (height - 1) as f64;
-
-            for x in 0..width {
-                let longitude = bounds.lon_min
-                    + (bounds.lon_max - bounds.lon_min) * x as f64 / (width - 1) as f64;
-
-                // 海面の高さは海抜0m。
-                let position = converter.ocean_to_world(longitude, latitude, 0.0);
-
-                vertices.push(TerrainVertex {
-                    position,
-                    height: 0.0,
-                });
-            }
-        }
-
-        let mut indices = Vec::with_capacity((width - 1) * (height - 1) * 6);
-
-        for z in 0..height - 1 {
-            for x in 0..width - 1 {
-                let top_left = (z * width + x) as u32;
-
-                let top_right = top_left + 1;
-
-                let bottom_left = top_left + width as u32;
-
-                let bottom_right = bottom_left + 1;
-
-                indices.extend_from_slice(&[
-                    top_left,
-                    bottom_left,
-                    top_right,
-                    top_right,
-                    bottom_left,
-                    bottom_right,
-                ]);
-            }
-        }
-
-        Self {
-            mesh: Mesh::new(vertices, indices),
-        }
-    }
-
-    /// GPUへ海面メッシュを転送する。
-    pub fn upload(&self, device: &wgpu::Device) -> GpuMesh<TerrainVertex> {
-        GpuMesh::upload(device, &self.mesh)
-    }
 }
