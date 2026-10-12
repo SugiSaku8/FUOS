@@ -244,8 +244,7 @@ async fn run() -> Result<()> {
     // --------------------------------------------------
 
     let terrain_mesh = TerrainMesh::from_heightmap(&heightmap, bounds, 5.0);
-    let ocean_mesh = OceanSurfaceMesh::new(bounds, width, height);
-
+    let ocean_mesh = OceanSurfaceMesh::new(bounds, &heightmap);
     println!("Terrain vertices: {}", terrain_mesh.vertex_count());
     println!("Terrain indices: {}", terrain_mesh.index_count());
 

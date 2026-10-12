@@ -91,18 +91,20 @@ impl TerrainMesh {
 ///
 /// 海底地形とは独立した水平面として生成する。
 /// 描画時には専用の半透明パイプラインを使用する。
+/// 海域だけに生成する水平な海面メッシュ。
 #[derive(Debug)]
 pub struct OceanSurfaceMesh {
     mesh: Mesh<TerrainVertex>,
 }
 
 impl OceanSurfaceMesh {
-    /// 指定された範囲に水平な海面を生成する。
-    ///
-    /// width、heightは海面の格子数。
-    pub fn new(bounds: GeoBounds, width: usize, height: usize) -> Self {
-        assert!(width >= 2);
-        assert!(height >= 2);
+    pub fn new(bounds: GeoBounds, heightmap: &HeightMap) -> Self {
+        assert!(heightmap.width >= 2);
+        assert!(heightmap.height >= 2);
+        assert_eq!(heightmap.data.len(), heightmap.width * heightmap.height);
+
+        let width = heightmap.width;
+        let height = heightmap.height;
 
         let converter = GeoConverter::new(bounds, 100_000.0);
 
@@ -129,22 +131,32 @@ impl OceanSurfaceMesh {
 
         for z in 0..height - 1 {
             for x in 0..width - 1 {
-                let top_left = (z * width + x) as u32;
-
+                let top_left = z * width + x;
                 let top_right = top_left + 1;
-
-                let bottom_left = top_left + width as u32;
-
+                let bottom_left = top_left + width;
                 let bottom_right = bottom_left + 1;
 
-                indices.extend_from_slice(&[
-                    top_left,
-                    bottom_left,
-                    top_right,
-                    top_right,
-                    bottom_left,
-                    bottom_right,
-                ]);
+                // 海底標高が負の地点だけを海域として扱う。
+                let is_sea = |index: usize| {
+                    let elevation = heightmap.data[index];
+                    elevation.is_finite() && elevation < 0.0
+                };
+
+                // 4頂点すべてが海域の場合だけ面を生成する。
+                if is_sea(top_left)
+                    && is_sea(top_right)
+                    && is_sea(bottom_left)
+                    && is_sea(bottom_right)
+                {
+                    indices.extend_from_slice(&[
+                        top_left as u32,
+                        bottom_left as u32,
+                        top_right as u32,
+                        top_right as u32,
+                        bottom_left as u32,
+                        bottom_right as u32,
+                    ]);
+                }
             }
         }
 
@@ -161,7 +173,6 @@ impl OceanSurfaceMesh {
         self.mesh.index_count()
     }
 
-    /// 海面メッシュをGPUへ転送する。
     pub fn upload(&self, device: &wgpu::Device) -> GpuMesh<TerrainVertex> {
         GpuMesh::upload(device, &self.mesh)
     }
