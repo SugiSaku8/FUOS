@@ -38,8 +38,13 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
         let d = clamp(depth / 4000.0, 0.0, 1.0);
 
         // 浅い海底は青、深海は濃紺。
-        let shallow = vec3<f32>(0.035, 0.16, 0.24);
-        let deep = vec3<f32>(0.004, 0.012, 0.035);
+        // 浅い海：透明感のある青緑
+
+        let shallow = vec3<f32>(0.055, 0.29, 0.34);
+
+        // 深い海：落ち着いた深い藍色
+
+        let deep = vec3<f32>(0.012, 0.075, 0.19);
 
         // 深くなるほど暗くし、海底の起伏を読み取りやすくする。
         let color = mix(shallow, deep, pow(d, 0.75));

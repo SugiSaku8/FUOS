@@ -2,8 +2,8 @@ use anyhow::{Context, Result};
 use s_field::{Coordinates, Grid4D, VelocityField};
 use s_renderer::{
     GeoBounds, GeoConverter, GpuFlowMesh, HeightMap, Renderer, TerrainMesh, TerrainVertex,
-    camera_controller::CameraController, flow_generator::FlowParticleSystem,
-    terrain::OceanSurfaceMesh,
+    camera_controller::CameraController, contour::generate_bathymetry_contours,
+    flow_generator::FlowParticleSystem, terrain::OceanSurfaceMesh,
 };
 use s_sof::grid::GridReader;
 use std::{fs, sync::Arc, time::Instant};
@@ -262,6 +262,30 @@ async fn run() -> Result<()> {
     let gpu_terrain = terrain_mesh.upload(renderer.device());
     let gpu_ocean = ocean_mesh.upload(renderer.device());
 
+    // --------------------------------------------------
+    // 4.1 海底等深線
+    // --------------------------------------------------
+
+    const CONTOUR_INTERVAL_M: f32 = 250.0;
+    const TERRAIN_VERTICAL_SCALE: f32 = 5.0;
+
+    let contour_vertices = generate_bathymetry_contours(
+        &heightmap,
+        bounds,
+        TERRAIN_VERTICAL_SCALE,
+        CONTOUR_INTERVAL_M,
+    );
+
+    let gpu_contours = GpuFlowMesh::from_flow_vertices(renderer.device(), &contour_vertices);
+
+    println!(
+        "Bathymetry contours: {} vertices ({} m interval)",
+        contour_vertices.len(),
+        CONTOUR_INTERVAL_M
+    );
+
+    let converter = GeoConverter::new(bounds, 100_000.0);
+
     let converter = GeoConverter::new(bounds, 100_000.0);
 
     // --------------------------------------------------
@@ -372,6 +396,7 @@ async fn run() -> Result<()> {
                 if let Err(error) = renderer.render_with_ocean_and_particles(
                     &gpu_terrain,
                     Some(&gpu_ocean),
+                    Some(&gpu_contours),
                     Some(&gpu_flow),
                     Some(&gpu_particle_dots),
                     None,

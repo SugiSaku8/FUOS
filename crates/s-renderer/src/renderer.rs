@@ -212,7 +212,11 @@ impl Renderer {
     where
         V: bytemuck::Pod,
     {
-        self.render_with_ocean_and_particles(terrain, ocean, flow, None, velocity)
+        self.render_with_ocean_and_particles(
+            terrain, ocean, None, // contours
+            flow, None, // particle_dots
+            velocity,
+        )
     }
 
     /// 海底地形、海面、流線、粒子、速度場を描画する。
@@ -222,6 +226,7 @@ impl Renderer {
         &mut self,
         terrain: &GpuMesh<V>,
         ocean: Option<&GpuMesh<TerrainVertex>>,
+        contours: Option<&GpuFlowMesh>,
         flow: Option<&GpuFlowMesh>,
         particle_dots: Option<&GpuFlowMesh>,
         velocity: Option<&GpuVelocityMesh>,
@@ -305,6 +310,45 @@ impl Renderer {
             pass.set_index_buffer(terrain.index_buffer().slice(..), wgpu::IndexFormat::Uint32);
 
             pass.draw_indexed(0..terrain.index_count(), 0, 0..1);
+        }
+
+        // --------------------------------------------------
+        // Bathymetry Contour Pass
+        // --------------------------------------------------
+
+        if let Some(contours) = contours {
+            if contours.vertex_count() > 0 {
+                let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: Some("bathymetry_contour_pass"),
+
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Load,
+                            store: wgpu::StoreOp::Store,
+                        },
+                        depth_slice: None,
+                    })],
+
+                    depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                        view: self.depth.view(),
+                        depth_ops: Some(wgpu::Operations {
+                            load: wgpu::LoadOp::Load,
+                            store: wgpu::StoreOp::Store,
+                        }),
+                        stencil_ops: None,
+                    }),
+
+                    timestamp_writes: None,
+                    occlusion_query_set: None,
+                });
+
+                pass.set_pipeline(self.flow_pipeline.pipeline());
+                pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
+                pass.set_vertex_buffer(0, contours.vertex_buffer().slice(..));
+                pass.draw(0..contours.vertex_count(), 0..1);
+            }
         }
 
         // --------------------------------------------------
