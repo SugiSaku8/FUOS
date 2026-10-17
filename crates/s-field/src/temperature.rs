@@ -94,4 +94,3 @@ impl TemperatureField {
         Some(sum / slice.len() as f32)
     }
 }
-

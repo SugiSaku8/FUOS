@@ -27,4 +27,3 @@ uint id [[thread_position_in_grid]]
 
     println!("Compute pipeline created");
 }
-

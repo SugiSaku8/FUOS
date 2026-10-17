@@ -13,4 +13,3 @@ pub struct VelocityGradient {
     pub w_dy: GpuField3D,
     pub w_dz: GpuField3D,
 }
-

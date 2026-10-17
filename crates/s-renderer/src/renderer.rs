@@ -145,8 +145,8 @@ impl Renderer {
             particle_shader.module(),
             pipeline.camera_layout(),
             &FlowVertex::layout(),
-            wgpu::PrimitiveTopology::PointList,
-            false,
+            wgpu::PrimitiveTopology::LineList,
+            true,
             false,
         );
 
