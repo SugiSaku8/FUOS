@@ -16,8 +16,9 @@ use crate::{
 /// 描画対象:
 /// - 海底地形
 /// - 半透明の海面
+/// - 等深線
 /// - 海流の流線
-/// - 海流粒子の現在位置
+/// - 海流粒子
 /// - 速度場
 pub struct Renderer {
     context: RenderContext,
@@ -25,6 +26,9 @@ pub struct Renderer {
 
     // 地形
     pipeline: RenderPipeline,
+
+    // 等深線
+    contour_pipeline: wgpu::RenderPipeline,
 
     // 海流
     flow_pipeline: FlowPipeline,
@@ -87,6 +91,25 @@ impl Renderer {
         )?;
 
         // --------------------------------------------------
+        // Bathymetry Contour Pipeline
+        // --------------------------------------------------
+
+        let contour_shader =
+            Shader::from_wgsl(device, include_str!("contour.wgsl"), "contour_shader")?;
+
+        let contour_pipeline = create_auxiliary_pipeline(
+            device,
+            surface_format,
+            Some(wgpu::TextureFormat::Depth32Float),
+            contour_shader.module(),
+            pipeline.camera_layout(),
+            &FlowVertex::layout(),
+            wgpu::PrimitiveTopology::LineList,
+            false,
+            false,
+        );
+
+        // --------------------------------------------------
         // Ocean Surface Pipeline
         // --------------------------------------------------
 
@@ -112,15 +135,14 @@ impl Renderer {
         // Flow Particle Pipeline
         // --------------------------------------------------
 
-        // 粒子用には、頂点位置を変換できるシェーダーと
-        // PointListトポロジーを使用する。
-        //
-        // flow.wgslがPointListにも対応することが前提。
+        let particle_shader =
+            Shader::from_wgsl(device, include_str!("particle.wgsl"), "particle_shader")?;
+
         let flow_dot_pipeline = create_auxiliary_pipeline(
             device,
             surface_format,
             Some(wgpu::TextureFormat::Depth32Float),
-            flow_shader.module(),
+            particle_shader.module(),
             pipeline.camera_layout(),
             &FlowVertex::layout(),
             wgpu::PrimitiveTopology::PointList,
@@ -155,15 +177,13 @@ impl Renderer {
         Ok(Self {
             context,
             surface,
-
             pipeline,
+            contour_pipeline,
             flow_pipeline,
             flow_dot_pipeline,
             ocean_pipeline,
             velocity_pipeline,
-
             depth,
-
             camera,
             camera_buffer,
         })
@@ -200,8 +220,6 @@ impl Renderer {
     }
 
     /// 既存の呼び出しとの互換性を保つ描画関数。
-    ///
-    /// 海面は描画するが、粒子専用メッシュは指定しない。
     pub fn render<V>(
         &mut self,
         terrain: &GpuMesh<V>,
@@ -212,16 +230,10 @@ impl Renderer {
     where
         V: bytemuck::Pod,
     {
-        self.render_with_ocean_and_particles(
-            terrain, ocean, None, // contours
-            flow, None, // particle_dots
-            velocity,
-        )
+        self.render_with_ocean_and_particles(terrain, ocean, None, flow, None, velocity)
     }
 
-    /// 海底地形、海面、流線、粒子、速度場を描画する。
-    ///
-    /// oceanとterrainは異なる頂点型を使用できる。
+    /// 海底地形、海面、等深線、流線、粒子、速度場を描画する。
     pub fn render_with_ocean_and_particles<V>(
         &mut self,
         terrain: &GpuMesh<V>,
@@ -268,11 +280,9 @@ impl Renderer {
         {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("terrain_pass"),
-
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
                     resolve_target: None,
-
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
                             r: 0.02,
@@ -282,33 +292,24 @@ impl Renderer {
                         }),
                         store: wgpu::StoreOp::Store,
                     },
-
                     depth_slice: None,
                 })],
-
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: self.depth.view(),
-
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.0),
                         store: wgpu::StoreOp::Store,
                     }),
-
                     stencil_ops: None,
                 }),
-
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
 
             pass.set_pipeline(self.pipeline.pipeline());
-
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
-
             pass.set_vertex_buffer(0, terrain.vertex_buffer().slice(..));
-
             pass.set_index_buffer(terrain.index_buffer().slice(..), wgpu::IndexFormat::Uint32);
-
             pass.draw_indexed(0..terrain.index_count(), 0, 0..1);
         }
 
@@ -320,7 +321,6 @@ impl Renderer {
             if contours.vertex_count() > 0 {
                 let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                     label: Some("bathymetry_contour_pass"),
-
                     color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                         view: &view,
                         resolve_target: None,
@@ -330,7 +330,6 @@ impl Renderer {
                         },
                         depth_slice: None,
                     })],
-
                     depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                         view: self.depth.view(),
                         depth_ops: Some(wgpu::Operations {
@@ -339,12 +338,13 @@ impl Renderer {
                         }),
                         stencil_ops: None,
                     }),
-
                     timestamp_writes: None,
                     occlusion_query_set: None,
                 });
 
-                pass.set_pipeline(self.flow_pipeline.pipeline());
+                // 等深線専用パイプライン
+                //pass.set_pipeline(self.flow_pipeline.pipeline());
+                pass.set_pipeline(&self.contour_pipeline);
                 pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
                 pass.set_vertex_buffer(0, contours.vertex_buffer().slice(..));
                 pass.draw(0..contours.vertex_count(), 0..1);
@@ -358,42 +358,31 @@ impl Renderer {
         if let Some(ocean) = ocean {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("transparent_ocean_surface_pass"),
-
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
                     resolve_target: None,
-
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Load,
                         store: wgpu::StoreOp::Store,
                     },
-
                     depth_slice: None,
                 })],
-
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: self.depth.view(),
-
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Load,
                         store: wgpu::StoreOp::Store,
                     }),
-
                     stencil_ops: None,
                 }),
-
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
 
             pass.set_pipeline(&self.ocean_pipeline);
-
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
-
             pass.set_vertex_buffer(0, ocean.vertex_buffer().slice(..));
-
             pass.set_index_buffer(ocean.index_buffer().slice(..), wgpu::IndexFormat::Uint32);
-
             pass.draw_indexed(0..ocean.index_count(), 0, 0..1);
         }
 
@@ -404,40 +393,31 @@ impl Renderer {
         if let Some(flow) = flow {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("flow_pass"),
-
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
                     resolve_target: None,
-
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Load,
                         store: wgpu::StoreOp::Store,
                     },
-
                     depth_slice: None,
                 })],
-
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: self.depth.view(),
-
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Load,
                         store: wgpu::StoreOp::Store,
                     }),
-
                     stencil_ops: None,
                 }),
-
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
 
+            // 海流の流線専用パイプライン
             pass.set_pipeline(self.flow_pipeline.pipeline());
-
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
-
             pass.set_vertex_buffer(0, flow.vertex_buffer().slice(..));
-
             pass.draw(0..flow.vertex_count(), 0..1);
         }
 
@@ -446,43 +426,36 @@ impl Renderer {
         // --------------------------------------------------
 
         if let Some(dots) = particle_dots {
-            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("flow_particle_dots_pass"),
-
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Load,
-                        store: wgpu::StoreOp::Store,
-                    },
-
-                    depth_slice: None,
-                })],
-
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: self.depth.view(),
-
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Load,
-                        store: wgpu::StoreOp::Store,
+            if dots.vertex_count() > 0 {
+                let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: Some("flow_particle_dots_pass"),
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Load,
+                            store: wgpu::StoreOp::Store,
+                        },
+                        depth_slice: None,
+                    })],
+                    depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                        view: self.depth.view(),
+                        depth_ops: Some(wgpu::Operations {
+                            load: wgpu::LoadOp::Load,
+                            store: wgpu::StoreOp::Store,
+                        }),
+                        stencil_ops: None,
                     }),
+                    timestamp_writes: None,
+                    occlusion_query_set: None,
+                });
 
-                    stencil_ops: None,
-                }),
-
-                timestamp_writes: None,
-                occlusion_query_set: None,
-            });
-
-            pass.set_pipeline(&self.flow_dot_pipeline);
-
-            pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
-
-            pass.set_vertex_buffer(0, dots.vertex_buffer().slice(..));
-
-            pass.draw(0..dots.vertex_count(), 0..1);
+                // 粒子専用シェーダーを使用
+                pass.set_pipeline(&self.flow_dot_pipeline);
+                pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
+                pass.set_vertex_buffer(0, dots.vertex_buffer().slice(..));
+                pass.draw(0..dots.vertex_count(), 0..1);
+            }
         }
 
         // --------------------------------------------------
@@ -492,40 +465,30 @@ impl Renderer {
         if let Some(velocity) = velocity {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("velocity_pass"),
-
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
                     resolve_target: None,
-
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Load,
                         store: wgpu::StoreOp::Store,
                     },
-
                     depth_slice: None,
                 })],
-
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: self.depth.view(),
-
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Load,
                         store: wgpu::StoreOp::Store,
                     }),
-
                     stencil_ops: None,
                 }),
-
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
 
             pass.set_pipeline(self.velocity_pipeline.pipeline());
-
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
-
             pass.set_vertex_buffer(0, velocity.vertex_buffer().slice(..));
-
             pass.draw(0..velocity.vertex_count(), 0..1);
         }
 
@@ -573,11 +536,9 @@ impl Renderer {
         {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("velocity_only_pass"),
-
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
                     resolve_target: None,
-
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
                             r: 0.02,
@@ -587,31 +548,23 @@ impl Renderer {
                         }),
                         store: wgpu::StoreOp::Store,
                     },
-
                     depth_slice: None,
                 })],
-
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: self.depth.view(),
-
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.0),
                         store: wgpu::StoreOp::Store,
                     }),
-
                     stencil_ops: None,
                 }),
-
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
 
             pass.set_pipeline(self.velocity_pipeline.pipeline());
-
             pass.set_bind_group(0, &self.camera_buffer.bind_group, &[]);
-
             pass.set_vertex_buffer(0, velocity.vertex_buffer().slice(..));
-
             pass.draw(0..velocity.vertex_count(), 0..1);
         }
 
@@ -623,10 +576,7 @@ impl Renderer {
     }
 }
 
-/// 海面・粒子などの補助描画パイプラインを作成する。
-///
-/// `alpha_blending`がtrueの場合、アルファブレンディングを有効にする。
-/// `depth_write_enabled`がfalseの場合、深度バッファを書き換えない。
+/// 海面・粒子・等深線などの補助描画パイプラインを作成する。
 fn create_auxiliary_pipeline(
     device: &wgpu::Device,
     format: wgpu::TextureFormat,
@@ -658,19 +608,15 @@ fn create_auxiliary_pipeline(
         fragment: Some(wgpu::FragmentState {
             module: shader,
             entry_point: Some("fs_main"),
-
             targets: &[Some(wgpu::ColorTargetState {
                 format,
-
                 blend: Some(if alpha_blending {
                     wgpu::BlendState::ALPHA_BLENDING
                 } else {
                     wgpu::BlendState::REPLACE
                 }),
-
                 write_mask: wgpu::ColorWrites::ALL,
             })],
-
             compilation_options: wgpu::PipelineCompilationOptions::default(),
         }),
 
