@@ -84,6 +84,8 @@ impl FlowGenerator {
                 let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, depth);
 
                 // 既存の海流表示と同じ高さ補正。
+                world_start[1] += 100.0;
+                world_end[1] += 100.0;
 
                 vertices.push(FlowVertex {
                     position: world_start,
@@ -160,8 +162,7 @@ impl FlowParticleSystem {
 
         let bounds = converter.bounds();
 
-        // speed_multiplier はシミュレーション時間の倍率。流速値そのものは変更しない。
-        let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0);
+        let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 100.0;
 
         if !dt.is_finite() || dt <= 0.0 {
             return;
@@ -241,6 +242,8 @@ impl FlowParticleSystem {
             let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, next_depth);
 
             // 既存の海流表示と同じ高さ補正。
+            world_start[1] += 100.0;
+            world_end[1] += 100.0;
 
             if particle.trail.is_empty() {
                 particle.trail.push(world_start);
@@ -269,52 +272,68 @@ impl FlowParticleSystem {
         particle.trail.clear();
     }
 
-    /// 各粒子の軌跡をGPU描画用の線分に変換する。
+    /// 軌跡と現在位置のマーカーを描画用頂点に変換する。
+    ///
+    /// 既存のLineListパイプラインで描画できるように、
+    /// 粒子は小さな十字形の線分として表現する。
     pub fn vertices(&self) -> Vec<FlowVertex> {
         let mut vertices = Vec::new();
 
+        // ワールド座標単位でのマーカーの半径。
+        let marker_size = 450.0_f32;
+
         for particle in &self.particles {
+            // ------------------------------------------
+            // 流線
+            // ------------------------------------------
+
             for segment in particle.trail.windows(2) {
                 vertices.push(FlowVertex {
                     position: segment[0],
                 });
+
                 vertices.push(FlowVertex {
                     position: segment[1],
                 });
             }
-        }
 
-        vertices
-    }
+            // ------------------------------------------
+            // 粒子マーカー
+            // ------------------------------------------
 
-    /// 現在の粒子位置を、3次元空間で視認しやすいマーカー頂点に変換する。
-    /// 粒子の最終軌跡点を使うため、流線と同じ水深・座標を保つ。
-    pub fn particle_vertices(&self) -> Vec<FlowVertex> {
-        const MARKER_RADIUS: f32 = 450.0;
-        let mut vertices = Vec::with_capacity(self.particles.len() * 6);
-
-        for particle in &self.particles {
             let Some(&position) = particle.trail.last() else {
                 continue;
             };
-            let [x, y, z] = position;
+
+            let x = position[0];
+            let y = position[1];
+            let z = position[2];
+
+            // X方向の線分。
             vertices.push(FlowVertex {
-                position: [x - MARKER_RADIUS, y, z],
+                position: [x - marker_size, y, z],
             });
+
             vertices.push(FlowVertex {
-                position: [x + MARKER_RADIUS, y, z],
+                position: [x + marker_size, y, z],
             });
+
+            // Y方向の線分。
             vertices.push(FlowVertex {
-                position: [x, y - MARKER_RADIUS, z],
+                position: [x, y - marker_size, z],
             });
+
             vertices.push(FlowVertex {
-                position: [x, y + MARKER_RADIUS, z],
+                position: [x, y + marker_size, z],
             });
+
+            // Z方向の線分。
             vertices.push(FlowVertex {
-                position: [x, y, z - MARKER_RADIUS],
+                position: [x, y, z - marker_size],
             });
+
             vertices.push(FlowVertex {
-                position: [x, y, z + MARKER_RADIUS],
+                position: [x, y, z + marker_size],
             });
         }
 

@@ -51,3 +51,4 @@ uint id [[thread_position_in_grid]]
 
     println!("{:?}", result.read_f32());
 }
+

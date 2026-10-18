@@ -93,8 +93,7 @@ fn load_surface_velocity() -> Result<VelocityField> {
 
     velocity.u_mut().replace(u);
     velocity.v_mut().replace(v);
-    // w が未提供のため、鉛直流を捏造せずゼロで初期化する。
-    velocity.w_mut().fill(0.0);
+    velocity.w_mut().fill(0.05);
     println!(
         "Ocean velocity loaded: {} x {} grid, {} depth levels",
         GRID_WIDTH, GRID_HEIGHT, DEPTH_COUNT
@@ -311,7 +310,7 @@ async fn run() -> Result<()> {
     let max_vertices = seeds.len() * (PARTICLE_TRAIL_POINTS - 1) * 2;
 
     let mut gpu_flow = GpuFlowMesh::with_capacity(renderer.device(), max_vertices);
-    let mut gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len() * 6);
+    let mut gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len());
     let mut camera_controller = CameraController::new();
 
     println!("Flow seeds: {}", seeds.len());

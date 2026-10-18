@@ -2,30 +2,66 @@ struct Camera {
     view_proj: mat4x4<f32>,
 };
 
+
 @group(0) @binding(0)
 var<uniform> camera: Camera;
 
+
+
 struct VertexInput {
-    @location(0) position: vec3<f32>,
+
+    @location(0)
+    position: vec3<f32>,
+
 };
+
+
 
 struct VertexOutput {
-    @builtin(position) position: vec4<f32>,
-    @location(0) depth: f32,
+
+    @builtin(position)
+    position: vec4<f32>,
+
 };
 
+
+
 @vertex
-fn vs_main(input: VertexInput) -> VertexOutput {
-    var out: VertexOutput;
-    let clip_position = camera.view_proj * vec4<f32>(input.position, 1.0);
-    out.position = clip_position;
-    out.depth = clamp(clip_position.z / max(clip_position.w, 0.0001), 0.0, 1.0);
+fn vs_main(
+    input: VertexInput
+)
+-> VertexOutput {
+
+
+    var out:VertexOutput;
+
+
+    out.position =
+        camera.view_proj
+        *
+        vec4<f32>(
+            input.position,
+            1.0
+        );
+
+
     return out;
+
 }
 
+
+
 @fragment
-fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
-    // 距離に応じて少し透かし、FPS視点で遠近感を保つ。
-    let alpha = mix(0.92, 0.24, input.depth);
-    return vec4<f32>(0.08, 0.92, 1.0, alpha);
+fn fs_main()
+-> @location(0) vec4<f32>
+{
+
+    //
+    // 黒潮表示用
+    //
+    // 後で速度値によって
+    // 色変更する
+    //
+
+    return vec4<f32>(0.0, 0.9, 1.0, 1.0);
 }
