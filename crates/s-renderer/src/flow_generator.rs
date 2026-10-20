@@ -2,6 +2,9 @@ use crate::{coordinate::GeoConverter, flow::FlowVertex};
 
 use s_field::VelocityField;
 
+/// terrain.rs と同じ深度方向の表示倍率。
+const OCEAN_VERTICAL_SCALE: f32 = 5.0;
+
 /// 静的な流線を生成する。
 pub struct FlowGenerator;
 
@@ -83,9 +86,9 @@ impl FlowGenerator {
 
                 let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, depth);
 
-                // 既存の海流表示と同じ高さ補正。
-                world_start[1] += 100.0;
-                world_end[1] += 100.0;
+                // 海面をY=0、深度を下向きにし、海底地形と同じ垂直倍率で表示する。
+                world_start[1] = -depth * OCEAN_VERTICAL_SCALE;
+                world_end[1] = -depth * OCEAN_VERTICAL_SCALE;
 
                 vertices.push(FlowVertex {
                     position: world_start,
@@ -241,9 +244,9 @@ impl FlowParticleSystem {
 
             let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, next_depth);
 
-            // 既存の海流表示と同じ高さ補正。
-            world_start[1] += 100.0;
-            world_end[1] += 100.0;
+            // 海面をY=0、深度を下向きにし、海底地形と同じ垂直倍率で表示する。
+            world_start[1] = -particle.depth * OCEAN_VERTICAL_SCALE;
+            world_end[1] = -next_depth * OCEAN_VERTICAL_SCALE;
 
             if particle.trail.is_empty() {
                 particle.trail.push(world_start);

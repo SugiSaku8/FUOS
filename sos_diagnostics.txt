@@ -1,0 +1,6998 @@
+==================================================
+ SOS - PROJECT DIAGNOSTICS
+ Date: Sun Oct 18 17:54:21 JST 2026
+==================================================
+
+========== 1. GIT STATUS ==========
+ M now.sh
+?? sos_diagnostics.txt
+e7bc167 restore save data
+
+========== 2. WORKSPACE ==========
+rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)
+cargo 1.93.1 (Homebrew)
+  File "<string>", line 6
+    print(f"{p[\"name\"]}: {p[\"manifest_path\"]}")
+                ^
+SyntaxError: unexpected character after line continuation character
+
+========== 3. SOURCE FILES ==========
+crates/gui/Cargo.toml
+crates/gui/src/lib.rs
+crates/physics/Cargo.toml
+crates/physics/src/lib.rs
+crates/s-builder/Cargo.toml
+crates/s-builder/examples/build_suruga.rs
+crates/s-builder/src/binary.rs
+crates/s-builder/src/builder.rs
+crates/s-builder/src/field_loader.rs
+crates/s-builder/src/gebco.rs
+crates/s-builder/src/hycom.rs
+crates/s-builder/src/lib.rs
+crates/s-builder/src/loader.rs
+crates/s-builder/src/metadata.rs
+crates/s-builder/src/raw.rs
+crates/s-core/Cargo.toml
+crates/s-core/src/field.rs
+crates/s-core/src/grid.rs
+crates/s-core/src/lib.rs
+crates/s-core/src/math.rs
+crates/s-core/src/time.rs
+crates/s-field/Cargo.toml
+crates/s-field/src/boundary.rs
+crates/s-field/src/coordinates.rs
+crates/s-field/src/field.rs
+crates/s-field/src/field2d.rs
+crates/s-field/src/field3d.rs
+crates/s-field/src/field4d.rs
+crates/s-field/src/field_storage.rs
+crates/s-field/src/generator/kuroshio.rs
+crates/s-field/src/generator/mod.rs
+crates/s-field/src/grid.rs
+crates/s-field/src/lib.rs
+crates/s-field/src/metadata.rs
+crates/s-field/src/ocean.rs
+crates/s-field/src/ocean_grid.rs
+crates/s-field/src/salinity.rs
+crates/s-field/src/scalar.rs
+crates/s-field/src/storage.rs
+crates/s-field/src/temperature.rs
+crates/s-field/src/traits.rs
+crates/s-field/src/velocity.rs
+crates/s-grid/Cargo.toml
+crates/s-grid/src/bathymetry.rs
+crates/s-grid/src/builder.rs
+crates/s-grid/src/geometry.rs
+crates/s-grid/src/grid.rs
+crates/s-grid/src/lib.rs
+crates/s-grid/src/mask.rs
+crates/s-grid/src/mesh.rs
+crates/s-grid/src/triangulate.rs
+crates/s-grid/src/upload.rs
+crates/s-grid/src/vertex.rs
+crates/s-io/Cargo.toml
+crates/s-io/src/error.rs
+crates/s-io/src/format.rs
+crates/s-io/src/lib.rs
+crates/s-io/src/reader.rs
+crates/s-io/src/types.rs
+crates/s-io/src/writer.rs
+crates/s-io/tests/basic.rs
+crates/s-math/Cargo.toml
+crates/s-math/src/differential.rs
+crates/s-math/src/interpolation.rs
+crates/s-math/src/lib.rs
+crates/s-math/src/matrix.rs
+crates/s-math/src/time.rs
+crates/s-math/src/vector.rs
+crates/s-math/tests/differential_3d_test.rs
+crates/s-math/tests/interpolation_test.rs
+crates/s-math/tests/matrix_test.rs
+crates/s-math/tests/time_test.rs
+crates/s-math/tests/vector_test.rs
+crates/s-metal/Cargo.toml
+crates/s-metal/build.rs
+crates/s-metal/examples/advection_test.rs
+crates/s-metal/examples/compute.rs
+crates/s-metal/examples/context.rs
+crates/s-metal/examples/derivative_x.rs
+crates/s-metal/examples/device.rs
+crates/s-metal/examples/diffusion_test.rs
+crates/s-metal/examples/divergence_test.rs
+crates/s-metal/examples/gradient_pressure_test.rs
+crates/s-metal/examples/kuroshio_test.rs
+crates/s-metal/examples/pressure_test.rs
+crates/s-metal/examples/projection_test.rs
+crates/s-metal/examples/solver_test.rs
+crates/s-metal/examples/vector_add.rs
+crates/s-metal/src/advection.rs
+crates/s-metal/src/boundary.rs
+crates/s-metal/src/buffer.rs
+crates/s-metal/src/compute.rs
+crates/s-metal/src/context.rs
+crates/s-metal/src/diffusion.rs
+crates/s-metal/src/divergence.rs
+crates/s-metal/src/export.rs
+crates/s-metal/src/field.rs
+crates/s-metal/src/gradient.rs
+crates/s-metal/src/gradient_operator.rs
+crates/s-metal/src/gradient_pressure.rs
+crates/s-metal/src/grid.rs
+crates/s-metal/src/land_mask.rs
+crates/s-metal/src/lib.rs
+crates/s-metal/src/pipeline.rs
+crates/s-metal/src/pressure.rs
+crates/s-metal/src/slice.rs
+crates/s-metal/src/solver.rs
+crates/s-metal/src/state.rs
+crates/s-metal/src/time.rs
+crates/s-metal/src/velocity.rs
+crates/s-metal/src/velocity_gradient.rs
+crates/s-metal/src/velocity_gradient_operator.rs
+crates/s-renderer/Cargo.toml
+crates/s-renderer/examples/terrain.rs
+crates/s-renderer/examples/triangle.rs
+crates/s-renderer/src/buffer.rs
+crates/s-renderer/src/camera.rs
+crates/s-renderer/src/camera_controller.rs
+crates/s-renderer/src/context.rs
+crates/s-renderer/src/contour.rs
+crates/s-renderer/src/contour.wgsl
+crates/s-renderer/src/coordinate.rs
+crates/s-renderer/src/depth.rs
+crates/s-renderer/src/error.rs
+crates/s-renderer/src/flow.rs
+crates/s-renderer/src/flow.wgsl
+crates/s-renderer/src/flow_generator.rs
+crates/s-renderer/src/flow_mesh.rs
+crates/s-renderer/src/flow_pipeline.rs
+crates/s-renderer/src/frame.rs
+crates/s-renderer/src/gebco.rs
+crates/s-renderer/src/heightmap.rs
+crates/s-renderer/src/heightmap_loader.rs
+crates/s-renderer/src/lib.rs
+crates/s-renderer/src/mesh.rs
+crates/s-renderer/src/ocean.rs
+crates/s-renderer/src/ocean_loader.rs
+crates/s-renderer/src/ocean_surface.wgsl
+crates/s-renderer/src/particle.rs
+crates/s-renderer/src/particle.wgsl
+crates/s-renderer/src/pipeline.rs
+crates/s-renderer/src/renderer.rs
+crates/s-renderer/src/s-io/Cargo.toml
+crates/s-renderer/src/s-io/ocean_surface.wgsl
+crates/s-renderer/src/s-io/src/boundary.rs
+crates/s-renderer/src/s-io/src/error.rs
+crates/s-renderer/src/s-io/src/gebco.rs
+crates/s-renderer/src/s-io/src/hycom.rs
+crates/s-renderer/src/s-io/src/lib.rs
+crates/s-renderer/src/s-io/src/reader.rs
+crates/s-renderer/src/shader.rs
+crates/s-renderer/src/shader.wgsl
+crates/s-renderer/src/surface.rs
+crates/s-renderer/src/terrain.rs
+crates/s-renderer/src/terrain.wgsl
+crates/s-renderer/src/terrain_mesh.rs
+crates/s-renderer/src/test_mesh.rs
+crates/s-renderer/src/texture.rs
+crates/s-renderer/src/uniform.rs
+crates/s-renderer/src/velocity.rs
+crates/s-renderer/src/velocity.wgsl
+crates/s-renderer/src/velocity_loader.rs
+crates/s-renderer/src/velocity_mesh.rs
+crates/s-renderer/src/velocity_pipeline.rs
+crates/s-renderer/src/velocity_renderer.rs
+crates/s-sof/Cargo.toml
+crates/s-sof/examples/common.rs
+crates/s-sof/examples/create_grid.rs
+crates/s-sof/examples/create_package.rs
+crates/s-sof/examples/create_suruga_test.rs
+crates/s-sof/examples/read_grid.rs
+crates/s-sof/examples/read_package.rs
+crates/s-sof/examples/read_suruga_bay.rs
+crates/s-sof/src/boundary.rs
+crates/s-sof/src/builder.rs
+crates/s-sof/src/dataset.rs
+crates/s-sof/src/error.rs
+crates/s-sof/src/forcing.rs
+crates/s-sof/src/format.rs
+crates/s-sof/src/grid.rs
+crates/s-sof/src/grid_writer.rs
+crates/s-sof/src/initial.rs
+crates/s-sof/src/lib.rs
+crates/s-sof/src/manifest.rs
+crates/s-sof/src/package.rs
+crates/s-sof/src/package_reader.rs
+crates/s-sof/src/reader.rs
+crates/s-sof/src/restart.rs
+crates/s-sof/src/velocity.rs
+crates/s-sof/src/writer.rs
+crates/simulation/Cargo.toml
+crates/simulation/examples/run.rs
+crates/simulation/examples/view.rs
+crates/simulation/src/lib.rs
+crates/util/Cargo.toml
+crates/util/src/lib.rs
+
+========== 4. FLOW / PARTICLE / CONTOUR REFERENCES ==========
+crates/s-renderer/examples/terrain.rs:4:    GeoBounds, GeoConverter, GpuFlowMesh, HeightMap, Renderer, TerrainMesh, TerrainVertex,
+crates/s-renderer/examples/terrain.rs:6:    flow_generator::FlowParticleSystem, terrain::OceanSurfaceMesh,
+crates/s-renderer/examples/terrain.rs:279:    let gpu_contours = GpuFlowMesh::from_flow_vertices(renderer.device(), &contour_vertices);
+crates/s-renderer/examples/terrain.rs:308:    let mut particles = FlowParticleSystem::new(&seeds, PARTICLE_TRAIL_POINTS);
+crates/s-renderer/examples/terrain.rs:312:    let mut gpu_flow = GpuFlowMesh::with_capacity(renderer.device(), max_vertices);
+crates/s-renderer/examples/terrain.rs:313:    let mut gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len());
+crates/s-renderer/examples/terrain.rs:401:                    Some(&gpu_particle_dots),
+crates/s-renderer/src/flow.rs:3:pub struct FlowVertex {
+crates/s-renderer/src/flow.rs:7:impl FlowVertex {
+crates/s-renderer/src/flow.rs:10:            array_stride: std::mem::size_of::<FlowVertex>() as u64,
+crates/s-renderer/src/renderer.rs:8:    camera::Camera, context::RenderContext, depth::DepthTexture, flow::FlowVertex,
+crates/s-renderer/src/renderer.rs:9:    flow_mesh::GpuFlowMesh, flow_pipeline::FlowPipeline, mesh::GpuMesh, pipeline::RenderPipeline,
+crates/s-renderer/src/renderer.rs:11:    velocity_mesh::GpuVelocityMesh, velocity_pipeline::VelocityPipeline,
+crates/s-renderer/src/renderer.rs:31:    contour_pipeline: wgpu::RenderPipeline,
+crates/s-renderer/src/renderer.rs:34:    flow_pipeline: FlowPipeline,
+crates/s-renderer/src/renderer.rs:41:    pub velocity_pipeline: VelocityPipeline,
+crates/s-renderer/src/renderer.rs:86:        let flow_pipeline = FlowPipeline::new(
+crates/s-renderer/src/renderer.rs:100:        let contour_pipeline = create_auxiliary_pipeline(
+crates/s-renderer/src/renderer.rs:106:            &FlowVertex::layout(),
+crates/s-renderer/src/renderer.rs:147:            &FlowVertex::layout(),
+crates/s-renderer/src/renderer.rs:160:        let velocity_pipeline = VelocityPipeline::new(
+crates/s-renderer/src/renderer.rs:181:            contour_pipeline,
+crates/s-renderer/src/renderer.rs:182:            flow_pipeline,
+crates/s-renderer/src/renderer.rs:185:            velocity_pipeline,
+crates/s-renderer/src/renderer.rs:227:        flow: Option<&GpuFlowMesh>,
+crates/s-renderer/src/renderer.rs:241:        contours: Option<&GpuFlowMesh>,
+crates/s-renderer/src/renderer.rs:242:        flow: Option<&GpuFlowMesh>,
+crates/s-renderer/src/renderer.rs:243:        particle_dots: Option<&GpuFlowMesh>,
+crates/s-renderer/src/renderer.rs:346:                //pass.set_pipeline(self.flow_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:347:                pass.set_pipeline(&self.contour_pipeline);
+crates/s-renderer/src/renderer.rs:418:            pass.set_pipeline(self.flow_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:428:        if let Some(dots) = particle_dots {
+crates/s-renderer/src/renderer.rs:431:                    label: Some("flow_particle_dots_pass"),
+crates/s-renderer/src/renderer.rs:489:            pass.set_pipeline(self.velocity_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:565:            pass.set_pipeline(self.velocity_pipeline.pipeline());
+crates/s-renderer/src/velocity_renderer.rs:19:            label: Some("velocity_pipeline_layout"),
+crates/s-renderer/src/velocity_renderer.rs:25:            label: Some("velocity_pipeline"),
+crates/s-renderer/src/lib.rs:24:pub mod flow_pipeline;
+crates/s-renderer/src/lib.rs:30:pub mod velocity_pipeline;
+crates/s-renderer/src/lib.rs:33:pub use flow_generator::FlowGenerator;
+crates/s-renderer/src/lib.rs:34:pub use flow_mesh::GpuFlowMesh;
+crates/s-renderer/src/lib.rs:41:pub use flow::FlowVertex;
+crates/s-renderer/src/contour.rs:2:use crate::flow::FlowVertex;
+crates/s-renderer/src/contour.rs:22:) -> Vec<FlowVertex> {
+crates/s-renderer/src/contour.rs:138:                    vertices.push(FlowVertex { position: world_a });
+crates/s-renderer/src/contour.rs:140:                    vertices.push(FlowVertex { position: world_b });
+crates/s-renderer/src/flow_pipeline.rs:3:use crate::flow::FlowVertex;
+crates/s-renderer/src/flow_pipeline.rs:6:pub struct FlowPipeline {
+crates/s-renderer/src/flow_pipeline.rs:10:impl FlowPipeline {
+crates/s-renderer/src/flow_pipeline.rs:19:            label: Some("flow_pipeline_layout"),
+crates/s-renderer/src/flow_pipeline.rs:25:            label: Some("flow_pipeline"),
+crates/s-renderer/src/flow_pipeline.rs:32:                buffers: &[FlowVertex::layout()],
+crates/s-renderer/src/flow_generator.rs:1:use crate::{coordinate::GeoConverter, flow::FlowVertex};
+crates/s-renderer/src/flow_generator.rs:6:pub struct FlowGenerator;
+crates/s-renderer/src/flow_generator.rs:8:impl FlowGenerator {
+crates/s-renderer/src/flow_generator.rs:16:    ) -> Vec<FlowVertex> {
+crates/s-renderer/src/flow_generator.rs:90:                vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:94:                vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:120:pub struct FlowParticleSystem {
+crates/s-renderer/src/flow_generator.rs:125:impl FlowParticleSystem {
+crates/s-renderer/src/flow_generator.rs:279:    pub fn vertices(&self) -> Vec<FlowVertex> {
+crates/s-renderer/src/flow_generator.rs:291:                vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:295:                vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:313:            vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:317:            vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:322:            vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:326:            vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:331:            vertices.push(FlowVertex {
+crates/s-renderer/src/flow_generator.rs:335:            vertices.push(FlowVertex {
+crates/s-renderer/src/velocity_pipeline.rs:16:            label: Some("velocity_pipeline_layout"),
+crates/s-renderer/src/velocity_pipeline.rs:24:            label: Some("velocity_pipeline"),
+crates/s-renderer/src/flow_mesh.rs:3:use crate::flow::FlowVertex;
+crates/s-renderer/src/flow_mesh.rs:6:pub struct GpuFlowMesh {
+crates/s-renderer/src/flow_mesh.rs:12:impl GpuFlowMesh {
+crates/s-renderer/src/flow_mesh.rs:17:        let capacity_bytes = (capacity_vertices * std::mem::size_of::<FlowVertex>()) as u64;
+crates/s-renderer/src/flow_mesh.rs:34:    pub fn from_flow_vertices(device: &wgpu::Device, vertices: &[FlowVertex]) -> Self {
+crates/s-renderer/src/flow_mesh.rs:37:        let capacity_bytes = (capacity_vertices * std::mem::size_of::<FlowVertex>()) as u64;
+crates/s-renderer/src/flow_mesh.rs:40:            bytemuck::cast_slice(&[FlowVertex {
+crates/s-renderer/src/flow_mesh.rs:63:    pub fn update_vertices(&mut self, queue: &wgpu::Queue, vertices: &[FlowVertex]) -> bool {
+crates/s-renderer/src/flow_mesh.rs:64:        let required_bytes = (vertices.len() * std::mem::size_of::<FlowVertex>()) as u64;
+
+========== 5. SHADER FILES ==========
+crates/s-renderer/src/ocean_surface.wgsl
+----- crates/s-renderer/src/ocean_surface.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+@group(0)
+@binding(0)
+var<uniform> camera: Camera;
+
+struct VertexInput {
+    @location(0) position: vec3<f32>,
+    @location(1) height: f32,
+};
+
+struct VertexOutput {
+    @builtin(position) position: vec4<f32>,
+    @location(0) height: f32,
+};
+
+@vertex
+fn vs_main(input: VertexInput) -> VertexOutput {
+    var out: VertexOutput;
+    out.position = camera.view_proj * vec4<f32>(input.position, 1.0);
+    out.height = input.height;
+    return out;
+}
+
+@fragment
+fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
+    let h = input.height;
+
+    // 海面：透明感のある青色
+    if h <= 0.0 {
+        return vec4<f32>(0.025, 0.32, 0.58, 0.28);
+    }
+
+    // 陸地
+    let land_t = clamp(h / 1000.0, 0.0, 1.0);
+    let lowland = vec3<f32>(0.12, 0.25, 0.12);
+    let highland = vec3<f32>(0.28, 0.30, 0.22);
+    let land_color = mix(lowland, highland, land_t);
+
+    return vec4<f32>(land_color, 1.0);
+}
+crates/s-renderer/src/s-io/ocean_surface.wgsl
+----- crates/s-renderer/src/s-io/ocean_surface.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+@group(0) @binding(0)
+var<uniform> camera: Camera;
+
+
+struct VertexInput {
+    @location(0) position: vec3<f32>,
+    @location(1) height: f32,
+};
+
+struct VertexOutput {
+    @builtin(position) position: vec4<f32>,
+};
+
+
+@vertex
+fn vs_main(
+    input: VertexInput
+) -> VertexOutput {
+    var output: VertexOutput;
+
+    output.position =
+        camera.view_proj
+        * vec4<f32>(input.position, 1.0);
+
+    return output;
+}
+
+
+@fragment
+fn fs_main() -> @location(0) vec4<f32> {
+    // RGBは海面の色、Alphaは不透明度。
+    // 0.30 = 不透明度30%、透過率70%。
+    return vec4<f32>(
+        0.02,
+        0.42,
+        0.68,
+        0.30
+    );
+}
+crates/s-renderer/src/contour.wgsl
+----- crates/s-renderer/src/contour.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+@group(0) @binding(0)
+var<uniform> camera: Camera;
+
+struct VertexInput {
+    @location(0) position: vec3<f32>,
+};
+
+struct VertexOutput {
+    @builtin(position) position: vec4<f32>,
+};
+
+@vertex
+fn vs_main(input: VertexInput) -> VertexOutput {
+    var out: VertexOutput;
+    out.position = camera.view_proj * vec4<f32>(input.position, 1.0);
+    return out;
+}
+
+@fragment
+fn fs_main() -> @location(0) vec4<f32> {
+return vec4<f32>(0.0,1.0, 1.0, 1.0);
+}
+crates/s-renderer/src/particle.wgsl
+----- crates/s-renderer/src/particle.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+@group(0)
+@binding(0)
+var<uniform> camera: Camera;
+
+
+struct VertexInput {
+
+    @location(0)
+    position: vec3<f32>,
+
+};
+
+
+struct VertexOutput {
+
+    @builtin(position)
+    position: vec4<f32>,
+
+};
+
+
+@vertex
+fn vs_main(
+    input:VertexInput
+)->VertexOutput{
+
+    var out:VertexOutput;
+
+    out.position =
+        camera.view_proj *
+        vec4<f32>(
+            input.position,
+            1.0
+        );
+
+    return out;
+}
+
+
+@fragment
+fn fs_main()
+-> @location(0) vec4<f32>{
+
+return vec4<f32>(1.0, 1.0, 1.0, 1.0);
+}
+crates/s-renderer/src/terrain.wgsl
+----- crates/s-renderer/src/terrain.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+@group(0)
+@binding(0)
+var<uniform> camera: Camera;
+
+
+struct VertexInput {
+
+    @location(0)
+    position: vec3<f32>,
+
+    @location(1)
+    height: f32,
+};
+
+
+struct VertexOutput {
+
+    @builtin(position)
+    position: vec4<f32>,
+
+    @location(0)
+    height: f32,
+};
+
+
+@vertex
+fn vs_main(
+    input: VertexInput
+)->VertexOutput {
+
+    var out: VertexOutput;
+
+    out.position =
+        camera.view_proj *
+        vec4<f32>(
+            input.position,
+            1.0
+        );
+
+    out.height =
+        input.height;
+
+    return out;
+}
+
+
+
+@fragment
+fn fs_main(
+    input: VertexOutput
+)->@location(0) vec4<f32>{
+
+    if input.height < 0.0 {
+
+        return vec4<f32>(
+            0.0,
+            0.15,
+            0.35,
+            1.0
+        );
+
+    }
+
+    return vec4<f32>(
+        0.2,
+        0.6,
+        0.2,
+        1.0
+    );
+
+}
+crates/s-renderer/src/velocity.wgsl
+----- crates/s-renderer/src/velocity.wgsl -----
+/*
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+
+@group(0)
+@binding(0)
+var<uniform> camera: Camera;
+
+
+
+struct VertexInput {
+
+    @location(0)
+    position: vec3<f32>,
+
+    @location(1)
+    velocity: vec3<f32>,
+};
+
+
+
+struct VertexOutput {
+
+    @builtin(position)
+    position: vec4<f32>,
+};
+
+
+
+@vertex
+fn vs_main(
+    input: VertexInput,
+    @builtin(vertex_index) vertex_index: u32
+)->VertexOutput {
+
+
+    var out: VertexOutput;
+
+
+    let scale = 0.02;
+
+
+    var pos = input.position;
+
+
+    //
+    // 2頂点のラインを作る
+    //
+    if vertex_index == 1u {
+
+        pos =
+            input.position +
+            input.velocity * scale;
+
+    }
+
+
+    out.position =
+        camera.view_proj *
+        vec4<f32>(
+            pos,
+            1.0
+        );
+
+
+    return out;
+}
+
+
+
+@fragment
+fn fs_main()
+    -> @location(0) vec4<f32>
+{
+
+    return vec4<f32>(
+        1.0,
+        0.1,
+        0.1,
+        1.0
+    );
+
+}
+*/
+
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+
+@group(0)
+@binding(0)
+var<uniform> camera: Camera;
+
+
+
+struct VertexInput {
+
+    @location(0)
+    position: vec3<f32>,
+
+};
+
+
+
+struct VertexOutput {
+
+    @builtin(position)
+    position: vec4<f32>,
+
+};
+
+
+
+@vertex
+fn vs_main(
+    input: VertexInput
+)->VertexOutput {
+
+    var out: VertexOutput;
+
+
+    out.position =
+        camera.view_proj *
+        vec4<f32>(
+            input.position,
+            1.0
+        );
+
+
+    return out;
+}
+
+
+
+@fragment
+fn fs_main()
+    -> @location(0) vec4<f32>
+{
+
+    return vec4<f32>(
+        0.0,
+        0.5,
+        1.0,
+        1.0
+    );
+
+}
+crates/s-renderer/src/flow.wgsl
+----- crates/s-renderer/src/flow.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+
+@group(0) @binding(0)
+var<uniform> camera: Camera;
+
+
+
+struct VertexInput {
+
+    @location(0)
+    position: vec3<f32>,
+
+};
+
+
+
+struct VertexOutput {
+
+    @builtin(position)
+    position: vec4<f32>,
+
+};
+
+
+
+@vertex
+fn vs_main(
+    input: VertexInput
+)
+-> VertexOutput {
+
+
+    var out:VertexOutput;
+
+
+    out.position =
+        camera.view_proj
+        *
+        vec4<f32>(
+            input.position,
+            1.0
+        );
+
+
+    return out;
+
+}
+
+
+
+@fragment
+fn fs_main()
+-> @location(0) vec4<f32>
+{
+
+    //
+    // 黒潮表示用
+    //
+    // 後で速度値によって
+    // 色変更する
+    //
+
+    return vec4<f32>(0.0, 0.9, 1.0, 1.0);
+}
+crates/s-renderer/src/shader.wgsl
+----- crates/s-renderer/src/shader.wgsl -----
+struct Camera {
+    view_proj: mat4x4<f32>,
+};
+
+@group(0) @binding(0)
+var<uniform> camera: Camera;
+
+struct VertexInput {
+    @location(0) position: vec3<f32>,
+    @location(1) height: f32,
+};
+
+struct VertexOutput {
+    @builtin(position) position: vec4<f32>,
+    @location(0) height: f32,
+};
+
+@vertex
+fn vs_main(input: VertexInput) -> VertexOutput {
+    var out: VertexOutput;
+    out.position = camera.view_proj * vec4<f32>(input.position,1.0);
+    out.height = input.height;
+    return out;
+}
+
+fn ocean_color(depth:f32)->vec3<f32>{
+    if(depth<50.0){return vec3<f32>(0.15,0.75,0.85);}
+    else if(depth<100.0){return vec3<f32>(0.05,0.65,0.80);}
+    else if(depth<150.0){return vec3<f32>(0.02,0.55,0.75);}
+    else if(depth<200.0){return vec3<f32>(0.00,0.45,0.70);}
+    else if(depth<225.0){return vec3<f32>(0.00,0.42,0.68);}
+    else if(depth<250.0){return vec3<f32>(0.00,0.39,0.66);}
+    else if(depth<275.0){return vec3<f32>(0.00,0.36,0.63);}
+    else if(depth<300.0){return vec3<f32>(0.00,0.33,0.60);}
+    else if(depth<400.0){return vec3<f32>(0.00,0.29,0.54);}
+    else if(depth<500.0){return vec3<f32>(0.00,0.25,0.48);}
+    else if(depth<600.0){return vec3<f32>(0.00,0.21,0.43);}
+    else if(depth<700.0){return vec3<f32>(0.00,0.17,0.37);}
+    else if(depth<800.0){return vec3<f32>(0.00,0.14,0.32);}
+    else if(depth<900.0){return vec3<f32>(0.00,0.11,0.28);}
+    else if(depth<1000.0){return vec3<f32>(0.00,0.09,0.24);}
+    else if(depth<1500.0){return vec3<f32>(0.00,0.07,0.18);}
+    else if(depth<2000.0){return vec3<f32>(0.00,0.05,0.14);}
+    else if(depth<2500.0){return vec3<f32>(0.00,0.03,0.10);}
+    return vec3<f32>(0.00,0.01,0.06);
+}
+
+fn land_color(h:f32)->vec3<f32>{
+    if(h<50.0){return vec3<f32>(0.85,0.80,0.55);}
+    else if(h<100.0){return vec3<f32>(0.75,0.82,0.45);}
+    else if(h<150.0){return vec3<f32>(0.60,0.75,0.35);}
+    else if(h<200.0){return vec3<f32>(0.45,0.70,0.28);}
+    else if(h<250.0){return vec3<f32>(0.35,0.65,0.22);}
+    else if(h<300.0){return vec3<f32>(0.28,0.60,0.18);}
+    else if(h<400.0){return vec3<f32>(0.22,0.55,0.16);}
+    else if(h<500.0){return vec3<f32>(0.18,0.50,0.14);}
+    else if(h<700.0){return vec3<f32>(0.30,0.45,0.18);}
+    else if(h<900.0){return vec3<f32>(0.40,0.40,0.20);}
+    else if(h<1100.0){return vec3<f32>(0.50,0.42,0.25);}
+    else if(h<1300.0){return vec3<f32>(0.60,0.50,0.35);}
+    else if(h<1600.0){return vec3<f32>(0.70,0.62,0.48);}
+    else if(h<2000.0){return vec3<f32>(0.82,0.78,0.70);}
+    else if(h<2500.0){return vec3<f32>(0.90,0.88,0.84);}
+    else if(h<3000.0){return vec3<f32>(0.95,0.95,0.95);}
+    return vec3<f32>(1.0,1.0,1.0);
+}
+
+@fragment
+fn fs_main(input:VertexOutput)->@location(0) vec4<f32>{
+    if(input.height<0.0){
+        return vec4<f32>(ocean_color(-input.height),1.0);
+    }
+    return vec4<f32>(land_color(input.height),1.0);
+}
+
+========== 6. FLOW-RELATED RUST SOURCES ==========
+
+----- crates/s-builder/examples/build_suruga.rs -----
+use anyhow::Result;
+use std::fs::File;
+use std::io::Read;
+
+use s_field::{
+    BoundaryField, Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField,
+    VelocityField,
+};
+
+use s_sof::builder::SofPackageBuilder;
+
+fn load_bathymetry(
+    path: &str,
+    src_width: usize,
+    src_height: usize,
+    dst_width: usize,
+    dst_height: usize,
+) -> anyhow::Result<Vec<f32>> {
+    let mut file = File::open(path)?;
+
+    let mut bytes = Vec::new();
+
+    file.read_to_end(&mut bytes)?;
+
+    let src = bytes
+        .chunks_exact(4)
+        .map(|b| f32::from_le_bytes([b[0], b[1], b[2], b[3]]))
+        .collect::<Vec<_>>();
+
+    if src.len() != src_width * src_height {
+        anyhow::bail!(
+            "source bathymetry size mismatch: {} != {}",
+            src.len(),
+            src_width * src_height
+        );
+    }
+
+    let mut dst = vec![0.0; dst_width * dst_height];
+
+    for y in 0..dst_height {
+        let sy = y * src_height / dst_height;
+
+        for x in 0..dst_width {
+            let sx = x * src_width / dst_width;
+
+            dst[y * dst_width + x] = src[sy * src_width + sx];
+        }
+    }
+
+    Ok(dst)
+}
+
+fn main() -> Result<()> {
+    let latitude: Vec<f64> = (0..80).map(|i| 34.5 + i as f64 * 0.01).collect();
+
+    let longitude: Vec<f64> = (0..120).map(|i| 138.5 + i as f64 * 0.01).collect();
+
+    let depth = vec![0.0, 10.0, 50.0, 100.0, 200.0];
+
+    let time = vec![0.0];
+
+    let grid = Grid4D::new(
+        [time.len(), depth.len(), latitude.len(), longitude.len()],
+        [1.0, 1.0, 0.01, 0.01],
+    );
+
+    println!("grid={:?}", grid.size());
+
+    println!(
+        "lat={} lon={} depth={} time={}",
+        latitude.len(),
+        longitude.len(),
+        depth.len(),
+        time.len()
+    );
+
+    let coordinates = Coordinates::new(
+        grid.clone(),
+        latitude.clone(),
+        longitude.clone(),
+        depth.clone(),
+        time.clone(),
+    );
+
+    let metadata = Metadata::new();
+
+    let velocity = VelocityField::new(grid.clone());
+
+    let temperature = TemperatureField::new(grid.clone());
+
+    let salinity = SalinityField::new(grid.clone());
+
+    let boundary = BoundaryField::new(
+        VelocityField::new(grid.clone()),
+        VelocityField::new(grid.clone()),
+        VelocityField::new(grid.clone()),
+        VelocityField::new(grid.clone()),
+    );
+
+    let ocean = OceanField::new(
+        coordinates,
+        metadata,
+        velocity,
+        temperature,
+        salinity,
+        boundary,
+    );
+
+    //
+    // bathymetry
+    //
+    // 現在のbin:
+    // 368 × 256 = 94208
+    //
+
+    let bathymetry = load_bathymetry(
+        "crates/s-builder/examples/bathymetry.bin",
+        368,
+        256,
+        longitude.len(),
+        latitude.len(),
+    )?;
+
+    println!("bathymetry={}", bathymetry.len());
+
+    SofPackageBuilder::new("suruga_bay")
+        .grid(
+            grid,
+            latitude.iter().map(|v| *v as f32).collect(),
+            longitude.iter().map(|v| *v as f32).collect(),
+            depth,
+            bathymetry,
+        )
+        .initial(ocean.clone())
+        .boundary(ocean.clone())
+        .restart(ocean)
+        .build("./suruga_bay.sof")?;
+
+    println!("SOF package created.");
+
+    Ok(())
+}
+
+----- crates/s-builder/src/builder.rs -----
+//! SOS dataset builder.
+
+use std::path::Path;
+
+use anyhow::Result;
+
+use s_field::{
+    BoundaryField, Coordinates, Metadata, OceanField, SalinityField, ScalarField, TemperatureField,
+    VelocityField,
+};
+
+use s_sof::builder::SofPackageBuilder;
+
+use crate::hycom::HycomDataset;
+
+/// Builder for Suruga Ocean Simulator dataset.
+pub struct SurugaBuilder;
+
+impl SurugaBuilder {
+    /// Build SOF package from HYCOM dataset.
+    pub fn build<P: AsRef<Path>>(
+        output: P,
+        dataset: HycomDataset,
+        latitude: Vec<f64>,
+        longitude: Vec<f64>,
+        depth: Vec<f32>,
+        time: Vec<f64>,
+        bathymetry: Vec<f32>,
+    ) -> Result<()> {
+        let grid = dataset.grid.clone();
+
+        //
+        // Coordinates
+        //
+
+        let coordinates = Coordinates::new(
+            grid.clone(),
+            latitude.clone(),
+            longitude.clone(),
+            depth.clone(),
+            time.clone(),
+        );
+
+        //
+        // Metadata
+        //
+
+        let mut metadata = Metadata::new();
+
+        metadata.set_dataset_name("Suruga Bay");
+
+        metadata.set_title("Suruga Ocean Simulator HYCOM Dataset");
+
+        //
+        // Temperature
+        //
+
+        let temperature = TemperatureField::from_field(dataset.temperature.into_field4d());
+
+        //
+        // Salinity
+        //
+
+        let salinity = SalinityField::from_field(dataset.salinity.into_field4d());
+
+        //
+        // Velocity
+        //
+
+        let velocity = VelocityField::from_fields(
+            grid.clone(),
+            dataset.u,
+            dataset.v,
+            ScalarField::zeros(grid.clone()),
+        );
+
+        //
+        // OceanField
+        //
+
+        let boundary = BoundaryField::zeros(velocity.grid().clone());
+
+        let ocean = OceanField::new(
+            coordinates,
+            metadata,
+            velocity,
+            temperature,
+            salinity,
+            boundary,
+        );
+        //
+        // Surface forcing
+        //
+        // MVP:
+        // wind_u
+        // wind_v
+        // surface_heat
+        //
+
+        let size = grid.len();
+
+        let wind_u = vec![0.0f32; size];
+
+        let wind_v = vec![0.0f32; size];
+
+        let surface_heat = vec![0.0f32; size];
+
+        //
+        // Grid coordinates
+        //
+
+        let latitude32 = latitude.iter().map(|v| *v as f32).collect();
+
+        let longitude32 = longitude.iter().map(|v| *v as f32).collect();
+
+        //
+        // Build SOF
+        //
+
+        SofPackageBuilder::new("suruga")
+            //
+            // grid.snc
+            //
+            .grid(grid.clone(), latitude32, longitude32, depth, bathymetry)
+            //
+            // boundary.snc
+            //
+            .boundary(ocean.clone())
+            //
+            // initial.snc
+            //
+            .initial(ocean.clone())
+            //
+            // restart.snc
+            //
+            .restart(ocean.clone())
+            //
+            // forcing.snc
+            //
+            .forcing(wind_u, wind_v, surface_heat)
+            .build(output)?;
+
+        Ok(())
+    }
+}
+
+----- crates/s-field/src/boundary.rs -----
+//! Boundary condition fields.
+
+use crate::VelocityField;
+
+/// Ocean boundary velocity.
+///
+/// Represents velocity imposed at domain boundaries.
+#[derive(Clone, Debug)]
+pub struct BoundaryField {
+    /// Western boundary.
+    ///
+    /// Used for Kuroshio inflow.
+    pub west: VelocityField,
+
+    /// Eastern boundary.
+    pub east: VelocityField,
+
+    /// Northern boundary.
+    pub north: VelocityField,
+
+    /// Southern boundary.
+    pub south: VelocityField,
+}
+
+impl BoundaryField {
+    /// Create empty boundary field.
+    pub fn new(
+        west: VelocityField,
+        east: VelocityField,
+        north: VelocityField,
+        south: VelocityField,
+    ) -> Self {
+        Self {
+            west,
+            east,
+            north,
+            south,
+        }
+    }
+
+    /// Create zero boundary condition.
+    pub fn zeros(grid: crate::Grid4D) -> Self {
+        Self {
+            west: VelocityField::new(grid.clone()),
+
+            east: VelocityField::new(grid.clone()),
+
+            north: VelocityField::new(grid.clone()),
+
+            south: VelocityField::new(grid),
+        }
+    }
+}
+
+----- crates/s-field/src/generator/kuroshio.rs -----
+use crate::{Grid4D, VelocityField};
+
+/// 駿河湾へ流入する黒潮の簡易モデルを生成する。
+///
+/// 南側境界から北東方向へ流入する。
+pub fn create_kuroshio(grid: Grid4D) -> VelocityField {
+    let mut velocity = VelocityField::new(grid);
+
+    let shape = velocity.shape();
+
+    let nx = shape[0];
+    let ny = shape[1];
+    let nz = shape[2];
+
+    //
+    // 値の書き込み
+    //
+    {
+        let u = velocity.u_mut().time_slice_mut(0).unwrap();
+
+        for z in 0..nz {
+            //
+            // 表層ほど強い
+            //
+            let depth_factor = 1.0 - z as f32 / nz as f32;
+
+            for y in 0..ny {
+                for x in 0..nx {
+                    let index = z * nx * ny + y * nx + x;
+
+                    //
+                    // 南側入口
+                    //
+                    let south = y as f32 / ny as f32;
+
+                    u[index] = 0.8 * depth_factor * (1.0 - south);
+                }
+            }
+        }
+    }
+
+    {
+        let v = velocity.v_mut().time_slice_mut(0).unwrap();
+
+        for z in 0..nz {
+            let depth_factor = 1.0 - z as f32 / nz as f32;
+
+            for y in 0..ny {
+                for x in 0..nx {
+                    let index = z * nx * ny + y * nx + x;
+
+                    //
+                    // 少し北向き
+                    //
+                    v[index] = 0.3 * depth_factor;
+                }
+            }
+        }
+    }
+
+    {
+        let w = velocity.w_mut().time_slice_mut(0).unwrap();
+
+        for value in w.iter_mut() {
+            *value = 0.0;
+        }
+    }
+
+    velocity
+}
+
+----- crates/s-field/src/lib.rs -----
+//! s-field
+//!
+//! SOS (Suruga Ocean Simulator) の海洋物理量ライブラリ。
+//!
+//! 主な機能
+//! - 汎用2D/3D/4Dフィールド
+//! - 海洋物理量（流速・水温・塩分）
+//! - 座標系
+//! - OceanFieldデータセット
+pub mod boundary;
+pub mod coordinates;
+pub mod field;
+pub mod field2d;
+pub mod field3d;
+pub mod field4d;
+pub mod field_storage;
+pub mod generator;
+pub mod grid;
+pub mod metadata;
+pub mod ocean;
+pub mod ocean_grid;
+pub mod salinity;
+pub mod temperature;
+pub mod velocity;
+pub use boundary::*;
+pub use coordinates::*;
+pub use field::*;
+pub use field_storage::*;
+pub mod scalar;
+pub use field2d::Field2D;
+pub use field3d::Field3D;
+pub use field4d::Field4D;
+pub use grid::{Grid2D, Grid3D, Grid4D};
+pub use metadata::*;
+pub use ocean::OceanField;
+pub use ocean_grid::OceanGrid;
+pub use salinity::SalinityField;
+pub use scalar::ScalarField;
+pub use temperature::TemperatureField;
+pub use velocity::VelocityField;
+
+----- crates/s-field/src/ocean.rs -----
+//! Ocean dataset.
+
+use std::collections::BTreeMap;
+
+use crate::{
+    BoundaryField, Coordinates, Field4D, Metadata, SalinityField, TemperatureField, VelocityField,
+};
+
+/// Complete ocean dataset.
+///
+/// This is the central data container used throughout SOS.
+///
+/// It stores:
+///
+/// - Coordinates
+/// - Metadata
+/// - Velocity
+/// - Temperature
+/// - Salinity
+///
+/// and optional additional scalar fields.
+#[derive(Clone, Debug)]
+pub struct OceanField {
+    coordinates: Coordinates,
+    metadata: Metadata,
+
+    velocity: VelocityField,
+    temperature: TemperatureField,
+    salinity: SalinityField,
+    boundary: BoundaryField,
+    scalar_fields: BTreeMap<String, Field4D<f32>>,
+}
+
+impl OceanField {
+    /// Creates a new ocean dataset.
+    pub fn new(
+        coordinates: Coordinates,
+        metadata: Metadata,
+        velocity: VelocityField,
+        temperature: TemperatureField,
+        salinity: SalinityField,
+        boundary: BoundaryField,
+    ) -> Self {
+        let grid = velocity.grid().clone();
+        Self {
+            coordinates,
+            metadata,
+            velocity,
+            temperature,
+            salinity,
+            boundary,
+            scalar_fields: BTreeMap::new(),
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Coordinates
+    // -------------------------------------------------------------------------
+
+    #[inline]
+    pub fn coordinates(&self) -> &Coordinates {
+        &self.coordinates
+    }
+
+    #[inline]
+    pub fn coordinates_mut(&mut self) -> &mut Coordinates {
+        &mut self.coordinates
+    }
+
+    // -------------------------------------------------------------------------
+    // Metadata
+    // -------------------------------------------------------------------------
+
+    #[inline]
+    pub fn metadata(&self) -> &Metadata {
+        &self.metadata
+    }
+
+    #[inline]
+    pub fn metadata_mut(&mut self) -> &mut Metadata {
+        &mut self.metadata
+    }
+
+    // -------------------------------------------------------------------------
+    // Velocity
+    // -------------------------------------------------------------------------
+
+    #[inline]
+    pub fn velocity(&self) -> &VelocityField {
+        &self.velocity
+    }
+
+    #[inline]
+    pub fn velocity_mut(&mut self) -> &mut VelocityField {
+        &mut self.velocity
+    }
+
+    // -------------------------------------------------------------------------
+    // Temperature
+    // -------------------------------------------------------------------------
+
+    #[inline]
+    pub fn temperature(&self) -> &TemperatureField {
+        &self.temperature
+    }
+
+    #[inline]
+    pub fn temperature_mut(&mut self) -> &mut TemperatureField {
+        &mut self.temperature
+    }
+
+    // -------------------------------------------------------------------------
+    // Salinity
+    // -------------------------------------------------------------------------
+
+    #[inline]
+    pub fn salinity(&self) -> &SalinityField {
+        &self.salinity
+    }
+
+    #[inline]
+    pub fn salinity_mut(&mut self) -> &mut SalinityField {
+        &mut self.salinity
+    }
+
+    // -------------------------------------------------------------------------
+    // Extra scalar fields
+    // -------------------------------------------------------------------------
+
+    /// Inserts or replaces an additional scalar field.
+    #[inline]
+    pub fn insert_scalar_field<S>(&mut self, name: S, field: Field4D<f32>)
+    where
+        S: Into<String>,
+    {
+        self.scalar_fields.insert(name.into(), field);
+    }
+
+    /// Returns an additional scalar field.
+    #[inline]
+    pub fn scalar_field(&self, name: &str) -> Option<&Field4D<f32>> {
+        self.scalar_fields.get(name)
+    }
+
+    /// Returns a mutable additional scalar field.
+    #[inline]
+    pub fn scalar_field_mut(&mut self, name: &str) -> Option<&mut Field4D<f32>> {
+        self.scalar_fields.get_mut(name)
+    }
+
+    /// Removes an additional scalar field.
+    #[inline]
+    pub fn remove_scalar_field(&mut self, name: &str) -> Option<Field4D<f32>> {
+        self.scalar_fields.remove(name)
+    }
+
+    /// Returns all extra scalar fields.
+    #[inline]
+    pub fn scalar_fields(&self) -> &BTreeMap<String, Field4D<f32>> {
+        &self.scalar_fields
+    }
+
+    #[inline]
+    pub fn has_scalar_field(&self, name: &str) -> bool {
+        self.scalar_fields.contains_key(name)
+    }
+    pub fn boundary(&self) -> &BoundaryField {
+        &self.boundary
+    }
+
+    pub fn boundary_mut(&mut self) -> &mut BoundaryField {
+        &mut self.boundary
+    }
+}
+
+----- crates/s-field/src/velocity.rs -----
+//! Velocity field.
+
+use crate::{Coordinates, Grid4D, ScalarField};
+
+/// 3次元流速場.
+///
+/// Components:
+///
+/// u : east-west velocity
+/// v : north-south velocity
+/// w : vertical velocity
+///
+#[derive(Clone, Debug)]
+pub struct VelocityField {
+    grid: Grid4D,
+
+    coordinates: Option<Coordinates>,
+
+    u: ScalarField<f32>,
+
+    v: ScalarField<f32>,
+
+    w: ScalarField<f32>,
+}
+
+impl VelocityField {
+    /// Creates empty velocity field.
+    pub fn new(grid: Grid4D) -> Self {
+        Self {
+            u: ScalarField::zeros(grid.clone()),
+
+            v: ScalarField::zeros(grid.clone()),
+
+            w: ScalarField::zeros(grid.clone()),
+
+            coordinates: None,
+
+            grid,
+        }
+    }
+
+    /// Creates velocity field with coordinates.
+    pub fn with_coordinates(grid: Grid4D, coordinates: Coordinates) -> Self {
+        Self {
+            u: ScalarField::zeros(grid.clone()),
+
+            v: ScalarField::zeros(grid.clone()),
+
+            w: ScalarField::zeros(grid.clone()),
+
+            coordinates: Some(coordinates),
+
+            grid,
+        }
+    }
+
+    #[inline]
+    pub fn grid(&self) -> &Grid4D {
+        &self.grid
+    }
+
+    #[inline]
+    pub fn shape(&self) -> [usize; 3] {
+        [self.grid.depth(), self.grid.height(), self.grid.width()]
+    }
+
+    /// Returns grid spacing.
+
+    #[inline]
+
+    pub fn spacing(&self) -> [f32; 4] {
+        self.grid.spacing()
+    }
+
+    #[inline]
+    pub fn coordinates(&self) -> Option<&Coordinates> {
+        self.coordinates.as_ref()
+    }
+
+    #[inline]
+    pub fn coordinates_mut(&mut self) -> Option<&mut Coordinates> {
+        self.coordinates.as_mut()
+    }
+
+    #[inline]
+    pub fn set_coordinates(&mut self, coordinates: Coordinates) {
+        self.coordinates = Some(coordinates);
+    }
+
+    #[inline]
+    pub fn u(&self) -> &ScalarField<f32> {
+        &self.u
+    }
+
+    #[inline]
+    pub fn v(&self) -> &ScalarField<f32> {
+        &self.v
+    }
+
+    #[inline]
+    pub fn w(&self) -> &ScalarField<f32> {
+        &self.w
+    }
+
+    #[inline]
+    pub fn u_mut(&mut self) -> &mut ScalarField<f32> {
+        &mut self.u
+    }
+
+    #[inline]
+    pub fn v_mut(&mut self) -> &mut ScalarField<f32> {
+        &mut self.v
+    }
+
+    #[inline]
+    pub fn w_mut(&mut self) -> &mut ScalarField<f32> {
+        &mut self.w
+    }
+
+    /// Returns velocity by linear index.
+    pub fn velocity_at_index(&self, time: usize, index: usize) -> Option<[f32; 3]> {
+        Some([
+            *self.u.time_slice(time)?.get(index)?,
+            *self.v.time_slice(time)?.get(index)?,
+            *self.w.time_slice(time)?.get(index)?,
+        ])
+    }
+
+    /// Returns velocity by grid index.
+    pub fn velocity(&self, time: usize, x: usize, y: usize, z: usize) -> Option<[f32; 3]> {
+        if x >= self.grid.width() || y >= self.grid.height() || z >= self.grid.depth() {
+            return None;
+        }
+
+        let index = z * self.grid.width() * self.grid.height() + y * self.grid.width() + x;
+
+        self.velocity_at_index(time, index)
+    }
+
+    /// Samples velocity from physical coordinates.
+    ///
+    /// Coordinates:
+    ///
+    /// longitude
+    /// latitude
+    /// depth
+    ///
+    pub fn sample(&self, longitude: f64, latitude: f64, depth: f32, time: f64) -> Option<[f32; 3]> {
+        let coord = self.coordinates.as_ref()?;
+
+        let x = coord.nearest_longitude(longitude);
+
+        let y = coord.nearest_latitude(latitude);
+
+        let z = coord.nearest_depth(depth);
+
+        let t = coord.nearest_time(time);
+
+        self.velocity(t, x, y, z)
+    }
+    /// Samples velocity using 4D multilinear interpolation.
+    ///
+    /// Interpolates across longitude, latitude, depth, and time.
+    ///
+    /// Returns None when:
+    /// - Spatial coordinates are outside the dataset.
+    /// - The requested time is outside the available time range.
+    /// - Coordinates are invalid or non-monotonic.
+    /// - A required velocity value is non-finite.
+    pub fn sample_interpolated(
+        &self,
+        longitude: f64,
+        latitude: f64,
+        depth: f32,
+        time: f64,
+    ) -> Option<[f32; 3]> {
+        let coord = self.coordinates.as_ref()?;
+
+        if !longitude.is_finite()
+            || !latitude.is_finite()
+            || !depth.is_finite()
+            || !time.is_finite()
+        {
+            return None;
+        }
+
+        if !coord.contains(longitude, latitude, depth) {
+            return None;
+        }
+
+        // Find the two surrounding grid indices on each axis.
+        let (x0, x1, wx) = bracket_axis(coord.longitude(), longitude)?;
+
+        let (y0, y1, wy) = bracket_axis(coord.latitude(), latitude)?;
+
+        let depth_values: Vec<f64> = coord.depth().iter().map(|&value| value as f64).collect();
+
+        let (z0, z1, wz) = bracket_axis(&depth_values, depth as f64)?;
+
+        // A single time slice represents a time-independent field.
+        let (t0, t1, wt) = if coord.time_steps() == 1 {
+            (0, 0, 0.0)
+        } else {
+            bracket_axis(coord.time(), time)?
+        };
+
+        let xs = [(x0, 1.0 - wx), (x1, wx)];
+        let ys = [(y0, 1.0 - wy), (y1, wy)];
+        let zs = [(z0, 1.0 - wz), (z1, wz)];
+        let ts = [(t0, 1.0 - wt), (t1, wt)];
+
+        let mut result = [0.0_f64; 3];
+
+        for &(t, tw) in &ts {
+            for &(z, zw) in &zs {
+                for &(y, yw) in &ys {
+                    for &(x, xw) in &xs {
+                        let weight = tw * zw * yw * xw;
+
+                        // Avoid reading unnecessary corners when a query
+                        // lies exactly on a grid coordinate.
+                        if weight == 0.0 {
+                            continue;
+                        }
+
+                        let velocity = self.velocity(t, x, y, z)?;
+
+                        for component in 0..3 {
+                            let value = velocity[component];
+
+                            if !value.is_finite() {
+                                return None;
+                            }
+
+                            result[component] += value as f64 * weight;
+                        }
+                    }
+                }
+            }
+        }
+
+        let interpolated = [result[0] as f32, result[1] as f32, result[2] as f32];
+
+        if interpolated.iter().all(|value| value.is_finite()) {
+            Some(interpolated)
+        } else {
+            None
+        }
+    }
+
+    /// Clears all velocity values.
+    pub fn clear(&mut self) {
+        self.u.fill(0.0);
+
+        self.v.fill(0.0);
+
+        self.w.fill(0.0);
+    }
+    /// Creates velocity field from existing scalar fields.
+    pub fn from_fields(
+        grid: Grid4D,
+        u: ScalarField<f32>,
+        v: ScalarField<f32>,
+        w: ScalarField<f32>,
+    ) -> Self {
+        Self {
+            grid,
+            coordinates: None,
+            u,
+            v,
+            w,
+        }
+    }
+}
+
+/// Finds the surrounding indices and interpolation weight.
+///
+/// Supports ascending and descending monotonic axes.
+///
+/// Returns:
+
+----- crates/s-metal/examples/advection_test.rs -----
+use s_field::{Grid4D, VelocityField};
+
+use s_metal::{AdvectionOperator, GpuVelocityField, MetalContext};
+
+fn main() {
+    //
+    // Metal context
+    //
+
+    let context = MetalContext::new();
+
+    //
+    // Grid
+    //
+    // x,y,z = 16
+    // time = 1
+    //
+
+    let nx = 16;
+    let ny = 16;
+    let nz = 16;
+
+    let grid = Grid4D::new([nx, ny, nz, 1], [1.0, 1.0, 1.0, 1.0]);
+
+    //
+    // Velocity field
+    //
+
+    let mut velocity = VelocityField::new(grid);
+
+    let mut u = vec![0.0f32; nx * ny * nz];
+
+    let mut v = vec![0.0f32; nx * ny * nz];
+
+    let mut w = vec![0.0f32; nx * ny * nz];
+
+    //
+    // Gaussian velocity blob
+    //
+
+    let cx = nx as f32 / 2.0;
+    let cy = ny as f32 / 2.0;
+    let cz = nz as f32 / 2.0;
+
+    let sigma = 3.0;
+
+    for z in 0..nz {
+        for y in 0..ny {
+            for x in 0..nx {
+                let dx = x as f32 - cx;
+
+                let dy = y as f32 - cy;
+
+                let dz = z as f32 - cz;
+
+                let r2 = dx * dx + dy * dy + dz * dz;
+
+                let value = (-r2 / (sigma * sigma)).exp();
+
+                let index = z * nx * ny + y * nx + x;
+
+                //
+                // x方向へ流れる速度
+                //
+                u[index] = value;
+
+                v[index] = 0.0;
+
+                w[index] = 0.0;
+            }
+        }
+    }
+
+    //
+    // upload CPU field
+    //
+
+    velocity
+        .u_mut()
+        .time_slice_mut(0)
+        .unwrap()
+        .copy_from_slice(&u);
+
+    velocity
+        .v_mut()
+        .time_slice_mut(0)
+        .unwrap()
+        .copy_from_slice(&v);
+
+    velocity
+        .w_mut()
+        .time_slice_mut(0)
+        .unwrap()
+        .copy_from_slice(&w);
+
+    let center = (nz / 2) * nx * ny + (ny / 2) * nx + (nx / 2);
+
+    println!(
+        "CPU center velocity = {}",
+        velocity.u().time_slice(0).unwrap()[center]
+    );
+
+    //
+    // GPU upload
+    //
+
+    let gpu_velocity = GpuVelocityField::from_velocity(&context, &velocity);
+
+    println!(
+        "GPU upload center = {}",
+        gpu_velocity.u.download(&context)[center]
+    );
+
+    //
+    // advection step
+    //
+
+    let solver = AdvectionOperator::new(&context);
+
+    let result = solver.compute(&context, &gpu_velocity, 0.1);
+
+    let result_u = result.u.download(&context);
+
+    println!("GPU result center = {}", result_u[center]);
+
+    //
+    // 周辺値確認
+    //
+
+    println!("center neighborhood:");
+
+    for z in 7..10 {
+        for y in 7..10 {
+            for x in 7..10 {
+                let i = z * nx * ny + y * nx + x;
+
+                println!("{} {} {} : {}", x, y, z, result_u[i]);
+            }
+        }
+    }
+}
+
+----- crates/s-metal/examples/divergence_test.rs -----
+use s_field::{Grid4D, VelocityField};
+use s_metal::{DivergenceOperator, GpuVelocityField, MetalContext};
+
+fn main() {
+    let context = MetalContext::new();
+
+    let nx = 16;
+    let ny = 16;
+    let nz = 16;
+
+    let grid = Grid4D::new([1, nz, ny, nx], [1.0, 1.0, 1.0, 1.0]);
+
+    let mut velocity = VelocityField::new(grid);
+
+    let size = nx * ny * nz;
+
+    let mut u = vec![0.0; size];
+
+    let v = vec![0.0; size];
+
+    let w = vec![0.0; size];
+
+    let cx = nx / 2;
+    let cy = ny / 2;
+    let cz = nz / 2;
+
+    let index = cz * nx * ny + cy * nx + cx;
+
+    u[index] = 1.0;
+
+    velocity
+        .u_mut()
+        .time_slice_mut(0)
+        .unwrap()
+        .copy_from_slice(&u);
+
+    velocity
+        .v_mut()
+        .time_slice_mut(0)
+        .unwrap()
+        .copy_from_slice(&v);
+
+    velocity
+        .w_mut()
+        .time_slice_mut(0)
+        .unwrap()
+        .copy_from_slice(&w);
+
+    println!("CPU center velocity = {}", u[index]);
+
+    let gpu_velocity = GpuVelocityField::from_velocity(&context, &velocity);
+
+    println!(
+        "GPU upload center = {}",
+        gpu_velocity.u.download(&context)[index]
+    );
+
+    let operator = DivergenceOperator::new(&context);
+
+    let divergence = operator.compute(&context, &gpu_velocity);
+
+    let result = divergence.download(&context);
+
+    println!("divergence center = {}", result[index]);
+
+    println!("neighborhood:");
+
+    for z in cz - 1..=cz + 1 {
+        for y in cy - 1..=cy + 1 {
+            for x in cx - 1..=cx + 1 {
+                let i = z * nx * ny + y * nx + x;
+
+                println!("{} {} {} : {}", x, y, z, result[i]);
+            }
+        }
+    }
+}
+
+----- crates/s-metal/examples/gradient_pressure_test.rs -----
+use s_metal::{GpuField3D, GpuVelocityField, GradientPressureOperator, GridInfo, MetalContext};
+
+fn index3d(x: usize, y: usize, z: usize, nx: usize, ny: usize) -> usize {
+    z * nx * ny + y * nx + x
+}
+
+fn main() {
+    let context = MetalContext::new();
+
+    //
+    // grid
+    //
+    let nx = 16;
+    let ny = 16;
+    let nz = 16;
+
+    let grid = GridInfo::new(nx as u32, ny as u32, nz as u32, 1.0, 1.0, 1.0);
+
+    //
+    // pressure field
+    //
+    let mut pressure = vec![0.0f32; grid.count()];
+
+    let cx = nx / 2;
+    let cy = ny / 2;
+    let cz = nz / 2;
+
+    let center = index3d(cx, cy, cz, nx, ny);
+
+    pressure[center] = 1.0;
+
+    println!("CPU pressure center = {}", pressure[center]);
+
+    let gpu_pressure = GpuField3D::from_f32(&context, &pressure, grid);
+
+    println!(
+        "GPU pressure center = {}",
+        gpu_pressure.download(&context)[center]
+    );
+
+    //
+    // velocity field
+    //
+    // zero velocity
+    //
+    let gpu_velocity = GpuVelocityField::empty(&context, grid);
+
+    println!(
+        "GPU upload center = {}",
+        gpu_velocity.u.download(&context)[center]
+    );
+
+    //
+    // pressure gradient correction
+    //
+    let operator = GradientPressureOperator::new(&context);
+
+    let corrected = operator.compute(&context, &gpu_velocity, &gpu_pressure, 0.01, 1025.0);
+
+    let u = corrected.u.download(&context);
+
+    let v = corrected.v.download(&context);
+
+    let w = corrected.w.download(&context);
+
+    println!("velocity correction center:");
+
+    println!("u = {}", u[center]);
+
+    println!("v = {}", v[center]);
+
+    println!("w = {}", w[center]);
+
+    println!("neighborhood:");
+
+    for z in cz - 1..=cz + 1 {
+        for y in cy - 1..=cy + 1 {
+            for x in cx - 1..=cx + 1 {
+                let i = index3d(x, y, z, nx, ny);
+
+                println!("{} {} {} : ({}, {}, {})", x, y, z, u[i], v[i], w[i],);
+            }
+        }
+    }
+}
+
+----- crates/s-metal/examples/kuroshio_test.rs -----
+use s_field::{
+    Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField,
+};
+
+use s_metal::{MetalContext, OceanSolver};
+
+fn main() {
+    //
+    // Grid
+    //
+    let grid = Grid4D::new([32, 32, 16, 1], [1000.0, 1000.0, 50.0, 1.0]);
+
+    let coordinates = Coordinates::new(
+        grid.clone(),
+        vec![0.0; 32],
+        vec![0.0; 32],
+        vec![0.0; 16],
+        vec![0.0],
+    );
+
+    let metadata = Metadata::default();
+
+    //
+    // Velocity
+    //
+    let mut velocity = VelocityField::new(grid.clone());
+
+    //
+    // 黒潮初期条件
+    //
+    {
+        let nx = 32;
+        let ny = 32;
+        let nz = 16;
+
+        //
+        // u component
+        //
+        {
+            let u = velocity.u_mut().time_slice_mut(0).unwrap();
+
+            for z in 0..nz {
+                for y in 0..ny {
+                    for x in 0..nx {
+                        let i = z * nx * ny + y * nx + x;
+
+                        if y < 4 {
+                            u[i] = 0.5;
+                        }
+
+                        if x > 12 && x < 20 && y > 12 && y < 20 {
+                            u[i] += 0.05;
+                        }
+                    }
+                }
+            }
+        }
+
+        //
+        // v component
+        //
+        {
+            let v = velocity.v_mut().time_slice_mut(0).unwrap();
+
+            for z in 0..nz {
+                for y in 0..ny {
+                    for x in 0..nx {
+                        let i = z * nx * ny + y * nx + x;
+
+                        if y < 4 {
+                            v[i] = 0.15;
+                        }
+
+                        if x > 12 && x < 20 && y > 12 && y < 20 {
+                            v[i] -= 0.05;
+                        }
+                    }
+                }
+            }
+        }
+
+        //
+        // w component
+        //
+        {
+            let w = velocity.w_mut().time_slice_mut(0).unwrap();
+
+            for value in w.iter_mut() {
+                *value = 0.0;
+            }
+        }
+    }
+
+    let temperature = TemperatureField::new(grid.clone());
+
+    let salinity = SalinityField::new(grid.clone());
+
+    let mut ocean = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
+
+    //
+    // Metal solver
+    //
+    let context = MetalContext::new();
+
+    let solver = OceanSolver::new(context);
+
+    let center = 8 * 32 * 32 + 16 * 32 + 16;
+
+    println!(
+        "initial u = {}",
+        ocean.velocity().u().time_slice(0).unwrap()[center]
+    );
+
+    for step in 0..100 {
+        solver.step(&mut ocean, 1.0);
+
+        if step % 10 == 0 {
+            let u = ocean.velocity().u().time_slice(0).unwrap()[center];
+
+            println!("step {} : u = {}", step, u);
+        }
+    }
+    let snapshot = gpu_velocity.snapshot(&context);
+    println!(
+        "velocity size={} center={}",
+        snapshot.size(),
+        snapshot.u[snapshot.index(8, 8, 8)]
+    );
+}
+
+----- crates/s-metal/examples/projection_test.rs -----
+use s_metal::{
+    DivergenceOperator, GpuVelocityField, GradientPressureOperator, GridInfo, MetalContext,
+    PressureSolver,
+};
+
+use std::f64::consts::PI;
+use std::time::Instant;
+
+const JACOBI_ITERATIONS: usize = 1000;
+
+fn index3d(x: usize, y: usize, z: usize, nx: usize, ny: usize) -> usize {
+    z * nx * ny + y * nx + x
+}
+
+/// 内部セルの発散 RMS を計算する。
+fn rms_interior(values: &[f32], nx: usize, ny: usize, nz: usize) -> f64 {
+    if nx < 3 || ny < 3 || nz < 3 {
+        return 0.0;
+    }
+
+    let mut sum_squared = 0.0_f64;
+    let mut count = 0_usize;
+    for z in 1..nz - 1 {
+        for y in 1..ny - 1 {
+            for x in 1..nx - 1 {
+                let i = index3d(x, y, z, nx, ny);
+                let value = values[i] as f64;
+                sum_squared += value * value;
+                count += 1;
+            }
+        }
+    }
+    if count == 0 {
+        return 0.0;
+    }
+    (sum_squared / count as f64).sqrt()
+}
+
+/// 圧力方程式の相対残差を計算する。
+///
+/// 対象方程式:
+///     laplacian(p) = (rho / dt) * divergence
+///
+/// 戻り値:
+///     (残差 RMS, 相対残差)
+fn pressure_residual_rms(
+    pressure: &[f32],
+    divergence: &[f32],
+    nx: usize,
+    ny: usize,
+    nz: usize,
+    dx: f32,
+    dy: f32,
+    dz: f32,
+    dt: f32,
+    rho: f32,
+) -> (f64, f64) {
+    if nx < 3 || ny < 3 || nz < 3 {
+        return (0.0, 0.0);
+    }
+
+    let dx = dx as f64;
+    let dy = dy as f64;
+    let dz = dz as f64;
+    let wx = 1.0 / (dx * dx);
+    let wy = 1.0 / (dy * dy);
+    let wz = 1.0 / (dz * dz);
+    let scale = rho as f64 / dt as f64;
+    let mut residual_squared_sum = 0.0_f64;
+    let mut rhs_squared_sum = 0.0_f64;
+    let mut count = 0_usize;
+    for z in 1..nz - 1 {
+        for y in 1..ny - 1 {
+            for x in 1..nx - 1 {
+                let i = index3d(x, y, z, nx, ny);
+                let xm = index3d(x - 1, y, z, nx, ny);
+                let xp = index3d(x + 1, y, z, nx, ny);
+                let ym = index3d(x, y - 1, z, nx, ny);
+                let yp = index3d(x, y + 1, z, nx, ny);
+                let zm = index3d(x, y, z - 1, nx, ny);
+                let zp = index3d(x, y, z + 1, nx, ny);
+                let p = pressure[i] as f64;
+                let laplacian = wx * (pressure[xm] as f64 - 2.0 * p + pressure[xp] as f64)
+                    + wy * (pressure[ym] as f64 - 2.0 * p + pressure[yp] as f64)
+                    + wz * (pressure[zm] as f64 - 2.0 * p + pressure[zp] as f64);
+                let rhs = scale * divergence[i] as f64;
+                let residual = laplacian - rhs;
+                residual_squared_sum += residual * residual;
+                rhs_squared_sum += rhs * rhs;
+                count += 1;
+            }
+        }
+    }
+    if count == 0 {
+        return (0.0, 0.0);
+    }
+    let residual_rms = (residual_squared_sum / count as f64).sqrt();
+    let rhs_rms = (rhs_squared_sum / count as f64).sqrt();
+    let relative_residual = if rhs_rms > 1.0e-30 {
+        residual_rms / rhs_rms
+    } else {
+        0.0
+    };
+    (residual_rms, relative_residual)
+}
+
+/// 空間的に変化する速度場を作る。
+fn make_test_velocity(
+    context: &MetalContext,
+    grid: GridInfo,
+    nx: usize,
+    ny: usize,
+    nz: usize,
+) -> GpuVelocityField {
+    let mut u = vec![0.0_f32; grid.count()];
+    let mut v = vec![0.0_f32; grid.count()];
+    let mut w = vec![0.0_f32; grid.count()];
+
+    for z in 0..nz {
+        for y in 0..ny {
+            for x in 0..nx {
+                let i = index3d(x, y, z, nx, ny);
+                let xf = x as f64 / (nx - 1) as f64;
+                let yf = y as f64 / (ny - 1) as f64;
+                let zf = z as f64 / (nz - 1) as f64;
+                u[i] = (2.0 * PI * xf).sin() as f32;
+                v[i] = (2.0 * PI * yf).sin() as f32;
+                w[i] = (2.0 * PI * zf).sin() as f32;
+            }
+        }
+    }
+    let velocity = GpuVelocityField::empty(context, grid);
+    velocity.u.upload(context, &u);
+    velocity.v.upload(context, &v);
+    velocity.w.upload(context, &w);
+    velocity
+}
+
+/// 一様速度場を作る。
+fn make_uniform_velocity(context: &MetalContext, grid: GridInfo) -> GpuVelocityField {
+    let count = grid.count();
+
+    let velocity = GpuVelocityField::empty(context, grid);
+    velocity.u.upload(context, &vec![1.25; count]);
+    velocity.v.upload(context, &vec![-0.5; count]);
+    velocity.w.upload(context, &vec![0.75; count]);
+    velocity
+}
+
+struct ProjectionResult {
+    iterations: usize,
+    divergence_before: f64,
+    divergence_after: f64,
+    reduction_percent: f64,
+    residual_rms: f64,
+    relative_residual: f64,
+    elapsed_ms: f64,
+}
+
+/// 速度場に圧力補正を適用し、結果を測定する。
+fn run_projection_case(
+    context: &MetalContext,
+
+    divergence_operator: &DivergenceOperator,
+
+    pressure_solver: &PressureSolver,
+
+    gradient_operator: &GradientPressureOperator,
+
+    nx: usize,
+
+    ny: usize,
+
+    nz: usize,
+
+    dt: f32,
+
+    rho: f32,
+
+    iterations: usize,
+) -> ProjectionResult {
+    let dx = 1.0_f32;
+    let dy = 1.0_f32;
+    let dz = 1.0_f32;
+
+    let grid = GridInfo::new(nx as u32, ny as u32, nz as u32, dx, dy, dz);
+    let velocity = make_test_velocity(context, grid, nx, ny, nz);
+    let start = Instant::now();
+    // 1. 補正前の発散
+    let divergence_before_field = divergence_operator.compute(context, &velocity);
+    let divergence_before_values = divergence_before_field.download(context);
+    let divergence_before = rms_interior(&divergence_before_values, nx, ny, nz);
+    // 2. 圧力ポアソン方程式を解く
+    let pressure = pressure_solver.solve(context, &divergence_before_field, dt, rho, iterations);
+    let pressure_values = pressure.download(context);
+    // 3. 圧力方程式の残差
+    let (residual_rms, relative_residual) = pressure_residual_rms(
+        &pressure_values,
+        &divergence_before_values,
+        nx,
+        ny,
+        nz,
+        dx,
+        dy,
+        dz,
+        dt,
+        rho,
+    );
+    // 4. 圧力勾配による速度補正
+    let corrected_velocity = gradient_operator.compute(context, &velocity, &pressure, dt, rho);
+    // 5. 補正後の発散
+    let divergence_after_field = divergence_operator.compute(context, &corrected_velocity);
+    let divergence_after_values = divergence_after_field.download(context);
+    let divergence_after = rms_interior(&divergence_after_values, nx, ny, nz);
+    let reduction_percent = if divergence_before > 1.0e-30 {
+        (1.0 - divergence_after / divergence_before) * 100.0
+    } else {
+        0.0
+    };
+    let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+    ProjectionResult {
+        iterations,
+        divergence_before,
+        divergence_after,
+        reduction_percent,
+        residual_rms,
+        relative_residual,
+        elapsed_ms,
+    }
+}
+
+fn print_result(label: &str, nx: usize, dt: f32, result: &ProjectionResult) {
+    println!();
+    println!("— {label} —");
+    println!("Grid: {} x {} x {}", nx, nx, nx);
+    println!("dt: {:.4}", dt);
+    println!("Jacobi iterations: {}", result.iterations);
+    println!("Divergence RMS before: {:.8e}", result.divergence_before);
+    println!("Divergence RMS after:  {:.8e}", result.divergence_after);
+    println!("Reduction:             {:.4}%", result.reduction_percent);
+    println!("Pressure residual RMS: {:.8e}", result.residual_rms);
+    println!("Relative residual:     {:.8e}", result.relative_residual);
+    println!("Elapsed:               {:.2} ms", result.elapsed_ms);
+}
+
+fn main() {
+    let context = MetalContext::new();
+
+    let divergence_operator = DivergenceOperator::new(&context);
+    let pressure_solver = PressureSolver::new(&context);
+    let gradient_operator = GradientPressureOperator::new(&context);
+    let rho = 1025.0_f32;
+    println!("======================================");
+    println!(" Suruga-Wan Pressure Projection Tests");
+    println!("======================================");
+    // Test A: 一様速度場
+    {
+        let n = 24;
+        let grid = GridInfo::new(n as u32, n as u32, n as u32, 1.0, 1.0, 1.0);
+        let velocity = make_uniform_velocity(&context, grid);
+        let divergence_field = divergence_operator.compute(&context, &velocity);
+        let divergence_values = divergence_field.download(&context);
+        let rms = rms_interior(&divergence_values, n, n, n);
+        println!();
+        println!("--- Test A: Uniform Velocity ---");
+        println!("Grid: {n} x {n} x {n}");
+        println!("Divergence RMS: {:.8e}", rms);
+        if rms < 1.0e-6 {
+            println!("Result: PASS");
+        } else {
+            println!("Result: FAIL");
+        }
+    }
+    // Test B: 基準ケース
+    // Test B: Jacobi 法の収束性テスト
+    let grid_sizes = [16_usize, 24, 32];
+    let iteration_counts = [100_usize, 500, 1000, 2000, 5000];
+    let dt = 0.01_f32;
+
+    for n in grid_sizes {
+
+----- crates/s-metal/examples/solver_test.rs -----
+use s_field::{
+    Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField,
+};
+
+use s_metal::{MetalContext, OceanSolver};
+
+fn main() {
+    //
+    // Metal context
+    //
+    let context = MetalContext::new();
+
+    //
+    // Grid
+    //
+    let nx = 16;
+    let ny = 16;
+    let nz = 16;
+    let nt = 1;
+
+    let grid = Grid4D::new([nx, ny, nz, nt], [1.0, 1.0, 1.0, 1.0]);
+
+    //
+    // Coordinates
+    //
+    let coordinates =
+        Coordinates::new(grid, vec![0.0; nx], vec![0.0; ny], vec![0.0; nz], vec![0.0]);
+
+    //
+    // Metadata
+    //
+    let metadata = Metadata::default();
+
+    //
+    // Ocean fields
+    //
+    let velocity = VelocityField::new(grid);
+
+    let temperature = TemperatureField::new(grid);
+
+    let salinity = SalinityField::new(grid);
+
+    //
+    // OceanField
+    //
+    let mut ocean = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
+
+    //
+    // Initial velocity
+    //
+    let cx = nx / 2;
+    let cy = ny / 2;
+    let cz = nz / 2;
+
+    for z in 0..nz {
+        for y in 0..ny {
+            for x in 0..nx {
+                let dx = x as f32 - cx as f32;
+
+                let dy = y as f32 - cy as f32;
+
+                let dz = z as f32 - cz as f32;
+
+                let r2 = dx * dx + dy * dy + dz * dz;
+
+                let value = (-r2 / 20.0).exp();
+
+                let i = z * nx * ny + y * nx + x;
+
+                //
+                // u velocity
+                //
+                {
+                    let u = ocean.velocity_mut().u_mut().time_slice_mut(0).unwrap();
+
+                    u[i] = value;
+                }
+
+                //
+                // v velocity
+                //
+                {
+                    let v = ocean.velocity_mut().v_mut().time_slice_mut(0).unwrap();
+
+                    v[i] = 0.0;
+                }
+
+                //
+                // w velocity
+                //
+                {
+                    let w = ocean.velocity_mut().w_mut().time_slice_mut(0).unwrap();
+
+                    w[i] = 0.0;
+                }
+            }
+        }
+    }
+
+    //
+    // CPU initial check
+    //
+    let before = ocean.velocity().u().time_slice(0).unwrap();
+
+    println!(
+        "CPU before center = {}",
+        before[cz * nx * ny + cy * nx + cx]
+    );
+
+    //
+    // Solver
+    //
+    let solver = OceanSolver::new(context);
+
+    solver.step(&mut ocean, 0.01);
+
+    //
+    // CPU result
+    //
+    let after = ocean.velocity().u().time_slice(0).unwrap();
+
+    println!("CPU after center = {}", after[cz * nx * ny + cy * nx + cx]);
+
+    //
+    // Neighborhood
+    //
+    println!("neighborhood:");
+
+    for z in cz - 1..=cz + 1 {
+        for y in cy - 1..=cy + 1 {
+            for x in cx - 1..=cx + 1 {
+                let i = z * nx * ny + y * nx + x;
+
+                println!("{} {} {} : {}", x, y, z, after[i]);
+            }
+        }
+    }
+}
+
+----- crates/s-metal/src/advection.rs -----
+//! GPU advection operator.
+
+use crate::{GpuVelocityField, MetalBuffer, MetalContext};
+
+use metal::MTLSize;
+
+pub struct AdvectionOperator {
+    pipeline: metal::ComputePipelineState,
+}
+
+impl AdvectionOperator {
+    pub fn new(context: &MetalContext) -> Self {
+        let library = context.load_library(include_str!("../shaders/advection.metal"));
+
+        let function = library
+            .get_function("advection_step", None)
+            .expect("advection kernel not found");
+
+        let pipeline = context
+            .device()
+            .new_compute_pipeline_state_with_function(&function)
+            .expect("failed to create advection pipeline");
+
+        Self { pipeline }
+    }
+
+    pub fn compute(
+        &self,
+        context: &MetalContext,
+        velocity: &GpuVelocityField,
+        dt: f32,
+    ) -> GpuVelocityField {
+        //
+        // output field
+        //
+        let grid = velocity.grid();
+
+        let output = GpuVelocityField::empty(context, grid);
+
+        let command_buffer = context.command_queue().new_command_buffer();
+
+        let encoder = command_buffer.new_compute_command_encoder();
+
+        encoder.set_compute_pipeline_state(&self.pipeline);
+
+        //
+        // input velocity
+        //
+
+        encoder.set_buffer(0, Some(velocity.u.buffer()), 0);
+
+        encoder.set_buffer(1, Some(velocity.v.buffer()), 0);
+
+        encoder.set_buffer(2, Some(velocity.w.buffer()), 0);
+
+        //
+        // output velocity
+        //
+
+        encoder.set_buffer(3, Some(output.u.buffer()), 0);
+
+        encoder.set_buffer(4, Some(output.v.buffer()), 0);
+
+        encoder.set_buffer(5, Some(output.w.buffer()), 0);
+
+        //
+        // GridInfo
+        //
+
+        let grid_buffer = MetalBuffer::from_struct(context, &grid);
+
+        encoder.set_buffer(6, Some(grid_buffer.raw()), 0);
+
+        //
+        // timestep
+        //
+
+        let dt_buffer = MetalBuffer::from_f32(context.device(), &[dt]);
+        encoder.set_buffer(7, Some(dt_buffer.raw()), 0);
+
+        //
+        // dispatch
+        //
+
+        let threads = MTLSize {
+            width: 8,
+            height: 8,
+            depth: 8,
+        };
+
+        let groups = MTLSize {
+            width: ((grid.nx() + 7) / 8) as u64,
+            height: ((grid.ny() + 7) / 8) as u64,
+            depth: ((grid.nz() + 7) / 8) as u64,
+        };
+
+        encoder.dispatch_thread_groups(groups, threads);
+
+        encoder.end_encoding();
+
+        command_buffer.commit();
+
+        command_buffer.wait_until_completed();
+
+        output
+    }
+}
+
+----- crates/s-metal/src/boundary.rs -----
+use crate::{GpuVelocityField, MetalContext};
+
+use s_field::{Grid4D, VelocityField};
+
+/// Ocean velocity boundary conditions.
+///
+/// MVP:
+/// - Prescribes velocity on the x = nx - 1 boundary face.
+/// - Preserves the velocity values in the interior.
+///
+/// This is a test boundary condition, not a validated Kuroshio model.
+pub struct BoundaryOperator;
+
+impl BoundaryOperator {
+    pub fn new(_context: &MetalContext) -> Self {
+        Self
+    }
+    /// Construct a test inflow velocity field.
+    pub fn kuroshio_inflow(
+        &self,
+        context: &MetalContext,
+        velocity: &GpuVelocityField,
+    ) -> GpuVelocityField {
+        let grid_info = velocity.grid();
+
+        let nx = grid_info.nx() as usize;
+        let ny = grid_info.ny() as usize;
+        let nz = grid_info.nz() as usize;
+
+        let total = nx * ny * nz;
+
+        let grid = Grid4D::new(
+            [nx, ny, nz, 1],
+            [grid_info.dx(), grid_info.dy(), grid_info.dz(), 1.0],
+        );
+
+        let mut field = VelocityField::new(grid);
+
+        let mut u = vec![0.0_f32; total];
+        let mut v = vec![0.0_f32; total];
+        let w = vec![0.0_f32; total];
+
+        if nx > 0 && ny > 0 && nz > 0 {
+            for z in 0..nz {
+                let depth_factor = if nz > 1 {
+                    1.0 - z as f32 / (nz - 1) as f32
+                } else {
+                    1.0
+                };
+
+                for y in 0..ny {
+                    let index = z * nx * ny + y * nx + (nx - 1);
+
+                    u[index] = 0.8 * depth_factor;
+                    v[index] = 0.15 * depth_factor;
+                }
+            }
+        }
+
+        field.u_mut().replace(u);
+        field.v_mut().replace(v);
+        field.w_mut().replace(w);
+
+        GpuVelocityField::from_velocity(context, &field)
+    }
+
+    /// Apply inflow on one boundary face while preserving the interior.
+    ///
+    /// This MVP implementation transfers the field through CPU memory.
+    pub fn apply_velocity(&self, context: &MetalContext, velocity: &mut GpuVelocityField) {
+        let grid_info = velocity.grid();
+        let nx = grid_info.nx() as usize;
+        let ny = grid_info.ny() as usize;
+        let nz = grid_info.nz() as usize;
+
+        if nx == 0 || ny == 0 || nz == 0 {
+            return;
+        }
+
+        // 現在の速度場をCPUへダウンロード
+        let mut current = velocity.download(context);
+
+        // 流入境界の速度場を作成
+        let inflow = self.kuroshio_inflow(context, velocity);
+        let inflow_cpu = inflow.download(context);
+
+        // u, v, w をそれぞれ独立した配列として取得
+        let mut u = current
+            .u()
+            .time_slice(0)
+            .expect("Failed to access current u velocity")
+            .to_vec();
+
+        let mut v = current
+            .v()
+            .time_slice(0)
+            .expect("Failed to access current v velocity")
+            .to_vec();
+
+        let mut w = current
+            .w()
+            .time_slice(0)
+            .expect("Failed to access current w velocity")
+            .to_vec();
+
+        let inflow_u = inflow_cpu
+            .u()
+            .time_slice(0)
+            .expect("Failed to access inflow u velocity");
+
+        let inflow_v = inflow_cpu
+            .v()
+            .time_slice(0)
+            .expect("Failed to access inflow v velocity");
+
+        let inflow_w = inflow_cpu
+            .w()
+            .time_slice(0)
+            .expect("Failed to access inflow w velocity");
+
+        // x方向の端面に流入境界条件を適用
+        for z in 0..nz {
+            for y in 0..ny {
+                let index = z * nx * ny + y * nx + (nx - 1);
+
+                u[index] = inflow_u[index];
+                v[index] = inflow_v[index];
+                w[index] = inflow_w[index];
+            }
+        }
+
+        // 変更した配列を速度場へ戻す
+        current.u_mut().replace(u);
+        current.v_mut().replace(v);
+        current.w_mut().replace(w);
+
+        // 更新した速度場をGPUへアップロード
+        *velocity = GpuVelocityField::from_velocity(context, &current);
+    }
+}
+
+----- crates/s-metal/src/diffusion.rs -----
+//! GPU diffusion operator.
+
+use crate::{GpuField3D, GpuVelocityField, MetalBuffer, MetalContext};
+
+use metal::MTLSize;
+
+pub struct DiffusionOperator {
+    pipeline: metal::ComputePipelineState,
+}
+
+impl DiffusionOperator {
+    pub fn new(context: &MetalContext) -> Self {
+        let library = context.load_library(include_str!("../shaders/diffusion.metal"));
+
+        let function = library
+            .get_function("diffusion_step", None)
+            .expect("diffusion kernel not found");
+
+        let pipeline = context
+            .device()
+            .new_compute_pipeline_state_with_function(&function)
+            .expect("failed to create diffusion pipeline");
+
+        Self { pipeline }
+    }
+
+    pub fn compute(
+        &self,
+        context: &MetalContext,
+        field: &GpuField3D,
+        viscosity: f32,
+        dt: f32,
+    ) -> GpuField3D {
+        let grid = field.grid();
+
+        let output = GpuField3D::empty(context, grid);
+
+        let command_buffer = context.command_queue().new_command_buffer();
+
+        let encoder = command_buffer.new_compute_command_encoder();
+
+        encoder.set_compute_pipeline_state(&self.pipeline);
+
+        encoder.set_buffer(0, Some(field.buffer()), 0);
+
+        encoder.set_buffer(1, Some(output.buffer()), 0);
+
+        let grid_buffer = MetalBuffer::from_struct(context, &grid);
+
+        encoder.set_buffer(2, Some(grid_buffer.raw()), 0);
+
+        let viscosity_buffer = MetalBuffer::from_f32(context.device(), &[viscosity]);
+
+        encoder.set_buffer(3, Some(viscosity_buffer.raw()), 0);
+
+        let dt_buffer = MetalBuffer::from_f32(context.device(), &[dt]);
+
+        encoder.set_buffer(4, Some(dt_buffer.raw()), 0);
+
+        let threads = MTLSize {
+            width: 8,
+            height: 8,
+            depth: 8,
+        };
+
+        let groups = MTLSize {
+            width: ((grid.nx() + 7) / 8) as u64,
+
+            height: ((grid.ny() + 7) / 8) as u64,
+
+            depth: ((grid.nz() + 7) / 8) as u64,
+        };
+
+        encoder.dispatch_thread_groups(groups, threads);
+
+        encoder.end_encoding();
+
+        command_buffer.commit();
+
+        command_buffer.wait_until_completed();
+
+        output
+    }
+
+    pub fn compute_velocity(
+        &self,
+        context: &MetalContext,
+        velocity: &GpuVelocityField,
+        viscosity: f32,
+        dt: f32,
+    ) -> GpuVelocityField {
+        let u = self.compute(context, &velocity.u, viscosity, dt);
+
+        let v = self.compute(context, &velocity.v, viscosity, dt);
+
+        let w = self.compute(context, &velocity.w, viscosity, dt);
+
+        GpuVelocityField {
+            u,
+
+            v,
+
+            w,
+
+            grid: velocity.grid(),
+        }
+    }
+}
+
+----- crates/s-metal/src/divergence.rs -----
+//! GPU divergence operator.
+
+use crate::{GpuField3D, GpuVelocityField, MetalBuffer, MetalContext};
+
+use metal::MTLSize;
+
+pub struct DivergenceOperator {
+    pipeline: metal::ComputePipelineState,
+}
+
+impl DivergenceOperator {
+    pub fn new(context: &MetalContext) -> Self {
+        let library = context.load_library(include_str!("../shaders/divergence.metal"));
+
+        let function = library
+            .get_function("divergence_step", None)
+            .expect("divergence kernel not found");
+
+        let pipeline = context
+            .device()
+            .new_compute_pipeline_state_with_function(&function)
+            .expect("failed to create divergence pipeline");
+
+        Self { pipeline }
+    }
+
+    pub fn compute(&self, context: &MetalContext, velocity: &GpuVelocityField) -> GpuField3D {
+        let grid = velocity.grid();
+
+        let output = GpuField3D::empty(context, grid);
+
+        let command_buffer = context.command_queue().new_command_buffer();
+
+        let encoder = command_buffer.new_compute_command_encoder();
+
+        encoder.set_compute_pipeline_state(&self.pipeline);
+
+        encoder.set_buffer(0, Some(velocity.u.buffer()), 0);
+
+        encoder.set_buffer(1, Some(velocity.v.buffer()), 0);
+
+        encoder.set_buffer(2, Some(velocity.w.buffer()), 0);
+
+        encoder.set_buffer(3, Some(output.buffer()), 0);
+
+        let grid_buffer = MetalBuffer::from_struct(context, &grid);
+
+        encoder.set_buffer(4, Some(grid_buffer.buffer()), 0);
+
+        let threads = MTLSize {
+            width: 8,
+            height: 8,
+            depth: 8,
+        };
+
+        let groups = MTLSize {
+            width: ((grid.nx() + 7) / 8) as u64,
+
+            height: ((grid.ny() + 7) / 8) as u64,
+
+            depth: ((grid.nz() + 7) / 8) as u64,
+        };
+
+        encoder.dispatch_thread_groups(groups, threads);
+
+        encoder.end_encoding();
+
+        command_buffer.commit();
+
+        command_buffer.wait_until_completed();
+
+        output
+    }
+}
+
+----- crates/s-metal/src/export.rs -----
+//! Export GPU ocean fields.
+
+use crate::{GpuVelocityField, MetalContext};
+
+/// CPU side velocity snapshot.
+///
+/// Used for renderer / visualization.
+pub struct VelocitySnapshot {
+    pub u: Vec<f32>,
+
+    pub v: Vec<f32>,
+
+    pub w: Vec<f32>,
+
+    pub nx: usize,
+
+    pub ny: usize,
+
+    pub nz: usize,
+}
+
+impl VelocitySnapshot {
+    pub fn size(&self) -> usize {
+        self.nx * self.ny * self.nz
+    }
+
+    #[inline]
+    pub fn index(&self, x: usize, y: usize, z: usize) -> usize {
+        z * self.nx * self.ny + y * self.nx + x
+    }
+}
+
+impl GpuVelocityField {
+    /// Download GPU velocity field.
+    ///
+    /// GPU
+    ///  |
+    ///  v
+    /// CPU snapshot
+    ///
+    pub fn snapshot(&self, context: &MetalContext) -> VelocitySnapshot {
+        let u = self.u.download(context);
+
+        let v = self.v.download(context);
+
+        let w = self.w.download(context);
+
+        let grid = self.grid();
+
+        VelocitySnapshot {
+            u,
+
+            v,
+
+            w,
+
+            nx: grid.nx() as usize,
+
+            ny: grid.ny() as usize,
+
+            nz: grid.nz() as usize,
+        }
+    }
+}
+
+----- crates/s-metal/src/gradient_pressure.rs -----
+//! Pressure gradient correction operator.
+
+use crate::{GpuField3D, GpuVelocityField, MetalBuffer, MetalContext};
+
+use metal::MTLSize;
+
+pub struct GradientPressureOperator {
+    pipeline: metal::ComputePipelineState,
+}
+
+impl GradientPressureOperator {
+    pub fn new(context: &MetalContext) -> Self {
+        let library = context.load_library(include_str!("../shaders/gradient_pressure.metal"));
+
+        let function = library
+            .get_function("gradient_pressure", None)
+            .expect("gradient pressure kernel not found");
+
+        let pipeline = context
+            .device()
+            .new_compute_pipeline_state_with_function(&function)
+            .expect("failed to create gradient pressure pipeline");
+
+        Self { pipeline }
+    }
+
+    pub fn compute(
+        &self,
+        context: &MetalContext,
+
+        velocity: &GpuVelocityField,
+
+        pressure: &GpuField3D,
+
+        dt: f32,
+
+        rho: f32,
+    ) -> GpuVelocityField {
+        let grid = velocity.grid();
+
+        let output = GpuVelocityField::empty(context, grid);
+
+        let command_buffer = context.command_queue().new_command_buffer();
+
+        let encoder = command_buffer.new_compute_command_encoder();
+
+        encoder.set_compute_pipeline_state(&self.pipeline);
+
+        //
+        // pressure
+        //
+        encoder.set_buffer(0, Some(pressure.buffer()), 0);
+
+        //
+        // velocity input
+        //
+        encoder.set_buffer(1, Some(velocity.u.buffer()), 0);
+
+        encoder.set_buffer(2, Some(velocity.v.buffer()), 0);
+
+        encoder.set_buffer(3, Some(velocity.w.buffer()), 0);
+
+        //
+        // velocity output
+        //
+        encoder.set_buffer(4, Some(output.u.buffer()), 0);
+
+        encoder.set_buffer(5, Some(output.v.buffer()), 0);
+
+        encoder.set_buffer(6, Some(output.w.buffer()), 0);
+
+        //
+        // GridInfo
+        //
+        let grid_buffer = MetalBuffer::from_struct(context, &grid);
+
+        encoder.set_buffer(7, Some(grid_buffer.buffer()), 0);
+
+        //
+        // dt
+        //
+        let dt_buffer = MetalBuffer::from_f32(context.device(), &[dt]);
+
+        encoder.set_buffer(8, Some(dt_buffer.buffer()), 0);
+
+        //
+        // density
+        //
+        let rho_buffer = MetalBuffer::from_f32(context.device(), &[rho]);
+
+        encoder.set_buffer(9, Some(rho_buffer.buffer()), 0);
+
+        let threads = MTLSize {
+            width: 8,
+            height: 8,
+            depth: 8,
+        };
+
+        let groups = MTLSize {
+            width: ((grid.nx() + 7) / 8) as u64,
+
+            height: ((grid.ny() + 7) / 8) as u64,
+
+            depth: ((grid.nz() + 7) / 8) as u64,
+        };
+
+        encoder.dispatch_thread_groups(groups, threads);
+
+        encoder.end_encoding();
+
+        command_buffer.commit();
+
+        command_buffer.wait_until_completed();
+
+        output
+    }
+}
+
+----- crates/s-metal/src/land_mask.rs -----
+//! Land mask operator.
+
+use crate::{GpuField3D, GpuVelocityField, MetalBuffer, MetalContext};
+
+use metal::MTLSize;
+
+pub struct LandMaskOperator {
+    pipeline: metal::ComputePipelineState,
+}
+
+impl LandMaskOperator {
+    pub fn new(context: &MetalContext) -> Self {
+        let library = context.load_library(include_str!("../shaders/land_mask.metal"));
+
+        let function = library
+            .get_function("land_mask_step", None)
+            .expect("land mask kernel not found");
+
+        let pipeline = context
+            .device()
+            .new_compute_pipeline_state_with_function(&function)
+            .expect("failed to create land mask pipeline");
+
+        Self { pipeline }
+    }
+
+    pub fn apply(
+        &self,
+        context: &MetalContext,
+        velocity: &GpuVelocityField,
+        mask: &GpuField3D,
+    ) -> GpuVelocityField {
+        let grid = velocity.grid();
+
+        let output = GpuVelocityField::empty(context, grid);
+
+        let command_buffer = context.command_queue().new_command_buffer();
+
+        let encoder = command_buffer.new_compute_command_encoder();
+
+        encoder.set_compute_pipeline_state(&self.pipeline);
+
+        encoder.set_buffer(0, Some(mask.buffer()), 0);
+
+        encoder.set_buffer(1, Some(velocity.u.buffer()), 0);
+        encoder.set_buffer(2, Some(velocity.v.buffer()), 0);
+        encoder.set_buffer(3, Some(velocity.w.buffer()), 0);
+
+        encoder.set_buffer(4, Some(output.u.buffer()), 0);
+        encoder.set_buffer(5, Some(output.v.buffer()), 0);
+        encoder.set_buffer(6, Some(output.w.buffer()), 0);
+
+        let grid_buffer = MetalBuffer::from_struct(context, &grid);
+
+        encoder.set_buffer(7, Some(grid_buffer.buffer()), 0);
+
+        let threads = MTLSize {
+            width: 8,
+            height: 8,
+            depth: 8,
+        };
+
+        let groups = MTLSize {
+            width: ((grid.nx() + 7) / 8) as u64,
+            height: ((grid.ny() + 7) / 8) as u64,
+            depth: ((grid.nz() + 7) / 8) as u64,
+        };
+
+        encoder.dispatch_thread_groups(groups, threads);
+
+        encoder.end_encoding();
+
+        command_buffer.commit();
+
+        command_buffer.wait_until_completed();
+
+        output
+    }
+}
+
+----- crates/s-metal/src/lib.rs -----
+pub mod advection;
+mod boundary;
+pub mod buffer;
+pub mod compute;
+pub mod context;
+pub mod diffusion;
+mod divergence;
+pub mod export;
+pub mod field;
+pub mod gradient;
+pub mod gradient_operator;
+mod gradient_pressure;
+pub mod grid;
+mod land_mask;
+pub mod pipeline;
+pub mod pressure;
+pub mod slice;
+pub mod solver;
+pub mod state;
+pub mod time;
+pub mod velocity;
+pub mod velocity_gradient;
+pub mod velocity_gradient_operator;
+
+pub use advection::AdvectionOperator;
+pub use boundary::BoundaryOperator;
+pub use buffer::MetalBuffer;
+pub use context::MetalContext;
+pub use diffusion::DiffusionOperator;
+pub use divergence::DivergenceOperator;
+pub use export::VelocitySnapshot;
+pub use field::GpuField3D;
+pub use gradient::Gradient3D;
+pub use gradient_operator::GradientOperator;
+pub use gradient_pressure::GradientPressureOperator;
+pub use grid::GridInfo;
+pub use land_mask::LandMaskOperator;
+pub use pressure::PressureSolver;
+pub use solver::OceanSolver;
+pub use state::GpuOceanState;
+pub use time::EulerIntegrator;
+pub use velocity::GpuVelocityField;
+pub use velocity_gradient::VelocityGradient;
+pub use velocity_gradient_operator::VelocityGradientOperator;
+
+----- crates/s-metal/src/solver.rs -----
+//! Ocean solver using Metal compute.
+
+use crate::{
+    AdvectionOperator, BoundaryOperator, DiffusionOperator, DivergenceOperator, GpuOceanState,
+    GradientPressureOperator, MetalContext, PressureSolver,
+};
+use std::sync::Arc;
+
+pub struct OceanSolver {
+    context: Arc<MetalContext>,
+
+    boundary: BoundaryOperator,
+
+    advection: AdvectionOperator,
+
+    diffusion: DiffusionOperator,
+
+    divergence: DivergenceOperator,
+
+    pressure: PressureSolver,
+
+    gradient_pressure: GradientPressureOperator,
+}
+impl OceanSolver {
+    pub fn new(context: Arc<MetalContext>) -> Self {
+        let boundary = BoundaryOperator::new(&context);
+
+        let advection = AdvectionOperator::new(&context);
+
+        let diffusion = DiffusionOperator::new(&context);
+
+        let divergence = DivergenceOperator::new(&context);
+
+        let pressure = PressureSolver::new(&context);
+
+        let gradient_pressure = GradientPressureOperator::new(&context);
+
+        Self {
+            context,
+
+            boundary,
+
+            advection,
+
+            diffusion,
+
+            divergence,
+
+            pressure,
+
+            gradient_pressure,
+        }
+    }
+
+    /// Advance ocean state.
+    ///
+    /// Navier-Stokes simplified step.
+    ///
+    ///
+    /// ∂u/∂t
+    ///
+    /// +
+    ///
+    /// (u・∇)u
+    ///
+    /// =
+    ///
+    /// -1/rho ∇p
+    ///
+    /// +
+    ///
+    /// ν∇²u
+    ///
+    pub fn step(&self, state: &mut GpuOceanState, dt: f32) {
+        //
+        // 1. Advection
+        //
+        state.velocity = self.advection.compute(&self.context, &state.velocity, dt);
+
+        //
+        // 2. Diffusion
+        //
+        state.velocity =
+            self.diffusion
+                .compute_velocity(&self.context, &state.velocity, 0.000001, dt);
+
+        //
+        // 3. Boundary condition
+        //
+        self.boundary
+            .apply_velocity(&self.context, &mut state.velocity);
+
+        //
+        // 4. Divergence
+        //
+        // 速度場の発散を計算
+        let divergence = self.divergence.compute(&self.context, &state.velocity);
+
+        // 海水密度の代表値
+        let rho = 1025.0_f32;
+
+        // 圧力ポアソン方程式を解く
+        state.pressure = self.pressure.solve(&self.context, &divergence, dt, rho, 40);
+
+        // 圧力勾配によって速度場を補正
+        state.velocity = self.gradient_pressure.compute(
+            &self.context,
+            &state.velocity,
+            &state.pressure,
+            dt,
+            rho,
+        );
+
+        //
+        // 7. Boundary correction
+        //
+        self.boundary
+            .apply_velocity(&self.context, &mut state.velocity);
+    }
+}
+
+----- crates/s-metal/src/state.rs -----
+use crate::{GpuField3D, GpuVelocityField, MetalContext};
+
+use s_field::OceanField;
+
+pub struct GpuOceanState {
+    pub velocity: GpuVelocityField,
+
+    pub pressure: GpuField3D,
+}
+
+impl GpuOceanState {
+    pub fn from_ocean(context: &MetalContext, ocean: &OceanField) -> Self {
+        let velocity = GpuVelocityField::from_velocity(context, ocean.velocity());
+
+        let grid = velocity.grid();
+
+        let pressure = GpuField3D::empty(context, grid);
+
+        Self { velocity, pressure }
+    }
+
+    pub fn download_velocity(&self, context: &MetalContext) -> s_field::VelocityField {
+        self.velocity.download(context)
+    }
+}
+
+----- crates/s-metal/src/velocity.rs -----
+//! GPU velocity field.
+
+use crate::{GpuField3D, GridInfo, MetalContext};
+
+use s_field::VelocityField;
+
+/// GPU resident velocity field.
+///
+/// Components:
+///
+/// u : east-west velocity
+/// v : north-south velocity
+/// w : vertical velocity
+///
+pub struct GpuVelocityField {
+    pub u: GpuField3D,
+
+    pub v: GpuField3D,
+
+    pub w: GpuField3D,
+
+    pub(crate) grid: GridInfo,
+}
+
+impl GpuVelocityField {
+    /// Upload CPU velocity field to GPU.
+    pub fn from_velocity(context: &MetalContext, velocity: &VelocityField) -> Self {
+        let shape = velocity.shape();
+
+        let spacing = velocity.spacing();
+
+        let grid = GridInfo::new(
+            shape[0] as u32,
+            shape[1] as u32,
+            shape[2] as u32,
+            spacing[0],
+            spacing[1],
+            spacing[2],
+        );
+
+        //
+        // First time slice
+        //
+        let u = velocity.u().time_slice(0).unwrap();
+
+        let v = velocity.v().time_slice(0).unwrap();
+
+        let w = velocity.w().time_slice(0).unwrap();
+
+        let gpu = Self {
+            u: GpuField3D::from_f32(context, u, grid),
+
+            v: GpuField3D::from_f32(context, v, grid),
+
+            w: GpuField3D::from_f32(context, w, grid),
+
+            grid,
+        };
+
+        //
+        // Debug upload check
+        //
+        let center =
+            (shape[2] / 2) * shape[0] * shape[1] + (shape[1] / 2) * shape[0] + shape[0] / 2;
+
+        let uploaded = gpu.u.download(context);
+
+        println!("GPU upload center = {}", uploaded[center]);
+
+        gpu
+    }
+
+    /// Create empty velocity field.
+    ///
+    /// Used for compute output.
+    pub fn empty(context: &MetalContext, grid: GridInfo) -> Self {
+        Self {
+            u: GpuField3D::empty(context, grid),
+
+            v: GpuField3D::empty(context, grid),
+
+            w: GpuField3D::empty(context, grid),
+
+            grid,
+        }
+    }
+
+    /// Download GPU velocity field to CPU.
+    ///
+    /// Converts GPU resident velocity into s-field VelocityField.
+
+    #[inline]
+    pub fn grid(&self) -> GridInfo {
+        self.grid
+    }
+
+    /// Download GPU velocity field to CPU arrays.
+    pub fn download(&self, context: &MetalContext) -> VelocityField {
+        let nx = self.grid.nx() as usize;
+        let ny = self.grid.ny() as usize;
+        let nz = self.grid.nz() as usize;
+
+        let grid = s_field::Grid4D::new(
+            [nx, ny, nz, 1],
+            [self.grid.dx(), self.grid.dy(), self.grid.dz(), 1.0],
+        );
+
+        //
+        // GPU -> CPU
+        //
+        let u = self.u.download(context);
+        let v = self.v.download(context);
+        let w = self.w.download(context);
+
+        //
+        // Vec -> ScalarField
+        //
+        let mut u_field = s_field::ScalarField::<f32>::zeros(grid.clone());
+
+        let mut v_field = s_field::ScalarField::<f32>::zeros(grid.clone());
+
+        let mut w_field = s_field::ScalarField::<f32>::zeros(grid.clone());
+
+        u_field.replace(u);
+        v_field.replace(v);
+        w_field.replace(w);
+
+        VelocityField::from_fields(grid, u_field, v_field, w_field)
+    }
+}
+
+----- crates/s-metal/src/velocity_gradient_operator.rs -----
+use crate::{GpuVelocityField, GradientOperator, MetalContext, VelocityGradient};
+
+pub struct VelocityGradientOperator {
+    gradient: GradientOperator,
+}
+
+impl VelocityGradientOperator {
+    pub fn new(gradient: GradientOperator) -> Self {
+        Self { gradient }
+    }
+
+    pub fn compute(&self, context: &MetalContext, velocity: &GpuVelocityField) -> VelocityGradient {
+        let u_gradient = self.gradient.gradient(context, &velocity.u);
+
+        let v_gradient = self.gradient.gradient(context, &velocity.v);
+
+        let w_gradient = self.gradient.gradient(context, &velocity.w);
+
+        VelocityGradient {
+            u_dx: u_gradient.dx,
+
+            u_dy: u_gradient.dy,
+
+            u_dz: u_gradient.dz,
+
+            v_dx: v_gradient.dx,
+
+            v_dy: v_gradient.dy,
+
+            v_dz: v_gradient.dz,
+
+            w_dx: w_gradient.dx,
+
+            w_dy: w_gradient.dy,
+
+            w_dz: w_gradient.dz,
+        }
+    }
+}
+
+----- crates/s-renderer/examples/terrain.rs -----
+use anyhow::{Context, Result};
+use s_field::{Coordinates, Grid4D, VelocityField};
+use s_renderer::{
+    GeoBounds, GeoConverter, GpuFlowMesh, HeightMap, Renderer, TerrainMesh, TerrainVertex,
+    camera_controller::CameraController, contour::generate_bathymetry_contours,
+    flow_generator::FlowParticleSystem, terrain::OceanSurfaceMesh,
+};
+use s_sof::grid::GridReader;
+use std::{fs, sync::Arc, time::Instant};
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::EventLoop,
+    window::WindowAttributes,
+};
+
+const GRID_PATH: &str = "suruga_bay.sof/grid.snc";
+const RAW_DATA_DIR: &str = "crates/s-builder/suruga_raw";
+
+const DEPTH_COUNT: usize = 6;
+const GRID_HEIGHT: usize = 22;
+const GRID_WIDTH: usize = 13;
+
+const PARTICLE_TRAIL_POINTS: usize = 24;
+const PARTICLE_SPEED_MULTIPLIER: f32 = 120.0;
+
+/// 海流の移動速度を確認しながら、f32のバイナリデータを読み込む。
+fn read_f32_file(path: &str) -> Result<Vec<f32>> {
+    let bytes = fs::read(path).with_context(|| format!("ファイルを読み込めません: {path}"))?;
+
+    anyhow::ensure!(
+        bytes.len() % 4 == 0,
+        "f32ファイルのサイズが4の倍数ではありません: {path}"
+    );
+
+    let values = bytes
+        .chunks_exact(4)
+        .map(|chunk| f32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]))
+        .collect::<Vec<_>>();
+
+    anyhow::ensure!(
+        values.iter().all(|value| value.is_finite()),
+        "{path} に非有限値があります"
+    );
+
+    Ok(values)
+}
+
+/// バイナリデータから海流の速度場を読み込む。
+fn load_surface_velocity() -> Result<VelocityField> {
+    // 配列の順序:
+    // time × depth × latitude × longitude
+    let grid = Grid4D::new(
+        [1, DEPTH_COUNT, GRID_HEIGHT, GRID_WIDTH],
+        [1.0, 1.0, 0.04, 0.08],
+    );
+
+    let latitudes = (0..GRID_HEIGHT)
+        .map(|i| 34.52000045776367 + i as f64 * 0.04)
+        .collect::<Vec<_>>();
+
+    let longitudes = (0..GRID_WIDTH)
+        .map(|i| 138.239990234375 + i as f64 * 0.08)
+        .collect::<Vec<_>>();
+
+    let depths = vec![0.0_f32, 10.0, 20.0, 50.0, 100.0, 200.0];
+    let times = vec![0.0_f64];
+
+    let coordinates = Coordinates::new(grid.clone(), latitudes, longitudes, depths, times);
+
+    let u_path = format!("{RAW_DATA_DIR}/u.bin");
+    let v_path = format!("{RAW_DATA_DIR}/v.bin");
+
+    let u = read_f32_file(&u_path)?;
+    let v = read_f32_file(&v_path)?;
+
+    let expected = grid.len();
+
+    anyhow::ensure!(
+        u.len() == expected,
+        "u.bin のデータ数が不正です: {} != {}",
+        u.len(),
+        expected
+    );
+
+    anyhow::ensure!(
+        v.len() == expected,
+        "v.bin のデータ数が不正です: {} != {}",
+        v.len(),
+        expected
+    );
+
+    let mut velocity = VelocityField::with_coordinates(grid, coordinates);
+
+    velocity.u_mut().replace(u);
+    velocity.v_mut().replace(v);
+    velocity.w_mut().fill(0.05);
+    println!(
+        "Ocean velocity loaded: {} x {} grid, {} depth levels",
+        GRID_WIDTH, GRID_HEIGHT, DEPTH_COUNT
+    );
+
+    // 速度データの統計を表示する。
+    //
+    // Fieldのデータ取得APIはプロジェクトの実装に依存するため、
+    // ここでは読み込んだバイナリを直接再利用して統計を計算する。
+    let u = read_f32_file(&u_path)?;
+    let v = read_f32_file(&v_path)?;
+
+    let mut min_speed = f32::INFINITY;
+    let mut max_speed = 0.0_f32;
+    let mut moving_points = 0usize;
+
+    for (&u_value, &v_value) in u.iter().zip(v.iter()) {
+        let speed = u_value.hypot(v_value);
+
+        min_speed = min_speed.min(speed);
+        max_speed = max_speed.max(speed);
+
+        if speed >= 0.02 {
+            moving_points += 1;
+        }
+    }
+
+    println!(
+        "Current speed range: {:.4} - {:.4} m/s",
+        min_speed, max_speed
+    );
+    println!("Moving grid points: {}", moving_points);
+
+    Ok(velocity)
+}
+
+/// 海流の開始位置を格子から生成する。
+fn generate_seeds(coordinates: &Coordinates, bounds: &GeoBounds) -> Vec<[f32; 3]> {
+    let mut seeds = Vec::new();
+
+    for y in (0..coordinates.height()).step_by(2) {
+        for x in 0..coordinates.width() {
+            let Some(lon) = coordinates.longitude_at(x) else {
+                continue;
+            };
+
+            let Some(lat) = coordinates.latitude_at(y) else {
+                continue;
+            };
+
+            if lon < bounds.lon_min
+                || lon > bounds.lon_max
+                || lat < bounds.lat_min
+                || lat > bounds.lat_max
+            {
+                continue;
+            }
+
+            seeds.push([lon as f32, lat as f32, 100.0]);
+        }
+    }
+
+    seeds
+}
+
+fn main() -> Result<()> {
+    pollster::block_on(run())
+}
+
+async fn run() -> Result<()> {
+    // --------------------------------------------------
+    // 1. ウィンドウ
+    // --------------------------------------------------
+
+    let event_loop = EventLoop::new()?;
+
+    let window = Arc::new(
+        event_loop
+            .create_window(WindowAttributes::default().with_title("Suruga Ocean Simulator"))?,
+    );
+
+    // --------------------------------------------------
+    // 2. 地形データの読み込み
+    // --------------------------------------------------
+
+    let mut reader = GridReader::open(GRID_PATH)?;
+    let grid = reader.read()?;
+
+    let width = grid.longitude.len();
+    let height = grid.latitude.len();
+
+    anyhow::ensure!(
+        width >= 2 && height >= 2,
+        "地形格子のサイズが不正です: {} x {}",
+        width,
+        height
+    );
+
+    anyhow::ensure!(
+        grid.bathymetry.len() == width * height,
+        "水深データのサイズが不正です: expected={}, actual={}",
+        width * height,
+        grid.bathymetry.len()
+    );
+
+    anyhow::ensure!(
+        grid.longitude.iter().all(|v| v.is_finite())
+            && grid.latitude.iter().all(|v| v.is_finite())
+            && grid.bathymetry.iter().all(|v| v.is_finite()),
+        "地形データに非有限値があります"
+    );
+
+    let (min_elevation, max_elevation) = grid
+        .bathymetry
+        .iter()
+        .fold((f32::INFINITY, f32::NEG_INFINITY), |(min, max), &value| {
+            (min.min(value), max.max(value))
+        });
+
+    println!("=== Suruga Ocean Simulator ===");
+    println!("Terrain grid: {} x {}", width, height);
+    println!(
+        "Longitude: {:.4} - {:.4}",
+        grid.longitude[0],
+        grid.longitude[width - 1]
+    );
+    println!(
+        "Latitude: {:.4} - {:.4}",
+        grid.latitude[0],
+        grid.latitude[height - 1]
+    );
+    println!(
+        "Bathymetry: {:.2} m - {:.2} m",
+        min_elevation, max_elevation
+    );
+
+    let bounds = GeoBounds::new(
+        grid.longitude[0] as f64,
+        grid.longitude[width - 1] as f64,
+        grid.latitude[0] as f64,
+        grid.latitude[height - 1] as f64,
+    );
+
+    let heightmap = HeightMap::new(width, height, grid.bathymetry);
+
+    // --------------------------------------------------
+    // 3. 地形メッシュ
+    // --------------------------------------------------
+
+    let terrain_mesh = TerrainMesh::from_heightmap(&heightmap, bounds, 5.0);
+    let ocean_mesh = OceanSurfaceMesh::new(bounds, &heightmap);
+    println!("Terrain vertices: {}", terrain_mesh.vertex_count());
+    println!("Terrain indices: {}", terrain_mesh.index_count());
+
+    // --------------------------------------------------
+    // 4. Renderer
+    // --------------------------------------------------
+
+    let mut renderer = Renderer::new(
+        window.clone(),
+        include_str!("../src/terrain.wgsl"),
+        &[TerrainVertex::layout()],
+    )
+    .await?;
+
+    let gpu_terrain = terrain_mesh.upload(renderer.device());
+    let gpu_ocean = ocean_mesh.upload(renderer.device());
+
+    // --------------------------------------------------
+    // 4.1 海底等深線
+    // --------------------------------------------------
+
+    const CONTOUR_INTERVAL_M: f32 = 250.0;
+    const TERRAIN_VERTICAL_SCALE: f32 = 5.0;
+
+    let contour_vertices = generate_bathymetry_contours(
+        &heightmap,
+        bounds,
+        TERRAIN_VERTICAL_SCALE,
+        CONTOUR_INTERVAL_M,
+    );
+
+    let gpu_contours = GpuFlowMesh::from_flow_vertices(renderer.device(), &contour_vertices);
+
+
+----- crates/s-renderer/src/contour.rs -----
+use crate::coordinate::{GeoBounds, GeoConverter};
+use crate::flow::FlowVertex;
+use crate::heightmap::HeightMap;
+
+/// 海底地形データから等深線を生成する。
+///
+/// # Arguments
+///
+/// * `heightmap` - 海底地形の標高データ（海底は負の値）
+/// * `bounds` - 地理座標の範囲
+/// * `vertical_scale` - 地形表示時の垂直方向の倍率
+/// * `interval_m` - 等深線の間隔（メートル）
+///
+/// # Returns
+///
+/// 等深線を構成する線分の頂点配列。
+pub fn generate_bathymetry_contours(
+    heightmap: &HeightMap,
+    bounds: GeoBounds,
+    vertical_scale: f32,
+    interval_m: f32,
+) -> Vec<FlowVertex> {
+    let width = heightmap.width;
+    let height = heightmap.height;
+
+    if width < 2 || height < 2 || interval_m <= 0.0 {
+        return Vec::new();
+    }
+
+    let converter = GeoConverter::new(bounds, 100_000.0);
+    let mut vertices = Vec::new();
+
+    // 250 mなど、指定された間隔ごとに等深線を生成する。
+    for z in 0..height - 1 {
+        let lat0 =
+            bounds.lat_min + (bounds.lat_max - bounds.lat_min) * z as f64 / (height - 1) as f64;
+
+        let lat1 = bounds.lat_min
+            + (bounds.lat_max - bounds.lat_min) * (z + 1) as f64 / (height - 1) as f64;
+
+        for x in 0..width - 1 {
+            let lon0 =
+                bounds.lon_min + (bounds.lon_max - bounds.lon_min) * x as f64 / (width - 1) as f64;
+
+            let lon1 = bounds.lon_min
+                + (bounds.lon_max - bounds.lon_min) * (x + 1) as f64 / (width - 1) as f64;
+
+            // セルの四隅。
+            let corners = [
+                (lon0, lat0, heightmap.get(x, z)),
+                (lon1, lat0, heightmap.get(x + 1, z)),
+                (lon1, lat1, heightmap.get(x + 1, z + 1)),
+                (lon0, lat1, heightmap.get(x, z + 1)),
+            ];
+
+            // 標高データが不正なセルはスキップする。
+            if corners.iter().any(|(_, _, h)| !h.is_finite()) {
+                continue;
+            }
+
+            let min_height = corners
+                .iter()
+                .map(|(_, _, h)| *h)
+                .fold(f32::INFINITY, f32::min);
+
+            let max_height = corners
+                .iter()
+                .map(|(_, _, h)| *h)
+                .fold(f32::NEG_INFINITY, f32::max);
+
+            // 海底を含まないセルには等深線を生成しない。
+            if min_height >= 0.0 {
+                continue;
+            }
+
+            // 対角線で四角形を2つの三角形に分割する。
+            let triangles = [[0_usize, 1_usize, 2_usize], [0_usize, 2_usize, 3_usize]];
+
+            let first_level = (min_height / interval_m).ceil() as i32;
+            let last_level = (max_height / interval_m).floor() as i32;
+
+            for level_index in first_level..=last_level {
+                let target = level_index as f32 * interval_m;
+
+                // 海底の等深線だけを描画する。
+                if target >= 0.0 {
+                    continue;
+                }
+
+                for triangle in triangles {
+                    let mut intersections: Vec<(f64, f64)> = Vec::with_capacity(3);
+
+                    for [a_idx, b_idx] in [[0_usize, 1_usize], [1, 2], [2, 0]] {
+                        let a = corners[triangle[a_idx]];
+                        let b = corners[triangle[b_idx]];
+
+                        let h_a = a.2;
+                        let h_b = b.2;
+
+                        // 等深線と交差する辺を判定する。
+                        let crosses =
+                            (h_a < target && h_b >= target) || (h_b < target && h_a >= target);
+
+                        if !crosses {
+                            continue;
+                        }
+
+                        let denominator = h_b - h_a;
+
+                        if denominator.abs() < f32::EPSILON {
+                            continue;
+                        }
+
+                        let t = ((target - h_a) / denominator) as f64;
+
+                        let lon = a.0 + (b.0 - a.0) * t;
+                        let lat = a.1 + (b.1 - a.1) * t;
+
+                        intersections.push((lon, lat));
+                    }
+
+                    // 三角形と等深線の交点が2つなら線分を作る。
+                    if intersections.len() != 2 {
+                        continue;
+                    }
+
+                    let (lon_a, lat_a) = intersections[0];
+                    let (lon_b, lat_b) = intersections[1];
+
+                    let mut world_a = converter.geo_to_world(lon_a, lat_a);
+                    let mut world_b = converter.geo_to_world(lon_b, lat_b);
+
+                    // 地形表面との重なりを避けるため、わずかに下げる。
+                    let y = target * vertical_scale + 0.5;
+                    world_a[1] = y;
+                    world_b[1] = y;
+
+                    vertices.push(FlowVertex { position: world_a });
+
+                    vertices.push(FlowVertex { position: world_b });
+                }
+            }
+        }
+    }
+
+    vertices
+}
+
+----- crates/s-renderer/src/flow.rs -----
+#[repr(C)]
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
+pub struct FlowVertex {
+    pub position: [f32; 3],
+}
+
+impl FlowVertex {
+    pub fn layout() -> wgpu::VertexBufferLayout<'static> {
+        wgpu::VertexBufferLayout {
+            array_stride: std::mem::size_of::<FlowVertex>() as u64,
+
+            step_mode: wgpu::VertexStepMode::Vertex,
+
+            attributes: &[wgpu::VertexAttribute {
+                offset: 0,
+
+                shader_location: 0,
+
+                format: wgpu::VertexFormat::Float32x3,
+            }],
+        }
+    }
+}
+
+----- crates/s-renderer/src/flow_generator.rs -----
+use crate::{coordinate::GeoConverter, flow::FlowVertex};
+
+use s_field::VelocityField;
+
+/// 静的な流線を生成する。
+pub struct FlowGenerator;
+
+impl FlowGenerator {
+    pub fn generate(
+        velocity: &VelocityField,
+        converter: &GeoConverter,
+        seeds: &[[f32; 3]],
+        dt_seconds: f32,
+        length: usize,
+        time: f64,
+    ) -> Vec<FlowVertex> {
+        let mut vertices = Vec::new();
+
+        let Some(coordinates) = velocity.coordinates() else {
+            return vertices;
+        };
+
+        let bounds = converter.bounds();
+
+        for seed in seeds {
+            let mut longitude = seed[0] as f64;
+            let mut latitude = seed[1] as f64;
+            let depth = seed[2];
+
+            for _ in 0..length {
+                if !coordinates.contains(longitude, latitude, depth) {
+                    break;
+                }
+
+                if longitude < bounds.lon_min
+                    || longitude > bounds.lon_max
+                    || latitude < bounds.lat_min
+                    || latitude > bounds.lat_max
+                {
+                    break;
+                }
+
+                let Some(vel) = velocity.sample(longitude, latitude, depth, time) else {
+                    break;
+                };
+
+                let u = vel[0] as f64;
+                let v = vel[1] as f64;
+
+                if !u.is_finite() || !v.is_finite() || u.hypot(v) < 0.02 {
+                    break;
+                }
+
+                let east_m = u * dt_seconds as f64;
+                let north_m = v * dt_seconds as f64;
+
+                let delta_lat = north_m / 110_540.0;
+
+                let cos_lat = latitude.to_radians().cos();
+
+                if cos_lat.abs() < 1.0e-6 {
+                    break;
+                }
+
+                let delta_lon = east_m / (111_320.0 * cos_lat);
+
+                let next_longitude = longitude + delta_lon;
+                let next_latitude = latitude + delta_lat;
+
+                if !coordinates.contains(next_longitude, next_latitude, depth) {
+                    break;
+                }
+
+                if next_longitude < bounds.lon_min
+                    || next_longitude > bounds.lon_max
+                    || next_latitude < bounds.lat_min
+                    || next_latitude > bounds.lat_max
+                {
+                    break;
+                }
+
+                let mut world_start = converter.ocean_to_world(longitude, latitude, depth);
+
+                let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, depth);
+
+                // 既存の海流表示と同じ高さ補正。
+                world_start[1] += 100.0;
+                world_end[1] += 100.0;
+
+                vertices.push(FlowVertex {
+                    position: world_start,
+                });
+
+                vertices.push(FlowVertex {
+                    position: world_end,
+                });
+
+                longitude = next_longitude;
+                latitude = next_latitude;
+            }
+        }
+
+        vertices
+    }
+}
+
+/// 1つの流速粒子と、その軌跡を保持する。
+struct FlowParticle {
+    origin: [f64; 2],
+    origin_depth: f32,
+
+    longitude: f64,
+    latitude: f64,
+    depth: f32,
+
+    trail: Vec<[f32; 3]>,
+}
+
+/// 流速データを使って粒子を時間発展させるシステム。
+pub struct FlowParticleSystem {
+    particles: Vec<FlowParticle>,
+    max_trail_points: usize,
+}
+
+impl FlowParticleSystem {
+    /// 初期位置から粒子を作成する。
+    ///
+    /// seedsは[経度、緯度、深度]。
+    pub fn new(seeds: &[[f32; 3]], max_trail_points: usize) -> Self {
+        let particles = seeds
+            .iter()
+            .map(|seed| FlowParticle {
+                origin: [seed[0] as f64, seed[1] as f64],
+                origin_depth: seed[2],
+
+                longitude: seed[0] as f64,
+                latitude: seed[1] as f64,
+                depth: seed[2],
+
+                trail: Vec::new(),
+            })
+            .collect();
+
+        Self {
+            particles,
+            max_trail_points: max_trail_points.max(2),
+        }
+    }
+
+    /// 全粒子を1フレーム分だけ移動させる。
+    pub fn update(
+        &mut self,
+        velocity: &VelocityField,
+        converter: &GeoConverter,
+        dt_seconds: f32,
+        speed_multiplier: f32,
+        time: f64,
+    ) {
+        let Some(coordinates) = velocity.coordinates() else {
+            return;
+        };
+
+        let bounds = converter.bounds();
+
+        let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 100.0;
+
+        if !dt.is_finite() || dt <= 0.0 {
+            return;
+        }
+
+        for particle in &mut self.particles {
+            let position_is_valid =
+                coordinates.contains(particle.longitude, particle.latitude, particle.depth)
+                    && particle.longitude >= bounds.lon_min
+                    && particle.longitude <= bounds.lon_max
+                    && particle.latitude >= bounds.lat_min
+                    && particle.latitude <= bounds.lat_max;
+
+            if !position_is_valid {
+                Self::reset_particle(particle);
+                continue;
+            }
+
+            let Some(vel) = velocity.sample_interpolated(
+                particle.longitude,
+                particle.latitude,
+                particle.depth,
+                time,
+            ) else {
+                Self::reset_particle(particle);
+                continue;
+            };
+
+            let u = vel[0] as f64;
+            let v = vel[1] as f64;
+            let w = vel[2] as f64;
+
+            if !u.is_finite() || !v.is_finite() || !w.is_finite() {
+                Self::reset_particle(particle);
+                continue;
+            }
+
+            if u.hypot(v).hypot(w) < 0.02 {
+                continue;
+            }
+
+            let east_m = u * dt as f64;
+            let north_m = v * dt as f64;
+
+            let delta_lat = north_m / 110_540.0;
+
+            let cos_lat = particle.latitude.to_radians().cos();
+
+            if cos_lat.abs() < 1.0e-6 {
+                Self::reset_particle(particle);
+                continue;
+            }
+
+            let delta_lon = east_m / (111_320.0 * cos_lat);
+
+            let next_longitude = particle.longitude + delta_lon;
+
+            let next_latitude = particle.latitude + delta_lat;
+
+            // 深度は海面0、下向きを正とする。
+            let next_depth = particle.depth - (w as f32) * dt;
+            let next_position_is_valid = next_depth.is_finite()
+                && coordinates.contains(next_longitude, next_latitude, next_depth)
+                && next_longitude >= bounds.lon_min
+                && next_longitude <= bounds.lon_max
+                && next_latitude >= bounds.lat_min
+                && next_latitude <= bounds.lat_max;
+
+            if !next_position_is_valid {
+                Self::reset_particle(particle);
+                continue;
+            }
+
+            let mut world_start =
+                converter.ocean_to_world(particle.longitude, particle.latitude, particle.depth);
+
+            let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, next_depth);
+
+            // 既存の海流表示と同じ高さ補正。
+            world_start[1] += 100.0;
+            world_end[1] += 100.0;
+
+            if particle.trail.is_empty() {
+                particle.trail.push(world_start);
+            }
+
+            particle.trail.push(world_end);
+
+            if particle.trail.len() > self.max_trail_points {
+                let excess = particle.trail.len() - self.max_trail_points;
+
+                particle.trail.drain(0..excess);
+            }
+
+            particle.longitude = next_longitude;
+            particle.latitude = next_latitude;
+            particle.depth = next_depth;
+        }
+    }
+
+    /// 粒子を初期位置に戻し、古い軌跡を消す。
+    fn reset_particle(particle: &mut FlowParticle) {
+        particle.longitude = particle.origin[0];
+        particle.latitude = particle.origin[1];
+        particle.depth = particle.origin_depth;
+
+        particle.trail.clear();
+    }
+
+    /// 軌跡と現在位置のマーカーを描画用頂点に変換する。
+    ///
+    /// 既存のLineListパイプラインで描画できるように、
+    /// 粒子は小さな十字形の線分として表現する。
+    pub fn vertices(&self) -> Vec<FlowVertex> {
+        let mut vertices = Vec::new();
+
+----- crates/s-renderer/src/flow_mesh.rs -----
+use wgpu::util::DeviceExt;
+
+use crate::flow::FlowVertex;
+
+/// GPU上に保持する潮流線メッシュ。
+pub struct GpuFlowMesh {
+    vertex_buffer: wgpu::Buffer,
+    vertex_count: u32,
+    capacity_bytes: u64,
+}
+
+impl GpuFlowMesh {
+    /// 指定した最大頂点数でGPUバッファを確保する。
+    pub fn with_capacity(device: &wgpu::Device, max_vertices: usize) -> Self {
+        let capacity_vertices = max_vertices.max(1);
+
+        let capacity_bytes = (capacity_vertices * std::mem::size_of::<FlowVertex>()) as u64;
+
+        let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("dynamic_flow_vertex_buffer"),
+            size: capacity_bytes,
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+
+        Self {
+            vertex_buffer,
+            vertex_count: 0,
+            capacity_bytes,
+        }
+    }
+
+    /// 初期頂点データからGPUメッシュを作成する。
+    pub fn from_flow_vertices(device: &wgpu::Device, vertices: &[FlowVertex]) -> Self {
+        let capacity_vertices = vertices.len().max(1);
+
+        let capacity_bytes = (capacity_vertices * std::mem::size_of::<FlowVertex>()) as u64;
+
+        let initial_contents = if vertices.is_empty() {
+            bytemuck::cast_slice(&[FlowVertex {
+                position: [0.0, 0.0, 0.0],
+            }])
+        } else {
+            bytemuck::cast_slice(vertices)
+        };
+
+        let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("flow_vertex_buffer"),
+            contents: initial_contents,
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+        });
+
+        Self {
+            vertex_buffer,
+            vertex_count: vertices.len() as u32,
+            capacity_bytes,
+        }
+    }
+
+    /// CPU側で更新した頂点データをGPUへ転送する。
+    ///
+    /// バッファの容量を超えた場合は false を返す。
+    pub fn update_vertices(&mut self, queue: &wgpu::Queue, vertices: &[FlowVertex]) -> bool {
+        let required_bytes = (vertices.len() * std::mem::size_of::<FlowVertex>()) as u64;
+
+        if required_bytes > self.capacity_bytes {
+            return false;
+        }
+
+        if !vertices.is_empty() {
+            queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(vertices));
+        }
+
+        self.vertex_count = vertices.len() as u32;
+
+        true
+    }
+
+    pub fn vertex_buffer(&self) -> &wgpu::Buffer {
+        &self.vertex_buffer
+    }
+
+    pub fn vertex_count(&self) -> u32 {
+        self.vertex_count
+    }
+}
+
+----- crates/s-renderer/src/flow_pipeline.rs -----
+use anyhow::Result;
+
+use crate::flow::FlowVertex;
+
+/// 海流の流線を描画するGPUパイプライン。
+pub struct FlowPipeline {
+    pipeline: wgpu::RenderPipeline,
+}
+
+impl FlowPipeline {
+    /// 海流の流線用パイプラインを作成する。
+    pub fn new(
+        device: &wgpu::Device,
+        format: wgpu::TextureFormat,
+        shader: &wgpu::ShaderModule,
+        camera_layout: &wgpu::BindGroupLayout,
+    ) -> Result<Self> {
+        let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: Some("flow_pipeline_layout"),
+            bind_group_layouts: &[camera_layout],
+            push_constant_ranges: &[],
+        });
+
+        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("flow_pipeline"),
+            layout: Some(&layout),
+
+            vertex: wgpu::VertexState {
+                module: shader,
+                entry_point: Some("vs_main"),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+                buffers: &[FlowVertex::layout()],
+            },
+
+            fragment: Some(wgpu::FragmentState {
+                module: shader,
+                entry_point: Some("fs_main"),
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format,
+                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+            }),
+
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::LineList,
+                ..Default::default()
+            },
+
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth32Float,
+                depth_write_enabled: false,
+                depth_compare: wgpu::CompareFunction::LessEqual,
+                stencil: wgpu::StencilState::default(),
+                bias: wgpu::DepthBiasState::default(),
+            }),
+
+            multisample: wgpu::MultisampleState::default(),
+            multiview: None,
+            cache: None,
+        });
+
+        Ok(Self { pipeline })
+    }
+
+    /// 作成済みの描画パイプラインを取得する。
+    pub fn pipeline(&self) -> &wgpu::RenderPipeline {
+        &self.pipeline
+    }
+}
+
+----- crates/s-renderer/src/lib.rs -----
+pub mod buffer;
+pub mod camera;
+pub mod camera_controller;
+pub mod context;
+pub mod coordinate;
+pub mod depth;
+pub mod error;
+pub mod frame;
+pub mod gebco;
+pub mod heightmap;
+pub mod heightmap_loader;
+pub mod mesh;
+pub mod pipeline;
+pub mod renderer;
+pub mod shader;
+pub mod surface;
+pub mod texture;
+pub mod uniform;
+pub use camera_controller::CameraController;
+pub use coordinate::{GeoBounds, GeoConverter};
+pub mod flow;
+pub mod flow_generator;
+pub mod flow_mesh;
+pub mod flow_pipeline;
+pub mod ocean;
+pub mod terrain_mesh;
+pub mod velocity;
+pub mod velocity_loader;
+pub mod velocity_mesh;
+pub mod velocity_pipeline;
+pub mod velocity_renderer;
+pub use camera::Camera;
+pub use flow_generator::FlowGenerator;
+pub use flow_mesh::GpuFlowMesh;
+pub use mesh::{GpuMesh, Mesh};
+pub use renderer::Renderer;
+pub use surface::RenderSurface;
+pub mod test_mesh;
+pub use test_mesh::{TestVertex, create_triangle};
+pub mod terrain;
+pub use flow::FlowVertex;
+pub use gebco::GebcoLoader;
+pub use heightmap::HeightMap;
+pub use heightmap_loader::HeightMapLoader;
+pub use terrain::TerrainMesh;
+pub use terrain_mesh::TerrainVertex;
+pub mod contour;
+
+----- crates/s-renderer/src/ocean.rs -----
+use s_metal::{GpuField3D, GpuVelocityField};
+
+pub struct OceanRenderData {
+    pub velocity: GpuVelocityField,
+
+    pub temperature: Option<GpuField3D>,
+
+    pub salinity: Option<GpuField3D>,
+
+    pub sea_surface_height: Option<GpuField3D>,
+}
+
+impl OceanRenderData {
+    pub fn new(velocity: GpuVelocityField) -> Self {
+        Self {
+            velocity,
+            temperature: None,
+            salinity: None,
+            sea_surface_height: None,
+        }
+    }
+}
+
+----- crates/s-renderer/src/ocean_loader.rs -----
+use anyhow::Result;
+
+use s_field::VelocityField;
+
+use s_sof::package_reader::SofPackageReader;
+
+pub struct OceanLoader;
+
+impl OceanLoader {
+    pub fn load_velocity(path: &str) -> Result<VelocityField> {
+        let mut package = SofPackageReader::open(path)?;
+
+        let velocity = package.read_boundary()?;
+
+        Ok(velocity.velocity())
+    }
+}
+
+----- crates/s-renderer/src/renderer.rs -----
+use anyhow::Result;
+use std::sync::Arc;
+
+use wgpu;
+use winit::{dpi::PhysicalSize, window::Window};
+
+use crate::{
+    camera::Camera, context::RenderContext, depth::DepthTexture, flow::FlowVertex,
+    flow_mesh::GpuFlowMesh, flow_pipeline::FlowPipeline, mesh::GpuMesh, pipeline::RenderPipeline,
+    shader::Shader, surface::RenderSurface, terrain_mesh::TerrainVertex, uniform::CameraBuffer,
+    velocity_mesh::GpuVelocityMesh, velocity_pipeline::VelocityPipeline,
+};
+
+/// Suruga Ocean Simulatorのメインレンダラー。
+///
+/// 描画対象:
+/// - 海底地形
+/// - 半透明の海面
+/// - 等深線
+/// - 海流の流線
+/// - 海流粒子
+/// - 速度場
+pub struct Renderer {
+    context: RenderContext,
+    surface: RenderSurface,
+
+    // 地形
+    pipeline: RenderPipeline,
+
+    // 等深線
+    contour_pipeline: wgpu::RenderPipeline,
+
+    // 海流
+    flow_pipeline: FlowPipeline,
+    flow_dot_pipeline: wgpu::RenderPipeline,
+
+    // 海面
+    ocean_pipeline: wgpu::RenderPipeline,
+
+    // 速度場
+    pub velocity_pipeline: VelocityPipeline,
+
+    // 深度
+    depth: DepthTexture,
+
+    // カメラ
+    pub camera: Camera,
+    camera_buffer: CameraBuffer,
+}
+
+impl Renderer {
+    /// Rendererを初期化する。
+    pub async fn new(
+        window: Arc<Window>,
+        shader_source: &str,
+        vertex_layouts: &[wgpu::VertexBufferLayout<'static>],
+    ) -> Result<Self> {
+        let context = RenderContext::new().await?;
+
+        let surface = RenderSurface::new(&context, window)?;
+        let size = surface.size();
+
+        let device = context.device();
+        let surface_format = surface.format();
+
+        // --------------------------------------------------
+        // Terrain Pipeline
+        // --------------------------------------------------
+
+        let terrain_shader = Shader::from_wgsl(device, shader_source, "terrain_shader")?;
+
+        let pipeline = RenderPipeline::new(
+            device,
+            surface_format,
+            Some(wgpu::TextureFormat::Depth32Float),
+            vertex_layouts,
+            terrain_shader.module(),
+        )?;
+
+        // --------------------------------------------------
+        // Flow Pipeline
+        // --------------------------------------------------
+
+        let flow_shader = Shader::from_wgsl(device, include_str!("flow.wgsl"), "flow_shader")?;
+
+        let flow_pipeline = FlowPipeline::new(
+            device,
+            surface_format,
+            flow_shader.module(),
+            pipeline.camera_layout(),
+        )?;
+
+        // --------------------------------------------------
+        // Bathymetry Contour Pipeline
+        // --------------------------------------------------
+
+        let contour_shader =
+            Shader::from_wgsl(device, include_str!("contour.wgsl"), "contour_shader")?;
+
+        let contour_pipeline = create_auxiliary_pipeline(
+            device,
+            surface_format,
+            Some(wgpu::TextureFormat::Depth32Float),
+            contour_shader.module(),
+            pipeline.camera_layout(),
+            &FlowVertex::layout(),
+            wgpu::PrimitiveTopology::LineList,
+            false,
+            false,
+        );
+
+        // --------------------------------------------------
+        // Ocean Surface Pipeline
+        // --------------------------------------------------
+
+        let ocean_shader = Shader::from_wgsl(
+            device,
+            include_str!("ocean_surface.wgsl"),
+            "ocean_surface_shader",
+        )?;
+
+        let ocean_pipeline = create_auxiliary_pipeline(
+            device,
+            surface_format,
+            Some(wgpu::TextureFormat::Depth32Float),
+            ocean_shader.module(),
+            pipeline.camera_layout(),
+            &TerrainVertex::layout(),
+            wgpu::PrimitiveTopology::TriangleList,
+            true,
+            false,
+        );
+
+        // --------------------------------------------------
+        // Flow Particle Pipeline
+        // --------------------------------------------------
+
+        let particle_shader =
+            Shader::from_wgsl(device, include_str!("particle.wgsl"), "particle_shader")?;
+
+        let flow_dot_pipeline = create_auxiliary_pipeline(
+            device,
+            surface_format,
+            Some(wgpu::TextureFormat::Depth32Float),
+            particle_shader.module(),
+            pipeline.camera_layout(),
+            &FlowVertex::layout(),
+            wgpu::PrimitiveTopology::PointList,
+            false,
+            false,
+        );
+
+        // --------------------------------------------------
+        // Velocity Pipeline
+        // --------------------------------------------------
+
+        let velocity_shader =
+            Shader::from_wgsl(device, include_str!("velocity.wgsl"), "velocity_shader")?;
+
+        let velocity_pipeline = VelocityPipeline::new(
+            device,
+            surface_format,
+            velocity_shader.module(),
+            pipeline.camera_layout(),
+        )?;
+
+        // --------------------------------------------------
+        // Depth / Camera
+        // --------------------------------------------------
+
+        let depth = DepthTexture::new(device, size.width, size.height)?;
+
+        let camera = Camera::new(size.width, size.height);
+
+        let camera_buffer = CameraBuffer::new(device, pipeline.camera_layout());
+
+        Ok(Self {
+            context,
+            surface,
+            pipeline,
+            contour_pipeline,
+            flow_pipeline,
+            flow_dot_pipeline,
+            ocean_pipeline,
+            velocity_pipeline,
+            depth,
+            camera,
+            camera_buffer,
+        })
+    }
+
+    /// GPUデバイスを取得する。
+    pub fn device(&self) -> &wgpu::Device {
+        self.context.device()
+    }
+
+    /// GPUキューを取得する。
+    pub fn queue(&self) -> &wgpu::Queue {
+        self.context.queue()
+    }
+
+    /// カメラを可変参照で取得する。
+    pub fn camera_mut(&mut self) -> &mut Camera {
+        &mut self.camera
+    }
+
+    /// ウィンドウサイズの変更に対応する。
+    pub fn resize(&mut self, size: PhysicalSize<u32>) {
+        if size.width == 0 || size.height == 0 {
+            return;
+        }
+
+        self.surface.resize(&self.context, size);
+
+        self.depth
+            .resize(self.context.device(), size.width, size.height)
+            .unwrap();
+
+        self.camera.resize(size.width, size.height);
+    }
+
+    /// 既存の呼び出しとの互換性を保つ描画関数。
+    pub fn render<V>(
+        &mut self,
+        terrain: &GpuMesh<V>,
+        ocean: Option<&GpuMesh<TerrainVertex>>,
+        flow: Option<&GpuFlowMesh>,
+        velocity: Option<&GpuVelocityMesh>,
+    ) -> Result<()>
+    where
+        V: bytemuck::Pod,
+    {
+        self.render_with_ocean_and_particles(terrain, ocean, None, flow, None, velocity)
+    }
+
+    /// 海底地形、海面、等深線、流線、粒子、速度場を描画する。
+    pub fn render_with_ocean_and_particles<V>(
+        &mut self,
+        terrain: &GpuMesh<V>,
+        ocean: Option<&GpuMesh<TerrainVertex>>,
+        contours: Option<&GpuFlowMesh>,
+        flow: Option<&GpuFlowMesh>,
+        particle_dots: Option<&GpuFlowMesh>,
+        velocity: Option<&GpuVelocityMesh>,
+    ) -> Result<()>
+    where
+        V: bytemuck::Pod,
+    {
+        // --------------------------------------------------
+        // Camera
+        // --------------------------------------------------
+
+        self.camera_buffer
+            .uniform
+            .update(self.camera.build_matrix());
+
+        self.camera_buffer.update(self.context.queue());
+
+        // --------------------------------------------------
+        // Frame
+        // --------------------------------------------------
+
+        let frame = self.surface.get_current_texture()?;
+
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
+
+        let mut encoder =
+            self.context
+                .device()
+                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                    label: Some("sos_render_encoder"),
+                });
+
+        // --------------------------------------------------
+        // Terrain Pass
+        // --------------------------------------------------
+
+        {
+
+----- crates/s-renderer/src/velocity.rs -----
+use s_field::VelocityField;
+
+#[repr(C)]
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
+pub struct VelocityVertex {
+    pub position: [f32; 3],
+    pub velocity: [f32; 3],
+}
+
+impl VelocityVertex {
+    pub fn layout() -> wgpu::VertexBufferLayout<'static> {
+        wgpu::VertexBufferLayout {
+            array_stride: std::mem::size_of::<VelocityVertex>() as wgpu::BufferAddress,
+
+            step_mode: wgpu::VertexStepMode::Vertex,
+
+            attributes: &[
+                wgpu::VertexAttribute {
+                    offset: 0,
+                    shader_location: 0,
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: 12,
+                    shader_location: 1,
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+            ],
+        }
+    }
+    pub fn desc() -> wgpu::VertexBufferLayout<'static> {
+        use std::mem;
+
+        wgpu::VertexBufferLayout {
+            array_stride: mem::size_of::<VelocityVertex>() as wgpu::BufferAddress,
+
+            step_mode: wgpu::VertexStepMode::Vertex,
+
+            attributes: &[
+                wgpu::VertexAttribute {
+                    offset: 0,
+
+                    shader_location: 0,
+
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+
+                    shader_location: 1,
+
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+            ],
+        }
+    }
+}
+
+pub struct VelocityMesh {
+    pub vertices: Vec<VelocityVertex>,
+    pub indices: Vec<u32>,
+}
+
+impl VelocityMesh {
+    pub fn from_field(field: &VelocityField, stride: usize) -> Self {
+        let shape = field.shape();
+
+        let nx = shape[2];
+        let ny = shape[1];
+        let nz = shape[0];
+
+        let mut vertices = Vec::new();
+        let mut indices = Vec::new();
+
+        let mut id = 0u32;
+
+        for z in (0..nz).step_by(stride) {
+            for y in (0..ny).step_by(stride) {
+                for x in (0..nx).step_by(stride) {
+                    let u = *field.u().get(0, z, y, x).unwrap_or(&0.0);
+
+                    let v = *field.v().get(0, z, y, x).unwrap_or(&0.0);
+
+                    let w = *field.w().get(0, z, y, x).unwrap_or(&0.0);
+
+                    let scale = 20.0;
+
+                    vertices.push(VelocityVertex {
+                        position: [x as f32, y as f32, -(z as f32)],
+                        velocity: [u, v, w],
+                    });
+
+                    vertices.push(VelocityVertex {
+                        position: [
+                            x as f32 + u * scale,
+                            y as f32 + v * scale,
+                            -(z as f32) + w * scale,
+                        ],
+                        velocity: [u, v, w],
+                    });
+
+                    indices.push(id);
+                    indices.push(id + 1);
+
+                    id += 2;
+                }
+            }
+        }
+
+        Self { vertices, indices }
+    }
+}
+
+----- crates/s-renderer/src/velocity_loader.rs -----
+use anyhow::Result;
+
+use s_field::{Grid4D, VelocityField};
+
+use s_io::SioReader;
+
+pub fn load_velocity(path: &str, grid: Grid4D) -> Result<VelocityField> {
+    let mut reader = SioReader::open(path)?;
+
+    let u = reader.read_array("velocity_u")?;
+
+    let v = reader.read_array("velocity_v")?;
+
+    let w = reader.read_array("velocity_w")?;
+
+    let mut velocity = VelocityField::new(grid);
+
+    velocity.u_mut().as_mut_slice().copy_from_slice(&u);
+
+    velocity.v_mut().as_mut_slice().copy_from_slice(&v);
+
+    velocity.w_mut().as_mut_slice().copy_from_slice(&w);
+
+    Ok(velocity)
+}
+
+----- crates/s-renderer/src/velocity_mesh.rs -----
+use crate::velocity::VelocityVertex;
+use wgpu::util::DeviceExt;
+
+pub struct GpuVelocityMesh {
+    vertex_buffer: wgpu::Buffer,
+
+    vertex_count: u32,
+}
+
+impl GpuVelocityMesh {
+    pub fn new(device: &wgpu::Device, vertices: &[VelocityVertex]) -> Self {
+        let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("velocity_vertex_buffer"),
+
+            contents: bytemuck::cast_slice(vertices),
+
+            usage: wgpu::BufferUsages::VERTEX,
+        });
+
+        Self {
+            vertex_buffer,
+
+            vertex_count: vertices.len() as u32,
+        }
+    }
+
+    pub fn from_field(
+        device: &wgpu::Device,
+
+        velocity: &s_field::VelocityField,
+
+        stride: usize,
+    ) -> Self {
+        let mesh = crate::velocity::VelocityMesh::from_field(velocity, stride);
+        Self::new(device, &mesh.vertices)
+    }
+
+    pub fn vertex_buffer(&self) -> &wgpu::Buffer {
+        &self.vertex_buffer
+    }
+
+    pub fn vertex_count(&self) -> u32 {
+        self.vertex_count
+    }
+}
+
+----- crates/s-sof/examples/common.rs -----
+use s_field::{
+    Coordinates, Field, Grid4D, Metadata, OceanField, SalinityField, TemperatureField,
+    VelocityField,
+};
+
+pub fn create_dummy_field() -> OceanField {
+    //
+    // Grid
+    //
+
+    let grid = Grid4D::new([5, 2, 2, 1], [1.0, 1.0, 10.0, 1.0]);
+
+    //
+    // Coordinates
+    //
+
+    let latitude = vec![35.0, 35.1];
+
+    let longitude = vec![138.5, 138.6, 138.7, 138.8, 138.9];
+
+    let depth = vec![0.0, 50.0];
+
+    let time = vec![0.0];
+
+    let coordinates = Coordinates::new(grid, latitude, longitude, depth, time);
+
+    //
+    // Fields
+    //
+
+    let mut velocity = VelocityField::new(grid);
+
+    let mut temperature = TemperatureField::new(grid);
+
+    let mut salinity = SalinityField::new(grid);
+
+    //
+    // Fill dummy values
+    //
+
+    for v in velocity.u_mut().as_mut_slice() {
+        *v = 0.1;
+    }
+
+    for v in velocity.v_mut().as_mut_slice() {
+        *v = 0.2;
+    }
+
+    for v in velocity.w_mut().as_mut_slice() {
+        *v = 0.0;
+    }
+
+    for v in temperature.field_mut().as_mut_slice() {
+        *v = 20.0;
+    }
+
+    for v in salinity.field_mut().as_mut_slice() {
+        *v = 34.5;
+    }
+
+    //
+    // Metadata
+    //
+
+    let mut metadata = Metadata::new();
+
+    metadata.set_dataset_name("dummy_ocean");
+
+    metadata.set_title("SOS Dummy Ocean Dataset");
+
+    metadata.set_source("create_package example");
+
+    //
+    // OceanField
+    //
+
+    OceanField::new(coordinates, metadata, velocity, temperature, salinity)
+}
+
+----- crates/s-sof/examples/create_package.rs -----
+use std::path::PathBuf;
+
+use s_field::{
+    Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField,
+};
+
+use s_sof::builder::SofPackageBuilder;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("Creating SOF package...");
+
+    //
+    // Grid
+    //
+    let grid = Grid4D::new([5, 2, 2, 1], [1.0, 1.0, 10.0, 1.0]);
+
+    //
+    // Coordinates
+    //
+    let coordinates = Coordinates::new(
+        grid.clone(),
+        vec![35.0, 35.1],
+        vec![138.5, 138.6, 138.7, 138.8, 138.9],
+        vec![0.0, 10.0],
+        vec![0.0],
+    );
+
+    //
+    // OceanField
+    //
+    let metadata = Metadata::new();
+
+    let velocity = VelocityField::new(grid.clone());
+
+    let temperature = TemperatureField::new(grid.clone());
+
+    let salinity = SalinityField::new(grid.clone());
+
+    let field = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
+
+    //
+    // Package
+    //
+    let output = PathBuf::from("dummy_ocean.sof");
+
+    SofPackageBuilder::new("Dummy Suruga Bay Ocean")
+        .boundary(field)
+        .build(output)?;
+
+    println!("SOF package created.");
+
+    Ok(())
+}
+
+----- crates/s-sof/examples/create_suruga_test.rs -----
+use std::path::Path;
+
+use s_field::{
+    Coordinates, Field, Grid4D, Metadata, OceanField, SalinityField, TemperatureField,
+    VelocityField,
+};
+
+use s_sof::builder::SofPackageBuilder;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    //
+    // Grid
+    //
+
+    let grid = Grid4D::new([32, 32, 10, 1], [0.01, 0.01, 10.0, 1.0]);
+
+    //
+    // Coordinates
+    //
+
+    let latitude: Vec<f64> = (0..32).map(|i| 34.5 + i as f64 * 0.01).collect();
+
+    let longitude: Vec<f64> = (0..32).map(|i| 138.5 + i as f64 * 0.01).collect();
+
+    let depth: Vec<f32> = (0..10).map(|i| i as f32 * 50.0).collect();
+
+    let time = vec![0.0];
+
+    let coordinates = Coordinates::new(grid.clone(), latitude, longitude, depth, time);
+
+    //
+    // Velocity
+    //
+
+    let mut velocity = VelocityField::with_coordinates(grid.clone(), coordinates.clone());
+
+    // Kuroshio-like synthetic flow
+
+    for value in velocity.u_mut().as_mut_slice() {
+        *value = 1.0;
+    }
+
+    for value in velocity.v_mut().as_mut_slice() {
+        *value = 0.2;
+    }
+
+    for value in velocity.w_mut().as_mut_slice() {
+        *value = 0.0;
+    }
+
+    //
+    // Temperature
+    //
+
+    let mut temperature = TemperatureField::new(grid.clone());
+
+    for value in temperature.field_mut().as_mut_slice() {
+        *value = 20.0;
+    }
+
+    //
+    // Salinity
+    //
+
+    let mut salinity = SalinityField::new(grid.clone());
+
+    for value in salinity.field_mut().as_mut_slice() {
+        *value = 34.5;
+    }
+
+    //
+    // Metadata
+    //
+
+    let mut metadata = Metadata::new();
+
+    metadata.set_dataset_name("Synthetic Suruga Bay Dataset");
+
+    metadata.set_title("Suruga Bay Test Ocean Field");
+
+    metadata.set_institution("Suruga Ocean Simulator");
+
+    metadata.set_source("Synthetic generator");
+
+    //
+    // OceanField
+    //
+
+    let ocean = OceanField::new(
+        coordinates.clone(),
+        metadata,
+        velocity,
+        temperature,
+        salinity,
+    );
+    //
+    // Create SOF package
+    //
+
+    let output = Path::new("./data/suruga_test.sof");
+
+    let _package = SofPackageBuilder::new("Suruga Bay Test")
+        .boundary(ocean.clone())
+        .initial(ocean.clone())
+        .restart(ocean)
+        .grid(
+            grid.clone(),
+            coordinates.latitude().iter().map(|v| *v as f32).collect(),
+            coordinates.longitude().iter().map(|v| *v as f32).collect(),
+            coordinates.depth().to_vec(),
+            vec![0.0; 32 * 32],
+        )
+        .forcing(vec![0.0; 32 * 32], vec![0.0; 32 * 32], vec![0.0; 32 * 32])
+        .build(output)?;
+
+    Ok(())
+}
+
+----- crates/s-sof/src/reader.rs -----
+use s_field::{
+    BoundaryField, Coordinates, Field4D, Grid4D, OceanField, SalinityField, TemperatureField,
+    VelocityField,
+};
+
+use s_io::SioReader;
+
+use crate::error::Result;
+
+pub struct BoundaryReader {
+    reader: SioReader,
+}
+
+impl BoundaryReader {
+    pub fn open(path: &str) -> Result<Self> {
+        let reader = SioReader::open(path)?;
+
+        Ok(Self { reader })
+    }
+
+    pub fn read(&mut self) -> Result<OceanField> {
+        //
+        // Metadata
+        //
+
+        let sio_metadata = self.reader.metadata().clone();
+
+        let mut metadata = s_field::Metadata::new();
+
+        metadata.set_dataset_name(sio_metadata.name);
+
+        metadata.set_title("Suruga Ocean Format Boundary Dataset");
+
+        metadata.set_comment(sio_metadata.description);
+
+        metadata.insert_attribute("sof_version", sio_metadata.version);
+
+        //
+        // Grid
+        //
+
+        let size = self.reader.read_dataset("grid_size")?;
+
+        let spacing = self.reader.read_dataset("grid_spacing")?;
+
+        let grid = Grid4D::new(
+            [
+                size[0] as usize,
+                size[1] as usize,
+                size[2] as usize,
+                size[3] as usize,
+            ],
+            [spacing[0], spacing[1], spacing[2], spacing[3]],
+        );
+
+        //
+        // Coordinates
+        //
+
+        let latitude = self
+            .reader
+            .read_dataset("latitude")?
+            .into_iter()
+            .map(|v| v as f64)
+            .collect();
+
+        let longitude = self
+            .reader
+            .read_dataset("longitude")?
+            .into_iter()
+            .map(|v| v as f64)
+            .collect();
+
+        let depth = self.reader.read_dataset("depth")?;
+
+        let time = self
+            .reader
+            .read_dataset("time")?
+            .into_iter()
+            .map(|v| v as f64)
+            .collect();
+
+        let coordinates = Coordinates::new(grid, latitude, longitude, depth, time);
+
+        //
+        // Velocity
+        //
+
+        let u = self.reader.read_dataset("velocity_u")?;
+
+        let v = self.reader.read_dataset("velocity_v")?;
+
+        let w = self.reader.read_dataset("velocity_w")?;
+
+        let mut velocity = VelocityField::new(*coordinates.grid());
+
+        velocity.u_mut().replace(u);
+
+        velocity.v_mut().replace(v);
+
+        velocity.w_mut().replace(w);
+
+        velocity.set_coordinates(coordinates.clone());
+        //
+        // Temperature
+        //
+
+        let temperature = self.reader.read_dataset("temperature")?;
+
+        let temperature =
+            TemperatureField::from_field(Field4D::from_vec(*coordinates.grid(), temperature));
+
+        //
+        // Salinity
+        //
+
+        let salinity = self.reader.read_dataset("salinity")?;
+
+        let salinity = SalinityField::from_field(Field4D::from_vec(*coordinates.grid(), salinity));
+        let boundary = BoundaryField::zeros(*coordinates.grid());
+        //
+        // OceanField
+        //
+
+        Ok(OceanField::new(
+            coordinates,
+            metadata,
+            velocity,
+            temperature,
+            salinity,
+            boundary,
+        ))
+    }
+}
+
+----- crates/s-sof/src/velocity.rs -----
+use std::path::Path;
+
+use s_field::{Coordinates, Grid4D, VelocityField};
+
+use s_io::{Metadata, SioReader, SioWriter};
+
+use crate::error::Result;
+
+// ==================================================
+// Velocity Writer
+// ==================================================
+
+pub struct VelocityWriter {
+    writer: SioWriter,
+}
+
+impl VelocityWriter {
+    pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+        Ok(Self {
+            writer: SioWriter::create(path.as_ref().to_str().unwrap())?,
+        })
+    }
+
+    pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+        let metadata = Metadata {
+            name: "Velocity Field".into(),
+            version: "0.1.0".into(),
+            description: "Ocean velocity field (u,v,w)".into(),
+        };
+
+        self.writer.write_metadata(&metadata)?;
+
+        let size = velocity.grid().size();
+
+        self.writer.write_array(
+            "grid_size",
+            &[
+                size[0] as f32,
+                size[1] as f32,
+                size[2] as f32,
+                size[3] as f32,
+            ],
+        )?;
+
+        let spacing = velocity.grid().spacing();
+
+        self.writer.write_array("grid_spacing", &spacing)?;
+
+        self.writer.write_array("u", velocity.u().as_slice())?;
+
+        self.writer.write_array("v", velocity.v().as_slice())?;
+
+        self.writer.write_array("w", velocity.w().as_slice())?;
+
+        Ok(())
+    }
+
+    pub fn finish(self) -> Result<()> {
+        self.writer.finish()?;
+
+        Ok(())
+    }
+}
+
+// ==================================================
+// Velocity Reader
+// ==================================================
+
+pub struct VelocityReader {
+    reader: SioReader,
+}
+
+impl VelocityReader {
+    pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+        Ok(Self {
+            reader: SioReader::open(path.as_ref().to_str().unwrap())?,
+        })
+    }
+
+    pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+        let size = self.read_size()?;
+
+        let spacing = self.read_spacing()?;
+
+        let grid = Grid4D::new(size, spacing);
+
+        let u = self.reader.read_array("u")?;
+
+        let v = self.reader.read_array("v")?;
+
+        let w = self.reader.read_array("w")?;
+
+        let mut velocity = VelocityField::new(grid.clone());
+
+        velocity.u_mut().replace(u);
+
+        velocity.v_mut().replace(v);
+
+        velocity.w_mut().replace(w);
+
+        velocity.set_coordinates(coordinates);
+
+        Ok(velocity)
+    }
+
+    fn read_size(&mut self) -> Result<[usize; 4]> {
+        let v = self.reader.read_array("grid_size")?;
+
+        Ok([v[0] as usize, v[1] as usize, v[2] as usize, v[3] as usize])
+    }
+
+    fn read_spacing(&mut self) -> Result<[f32; 4]> {
+        let v = self.reader.read_array("grid_spacing")?;
+
+        Ok([v[0], v[1], v[2], v[3]])
+    }
+}
+
+----- crates/simulation/examples/run.rs -----
+use anyhow::Result;
+
+use std::sync::Arc;
+
+use s_field::{
+    BoundaryField, Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField,
+    VelocityField,
+};
+
+use s_metal::{MetalContext, OceanSolver};
+
+use simulation::Simulation;
+
+use s_io::SioWriter;
+
+fn main() -> Result<()> {
+    pollster::block_on(run())
+}
+
+async fn run() -> Result<()> {
+    println!("=== Suruga Ocean Simulator ===");
+
+    //
+    // Ocean field initialization
+    //
+
+    let grid = Grid4D::new([1, 32, 64, 64], [1.0, 10.0, 0.01, 0.01]);
+
+    let coordinates = Coordinates::new(
+        grid.clone(),
+        vec![0.0; 64],
+        vec![0.0; 64],
+        vec![0.0; 32],
+        vec![0.0; 1],
+    );
+
+    let ocean = OceanField::new(
+        coordinates,
+        Metadata::new(),
+        VelocityField::new(grid.clone()),
+        TemperatureField::new(grid.clone()),
+        SalinityField::new(grid.clone()),
+        BoundaryField::new(
+            VelocityField::new(grid.clone()),
+            VelocityField::new(grid.clone()),
+            VelocityField::new(grid.clone()),
+            VelocityField::new(grid.clone()),
+        ),
+    );
+
+    //
+    // Metal simulation
+    //
+
+    let context = Arc::new(MetalContext::new());
+
+    let solver = OceanSolver::new(context.clone());
+
+    let mut simulation = Simulation::new(&context, ocean, solver);
+
+    //
+    // Time integration
+    //
+
+    let steps = 100;
+    let dt = 0.1;
+
+    for i in 0..steps {
+        simulation.step(dt);
+
+        println!("step={} time={}", i, simulation.time);
+    }
+
+    //
+    // Download velocity from GPU
+    //
+
+    println!("Downloading velocity field...");
+
+    let velocity = simulation.state.download_velocity(&context);
+
+    //
+    // Save result
+    //
+
+    println!("Writing velocity output...");
+
+    let mut writer =
+        SioWriter::create("suruga_velocity.bin").expect("failed to create velocity file");
+
+    writer
+        .write_array("velocity_u", velocity.u().as_slice())
+        .expect("failed to write velocity_u");
+
+    writer
+        .write_array("velocity_v", velocity.v().as_slice())
+        .expect("failed to write velocity_v");
+
+    writer
+        .write_array("velocity_w", velocity.w().as_slice())
+        .expect("failed to write velocity_w");
+
+    writer.finish().expect("failed to finish velocity file");
+
+    println!("Simulation finished.");
+
+    Ok(())
+}
+
+========== 7. RENDERER PIPELINE / DRAW CALLS ==========
+crates/s-renderer/src/renderer.rs:72:        let pipeline = RenderPipeline::new(
+crates/s-renderer/src/renderer.rs:100:        let contour_pipeline = create_auxiliary_pipeline(
+crates/s-renderer/src/renderer.rs:122:        let ocean_pipeline = create_auxiliary_pipeline(
+crates/s-renderer/src/renderer.rs:141:        let flow_dot_pipeline = create_auxiliary_pipeline(
+crates/s-renderer/src/renderer.rs:287:                        load: wgpu::LoadOp::Clear(wgpu::Color {
+crates/s-renderer/src/renderer.rs:300:                        load: wgpu::LoadOp::Clear(1.0),
+crates/s-renderer/src/renderer.rs:309:            pass.set_pipeline(self.pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:311:            pass.set_vertex_buffer(0, terrain.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:313:            pass.draw_indexed(0..terrain.index_count(), 0, 0..1);
+crates/s-renderer/src/renderer.rs:328:                            load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:336:                            load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:346:                //pass.set_pipeline(self.flow_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:347:                pass.set_pipeline(&self.contour_pipeline);
+crates/s-renderer/src/renderer.rs:349:                pass.set_vertex_buffer(0, contours.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:350:                pass.draw(0..contours.vertex_count(), 0..1);
+crates/s-renderer/src/renderer.rs:365:                        load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:373:                        load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:382:            pass.set_pipeline(&self.ocean_pipeline);
+crates/s-renderer/src/renderer.rs:384:            pass.set_vertex_buffer(0, ocean.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:386:            pass.draw_indexed(0..ocean.index_count(), 0, 0..1);
+crates/s-renderer/src/renderer.rs:400:                        load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:408:                        load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:418:            pass.set_pipeline(self.flow_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:420:            pass.set_vertex_buffer(0, flow.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:421:            pass.draw(0..flow.vertex_count(), 0..1);
+crates/s-renderer/src/renderer.rs:436:                            load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:444:                            load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:454:                pass.set_pipeline(&self.flow_dot_pipeline);
+crates/s-renderer/src/renderer.rs:456:                pass.set_vertex_buffer(0, dots.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:457:                pass.draw(0..dots.vertex_count(), 0..1);
+crates/s-renderer/src/renderer.rs:472:                        load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:480:                        load: wgpu::LoadOp::Load,
+crates/s-renderer/src/renderer.rs:489:            pass.set_pipeline(self.velocity_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:491:            pass.set_vertex_buffer(0, velocity.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:492:            pass.draw(0..velocity.vertex_count(), 0..1);
+crates/s-renderer/src/renderer.rs:543:                        load: wgpu::LoadOp::Clear(wgpu::Color {
+crates/s-renderer/src/renderer.rs:556:                        load: wgpu::LoadOp::Clear(1.0),
+crates/s-renderer/src/renderer.rs:565:            pass.set_pipeline(self.velocity_pipeline.pipeline());
+crates/s-renderer/src/renderer.rs:567:            pass.set_vertex_buffer(0, velocity.vertex_buffer().slice(..));
+crates/s-renderer/src/renderer.rs:568:            pass.draw(0..velocity.vertex_count(), 0..1);
+crates/s-renderer/src/renderer.rs:580:fn create_auxiliary_pipeline(
+crates/s-renderer/src/renderer.rs:589:    depth_write_enabled: bool,
+crates/s-renderer/src/renderer.rs:629:        depth_stencil: depth_format.map(|format| wgpu::DepthStencilState {
+crates/s-renderer/src/renderer.rs:631:            depth_write_enabled,
+crates/s-renderer/src/renderer.rs:632:            depth_compare: wgpu::CompareFunction::LessEqual,
+crates/s-renderer/src/flow_pipeline.rs:51:            depth_stencil: Some(wgpu::DepthStencilState {
+crates/s-renderer/src/flow_pipeline.rs:53:                depth_write_enabled: false,
+crates/s-renderer/src/flow_pipeline.rs:54:                depth_compare: wgpu::CompareFunction::LessEqual,
+crates/s-renderer/src/velocity_pipeline.rs:69:            depth_stencil: Some(wgpu::DepthStencilState {
+crates/s-renderer/src/velocity_pipeline.rs:72:                depth_write_enabled: false,
+crates/s-renderer/src/velocity_pipeline.rs:74:                depth_compare: wgpu::CompareFunction::LessEqual,
+
+========== 8. EXAMPLES ==========
+crates/s-builder/examples/build_suruga.rs
+crates/s-metal/examples/advection_test.rs
+crates/s-metal/examples/compute.rs
+crates/s-metal/examples/context.rs
+crates/s-metal/examples/derivative_x.rs
+crates/s-metal/examples/device.rs
+crates/s-metal/examples/diffusion_test.rs
+crates/s-metal/examples/divergence_test.rs
+crates/s-metal/examples/gradient_pressure_test.rs
+crates/s-metal/examples/kuroshio_test.rs
+crates/s-metal/examples/pressure_test.rs
+crates/s-metal/examples/projection_test.rs
+crates/s-metal/examples/solver_test.rs
+crates/s-metal/examples/vector_add.rs
+crates/s-renderer/examples/terrain.rs
+crates/s-renderer/examples/triangle.rs
+crates/s-sof/examples/common.rs
+crates/s-sof/examples/create_grid.rs
+crates/s-sof/examples/create_package.rs
+crates/s-sof/examples/create_suruga_test.rs
+crates/s-sof/examples/read_grid.rs
+crates/s-sof/examples/read_package.rs
+crates/s-sof/examples/read_suruga_bay.rs
+crates/simulation/examples/run.rs
+crates/simulation/examples/view.rs
+
+========== 9. RECENT TEST RESULTS ==========
+warning: unused variable: `grid`
+  --> crates/s-field/src/ocean.rs:44:13
+   |
+44 |         let grid = velocity.grid().clone();
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_grid`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-field` (lib) generated 1 warning (run `cargo fix --lib -p s-field` to apply 1 suggestion)
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:8:1
+  |
+8 | pub mod boundary;
+  | ^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> crates/s-sof/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:9:1
+  |
+9 | pub mod builder;
+  | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:10:1
+   |
+10 | pub mod dataset;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:11:1
+   |
+11 | pub mod error;
+   | ^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:12:1
+   |
+12 | pub mod forcing;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:13:1
+   |
+13 | pub mod format;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:14:1
+   |
+14 | pub mod grid;
+   | ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:15:1
+   |
+15 | pub mod initial;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:18:1
+   |
+18 | pub mod package_reader;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:19:1
+   |
+19 | pub mod reader;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:20:1
+   |
+20 | pub mod restart;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:21:1
+   |
+21 | pub mod velocity;
+   | ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:22:1
+   |
+22 | pub mod writer;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/builder.rs:60:5
+   |
+60 |     pub fn new(name: impl Into<String>) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/builder.rs:82:5
+   |
+82 | /     pub fn grid(
+83 | |         mut self,
+84 | |         grid: Grid4D,
+85 | |         latitude: Vec<f32>,
+...  |
+88 | |         bathymetry: Vec<f32>,
+89 | |     ) -> Self {
+   | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:111:5
+    |
+111 | /     pub fn boundary(
+112 | |         mut self,
+113 | |         field: OceanField
+114 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:125:5
+    |
+125 | /     pub fn initial(
+126 | |         mut self,
+127 | |         field: OceanField
+128 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:140:5
+    |
+140 | /     pub fn restart(
+141 | |         mut self,
+142 | |         field: OceanField
+143 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:155:5
+    |
+155 | /     pub fn forcing(
+156 | |         mut self,
+157 | |         wind_u: Vec<f32>,
+158 | |         wind_v: Vec<f32>,
+159 | |         surface_heat: Vec<f32>,
+160 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:181:5
+    |
+181 | /     pub fn build<P: AsRef<Path>>(
+182 | |         self,
+183 | |         output:P
+184 | |     )->Result<SofPackage>{
+    | |_________________________^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:42:5
+   |
+42 |     pub fn new(name: impl Into<String>, dataset_type: DatasetType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/dataset.rs:71:5
+   |
+71 |     pub fn add_variable(&mut self, variable: VariableInfo) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:87:5
+   |
+87 |     pub fn new(name: impl Into<String>, variable_type: VariableType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> crates/s-sof/src/dataset.rs:99:5
+   |
+99 |     Velocity,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:101:5
+    |
+101 |     Temperature,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:103:5
+    |
+103 |     Salinity,
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:105:5
+    |
+105 |     Coordinate,
+    |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:107:5
+    |
+107 |     Scalar,
+    |     ^^^^^^
+
+warning: missing documentation for a struct
+ --> crates/s-sof/src/forcing.rs:7:1
+  |
+7 | pub struct ForcingWriter {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:12:5
+   |
+12 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:18:5
+   |
+18 |     pub fn write(&mut self, wind_u: &[f32], wind_v: &[f32], surface_heat: &[f32]) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:38:5
+   |
+38 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:45:1
+   |
+45 | pub struct ForcingReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:50:5
+   |
+50 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:56:5
+   |
+56 |     pub fn read(&mut self) -> Result<ForcingData> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:67:1
+   |
+67 | pub struct ForcingData {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:68:5
+   |
+68 |     pub wind_u: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:70:5
+   |
+70 |     pub wind_v: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:72:5
+   |
+72 |     pub surface_heat: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:1:1
+  |
+1 | pub const SOF_MAGIC: &[u8; 8] = b"SOF00001";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:3:1
+  |
+3 | pub const SOF_VERSION: u32 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:13:1
+   |
+13 | pub struct GridWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/grid.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:24:5
+   |
+24 | /     pub fn write(
+25 | |         &mut self,
+26 | |         grid: &Grid4D,
+27 | |         latitude: &[f32],
+...  |
+30 | |         bathymetry: &[f32],
+31 | |     ) -> Result<()> {
+   | |___________________^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:70:5
+   |
+70 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:82:1
+   |
+82 | pub struct GridData {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:83:5
+   |
+83 |     pub size: [usize; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:85:5
+   |
+85 |     pub spacing: [f32; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:87:5
+   |
+87 |     pub latitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:89:5
+   |
+89 |     pub longitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:91:5
+   |
+91 |     pub depth: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:93:5
+   |
+93 |     pub bathymetry: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> crates/s-sof/src/grid.rs:100:1
+    |
+100 | pub struct GridReader {
+    | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> crates/s-sof/src/grid.rs:105:5
+    |
+105 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/grid.rs:111:5
+    |
+111 |     pub fn read(&mut self) -> Result<GridData> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:10:1
+   |
+10 | pub struct InitialWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:13:5
+   |
+13 |     pub fn write<P: AsRef<Path>>(path: P, field: &OceanField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:22:1
+   |
+22 | pub struct InitialReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:25:5
+   |
+25 |     pub fn read<P: AsRef<Path>>(path: P) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:211:5
+    |
+211 |     pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:217:5
+    |
+217 |     pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/reader.rs:10:1
+   |
+10 | pub struct BoundaryReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/reader.rs:15:5
+   |
+15 |     pub fn open(path: &str) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/reader.rs:21:5
+   |
+21 |     pub fn read(&mut self) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:12:1
+   |
+12 | pub struct RestartWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:18:5
+   |
+18 | /     pub fn write<P:AsRef<Path>>(
+19 | |         path:P,
+20 | |         field:&OceanField
+21 | |     )->Result<()> {
+   | |_________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:39:1
+   |
+39 | pub struct RestartReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:46:5
+   |
+46 | /     pub fn read<P:AsRef<Path>>(
+47 | |         path:P
+48 | |     )->Result<OceanField>{
+   | |_________________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:13:1
+   |
+13 | pub struct VelocityWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:24:5
+   |
+24 |     pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:58:5
+   |
+58 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:69:1
+   |
+69 | pub struct VelocityReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:74:5
+   |
+74 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:80:5
+   |
+80 |     pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `s-sof` (lib) generated 75 warnings
+   Compiling s-renderer v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-renderer)
+   Compiling s-core v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-core)
+   Compiling s-builder v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-builder)
+   Compiling s-math v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-math)
+   Compiling s-sof v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-sof)
+   Compiling s-grid v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-grid)
+warning: unused import: `wgpu::util::DeviceExt`
+ --> crates/s-renderer/src/velocity_renderer.rs:1:5
+  |
+1 | use wgpu::util::DeviceExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling s-metal v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-metal)
+error[E0061]: this function takes 6 arguments but 5 arguments were supplied
+  --> crates/s-sof/examples/create_suruga_test.rs:89:17
+   |
+89 |       let ocean = OceanField::new(
+   |  _________________^^^^^^^^^^^^^^^-
+90 | |         coordinates.clone(),
+91 | |         metadata,
+92 | |         velocity,
+93 | |         temperature,
+94 | |         salinity,
+95 | |     );
+   | |_____- argument #6 of type `BoundaryField` is missing
+   |
+note: associated function defined here
+  --> /Users/sugisaku/Developer/Suruga-Wan/crates/s-field/src/ocean.rs:36:12
+   |
+36 |     pub fn new(
+   |            ^^^
+help: provide the argument
+   |
+89 |     let ocean = OceanField::new(
+...
+94 |         salinity,
+95 ~         /* BoundaryField */,
+96 ~     );
+   |
+
+error[E0061]: this function takes 6 arguments but 5 arguments were supplied
+  --> crates/s-sof/examples/create_package.rs:39:17
+   |
+39 | ... = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
+   |       ^^^^^^^^^^^^^^^-------------------------------------------------------- argument #6 of type `BoundaryField` is missing
+   |
+note: associated function defined here
+  --> /Users/sugisaku/Developer/Suruga-Wan/crates/s-field/src/ocean.rs:36:12
+   |
+36 |     pub fn new(
+   |            ^^^
+help: provide the argument
+   |
+39 |     let field = OceanField::new(coordinates, metadata, velocity, temperature, salinity, /* BoundaryField */);
+   |                                                                                       +++++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `s-sof` (example "create_suruga_test") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `s-sof` (example "create_package") due to 1 previous error
+error[E0061]: this function takes 6 arguments but 5 arguments were supplied
+  --> crates/s-metal/examples/solver_test.rs:46:21
+   |
+46 | ... = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
+   |       ^^^^^^^^^^^^^^^-------------------------------------------------------- argument #6 of type `BoundaryField` is missing
+   |
+note: associated function defined here
+  --> /Users/sugisaku/Developer/Suruga-Wan/crates/s-field/src/ocean.rs:36:12
+   |
+36 |     pub fn new(
+   |            ^^^
+help: provide the argument
+   |
+46 |     let mut ocean = OceanField::new(coordinates, metadata, velocity, temperature, salinity, /* BoundaryField */);
+   |                                                                                           +++++++++++++++++++++
+
+error[E0308]: mismatched types
+   --> crates/s-metal/examples/solver_test.rs:113:35
+    |
+113 |     let solver = OceanSolver::new(context);
+    |                  ---------------- ^^^^^^^ expected `Arc<MetalContext>`, found `MetalContext`
+    |                  |
+    |                  arguments to this function are incorrect
+    |
+    = note: expected struct `Arc<MetalContext>`
+               found struct `MetalContext`
+note: associated function defined here
+   --> /Users/sugisaku/Developer/Suruga-Wan/crates/s-metal/src/solver.rs:25:12
+    |
+ 25 |     pub fn new(context: Arc<MetalContext>)...
+    |            ^^^
+help: call `Into::into` on this expression to convert `MetalContext` into `Arc<MetalContext>`
+    |
+113 |     let solver = OceanSolver::new(context.into());
+    |                                          +++++++
+
+error[E0308]: mismatched types
+   --> crates/s-metal/examples/solver_test.rs:115:17
+    |
+115 |     solver.step(&mut ocean, 0.01);
+    |            ---- ^^^^^^^^^^ expected `&mut GpuOceanState`, found `&mut OceanField`
+    |            |
+    |            arguments to this method are incorrect
+    |
+    = note: expected mutable reference `&mut GpuOceanState`
+               found mutable reference `&mut OceanField`
+note: method defined here
+   --> /Users/sugisaku/Developer/Suruga-Wan/crates/s-metal/src/solver.rs:74:12
+    |
+ 74 |     pub fn step(&self, state: &mut GpuOcea...
+    |            ^^^^
+
+Some errors have detailed explanations: E0061, E0308.
+For more information about an error, try `rustc --explain E0061`.
+error: could not compile `s-metal` (example "solver_test") due to 3 previous errors
+warning: `s-renderer` (lib) generated 1 warning (run `cargo fix --lib -p s-renderer` to apply 1 suggestion)
+warning: `s-renderer` (lib test) generated 1 warning (1 duplicate)
+
+========== 10. BUILD CHECK ==========
+    Checking s-field v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-field)
+    Checking s-core v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-core)
+warning: unused variable: `grid`
+  --> crates/s-field/src/ocean.rs:44:13
+   |
+44 |         let grid = velocity.grid().clone();
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_grid`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-field` (lib) generated 1 warning (run `cargo fix --lib -p s-field` to apply 1 suggestion)
+    Checking s-sof v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-sof)
+    Checking s-metal v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-metal)
+    Checking s-grid v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-grid)
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:8:1
+  |
+8 | pub mod boundary;
+  | ^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> crates/s-sof/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:9:1
+  |
+9 | pub mod builder;
+  | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:10:1
+   |
+10 | pub mod dataset;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:11:1
+   |
+11 | pub mod error;
+   | ^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:12:1
+   |
+12 | pub mod forcing;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:13:1
+   |
+13 | pub mod format;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:14:1
+   |
+14 | pub mod grid;
+   | ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:15:1
+   |
+15 | pub mod initial;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:18:1
+   |
+18 | pub mod package_reader;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:19:1
+   |
+19 | pub mod reader;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:20:1
+   |
+20 | pub mod restart;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:21:1
+   |
+21 | pub mod velocity;
+   | ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:22:1
+   |
+22 | pub mod writer;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/builder.rs:60:5
+   |
+60 |     pub fn new(name: impl Into<String>) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/builder.rs:82:5
+   |
+82 | /     pub fn grid(
+83 | |         mut self,
+84 | |         grid: Grid4D,
+85 | |         latitude: Vec<f32>,
+...  |
+88 | |         bathymetry: Vec<f32>,
+89 | |     ) -> Self {
+   | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:111:5
+    |
+111 | /     pub fn boundary(
+112 | |         mut self,
+113 | |         field: OceanField
+114 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:125:5
+    |
+125 | /     pub fn initial(
+126 | |         mut self,
+127 | |         field: OceanField
+128 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:140:5
+    |
+140 | /     pub fn restart(
+141 | |         mut self,
+142 | |         field: OceanField
+143 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:155:5
+    |
+155 | /     pub fn forcing(
+156 | |         mut self,
+157 | |         wind_u: Vec<f32>,
+158 | |         wind_v: Vec<f32>,
+159 | |         surface_heat: Vec<f32>,
+160 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:181:5
+    |
+181 | /     pub fn build<P: AsRef<Path>>(
+182 | |         self,
+183 | |         output:P
+184 | |     )->Result<SofPackage>{
+    | |_________________________^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:42:5
+   |
+42 |     pub fn new(name: impl Into<String>, dataset_type: DatasetType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/dataset.rs:71:5
+   |
+71 |     pub fn add_variable(&mut self, variable: VariableInfo) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:87:5
+   |
+87 |     pub fn new(name: impl Into<String>, variable_type: VariableType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> crates/s-sof/src/dataset.rs:99:5
+   |
+99 |     Velocity,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:101:5
+    |
+101 |     Temperature,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:103:5
+    |
+103 |     Salinity,
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:105:5
+    |
+105 |     Coordinate,
+    |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:107:5
+    |
+107 |     Scalar,
+    |     ^^^^^^
+
+warning: missing documentation for a struct
+ --> crates/s-sof/src/forcing.rs:7:1
+  |
+7 | pub struct ForcingWriter {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:12:5
+   |
+12 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:18:5
+   |
+18 |     pub fn write(&mut self, wind_u: &[f32], wind_v: &[f32], surface_heat: &[f32]) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:38:5
+   |
+38 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:45:1
+   |
+45 | pub struct ForcingReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:50:5
+   |
+50 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:56:5
+   |
+56 |     pub fn read(&mut self) -> Result<ForcingData> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:67:1
+   |
+67 | pub struct ForcingData {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:68:5
+   |
+68 |     pub wind_u: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:70:5
+   |
+70 |     pub wind_v: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:72:5
+   |
+72 |     pub surface_heat: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:1:1
+  |
+1 | pub const SOF_MAGIC: &[u8; 8] = b"SOF00001";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:3:1
+  |
+3 | pub const SOF_VERSION: u32 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:13:1
+   |
+13 | pub struct GridWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/grid.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:24:5
+   |
+24 | /     pub fn write(
+25 | |         &mut self,
+26 | |         grid: &Grid4D,
+27 | |         latitude: &[f32],
+...  |
+30 | |         bathymetry: &[f32],
+31 | |     ) -> Result<()> {
+   | |___________________^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:70:5
+   |
+70 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:82:1
+   |
+82 | pub struct GridData {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:83:5
+   |
+83 |     pub size: [usize; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:85:5
+   |
+85 |     pub spacing: [f32; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:87:5
+   |
+87 |     pub latitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:89:5
+   |
+89 |     pub longitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:91:5
+   |
+91 |     pub depth: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:93:5
+   |
+93 |     pub bathymetry: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> crates/s-sof/src/grid.rs:100:1
+    |
+100 | pub struct GridReader {
+    | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> crates/s-sof/src/grid.rs:105:5
+    |
+105 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/grid.rs:111:5
+    |
+111 |     pub fn read(&mut self) -> Result<GridData> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:10:1
+   |
+10 | pub struct InitialWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:13:5
+   |
+13 |     pub fn write<P: AsRef<Path>>(path: P, field: &OceanField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:22:1
+   |
+22 | pub struct InitialReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:25:5
+   |
+25 |     pub fn read<P: AsRef<Path>>(path: P) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:211:5
+    |
+211 |     pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:217:5
+    |
+217 |     pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/reader.rs:10:1
+   |
+10 | pub struct BoundaryReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/reader.rs:15:5
+   |
+15 |     pub fn open(path: &str) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/reader.rs:21:5
+   |
+21 |     pub fn read(&mut self) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:12:1
+   |
+12 | pub struct RestartWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:18:5
+   |
+18 | /     pub fn write<P:AsRef<Path>>(
+19 | |         path:P,
+20 | |         field:&OceanField
+21 | |     )->Result<()> {
+   | |_________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:39:1
+   |
+39 | pub struct RestartReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:46:5
+   |
+46 | /     pub fn read<P:AsRef<Path>>(
+47 | |         path:P
+48 | |     )->Result<OceanField>{
+   | |_________________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:13:1
+   |
+13 | pub struct VelocityWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:24:5
+   |
+24 |     pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:58:5
+   |
+58 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:69:1
+   |
+69 | pub struct VelocityReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:74:5
+   |
+74 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:80:5
+   |
+80 |     pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `s-sof` (lib) generated 75 warnings
+    Checking s-renderer v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-renderer)
+    Checking s-builder v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/s-builder)
+warning: unused import: `wgpu::util::DeviceExt`
+ --> crates/s-renderer/src/velocity_renderer.rs:1:5
+  |
+1 | use wgpu::util::DeviceExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-renderer` (lib) generated 1 warning (run `cargo fix --lib -p s-renderer` to apply 1 suggestion)
+    Checking simulation v0.1.0 (/Users/sugisaku/Developer/Suruga-Wan/crates/simulation)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.48s
+
+========== END OF DIAGNOSTICS ==========

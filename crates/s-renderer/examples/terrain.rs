@@ -16,7 +16,8 @@ use winit::{
 const GRID_PATH: &str = "suruga_bay.sof/grid.snc";
 const RAW_DATA_DIR: &str = "crates/s-builder/suruga_raw";
 
-const DEPTH_COUNT: usize = 6;
+const SOURCE_DEPTH_COUNT: usize = 6;
+const DEPTH_INTERVAL_M: usize = 250;
 const GRID_HEIGHT: usize = 22;
 const GRID_WIDTH: usize = 13;
 
@@ -46,12 +47,19 @@ fn read_f32_file(path: &str) -> Result<Vec<f32>> {
 }
 
 /// バイナリデータから海流の速度場を読み込む。
-fn load_surface_velocity() -> Result<VelocityField> {
-    // 配列の順序:
-    // time × depth × latitude × longitude
+fn load_surface_velocity(max_seabed_depth_m: f32) -> Result<VelocityField> {
+    // 元のシミュレーション出力は0〜200mの6層。
+    // 海底の最大水深まで250m間隔の描画層を作る。
+    // 200mより深い層は200m層を基準に深度減衰させる簡易モデル。
+    // 配列の順序: time × depth × latitude × longitude
+    let max_sim_depth_m = (((max_seabed_depth_m.max(0.0) as usize)
+        + DEPTH_INTERVAL_M - 1)
+        / DEPTH_INTERVAL_M)
+        * DEPTH_INTERVAL_M;
+    let depth_count = max_sim_depth_m / DEPTH_INTERVAL_M + 1;
     let grid = Grid4D::new(
-        [1, DEPTH_COUNT, GRID_HEIGHT, GRID_WIDTH],
-        [1.0, 1.0, 0.04, 0.08],
+        [1, depth_count, GRID_HEIGHT, GRID_WIDTH],
+        [1.0, DEPTH_INTERVAL_M as f32, 0.04, 0.08],
     );
 
     let latitudes = (0..GRID_HEIGHT)
@@ -62,7 +70,9 @@ fn load_surface_velocity() -> Result<VelocityField> {
         .map(|i| 138.239990234375 + i as f64 * 0.08)
         .collect::<Vec<_>>();
 
-    let depths = vec![0.0_f32, 10.0, 20.0, 50.0, 100.0, 200.0];
+    let depths = (0..depth_count)
+        .map(|i| (i * DEPTH_INTERVAL_M) as f32)
+        .collect::<Vec<_>>();
     let times = vec![0.0_f64];
 
     let coordinates = Coordinates::new(grid.clone(), latitudes, longitudes, depths, times);
@@ -73,30 +83,79 @@ fn load_surface_velocity() -> Result<VelocityField> {
     let u = read_f32_file(&u_path)?;
     let v = read_f32_file(&v_path)?;
 
-    let expected = grid.len();
+    let source_expected = SOURCE_DEPTH_COUNT * GRID_HEIGHT * GRID_WIDTH;
 
     anyhow::ensure!(
-        u.len() == expected,
+        u.len() == source_expected,
         "u.bin のデータ数が不正です: {} != {}",
         u.len(),
-        expected
+        source_expected
     );
-
     anyhow::ensure!(
-        v.len() == expected,
+        v.len() == source_expected,
         "v.bin のデータ数が不正です: {} != {}",
         v.len(),
-        expected
+        source_expected
     );
 
-    let mut velocity = VelocityField::with_coordinates(grid, coordinates);
+    // シミュレーション出力を250m間隔の描画用格子へ写す。
+    // 200mより深い層は、200m層の速度を指数減衰させて簡易的に拡張する。
+    // これは未計算の深部を実測値として扱うものではなく、深度方向の簡易モデル。
+    let horizontal_count = GRID_HEIGHT * GRID_WIDTH;
+    let source_depths = [0.0_f32, 10.0, 20.0, 50.0, 100.0, 200.0];
+    let mut expanded_u = Vec::with_capacity(grid.len());
+    let mut expanded_v = Vec::with_capacity(grid.len());
 
-    velocity.u_mut().replace(u);
-    velocity.v_mut().replace(v);
-    velocity.w_mut().fill(0.05);
+    for &depth in coordinates.depth() {
+        if depth <= source_depths[0] {
+            expanded_u.extend_from_slice(&u[..horizontal_count]);
+            expanded_v.extend_from_slice(&v[..horizontal_count]);
+            continue;
+        }
+
+        if depth <= source_depths[SOURCE_DEPTH_COUNT - 1] {
+            let upper = source_depths
+                .iter()
+                .position(|&source_depth| source_depth >= depth)
+                .unwrap_or(SOURCE_DEPTH_COUNT - 1);
+            let lower = upper.saturating_sub(1);
+            let span = source_depths[upper] - source_depths[lower];
+            let fraction = if span > 0.0 {
+                (depth - source_depths[lower]) / span
+            } else {
+                0.0
+            };
+            let lower_offset = lower * horizontal_count;
+            let upper_offset = upper * horizontal_count;
+            for i in 0..horizontal_count {
+                expanded_u.push(
+                    u[lower_offset + i] * (1.0 - fraction)
+                        + u[upper_offset + i] * fraction,
+                );
+                expanded_v.push(
+                    v[lower_offset + i] * (1.0 - fraction)
+                        + v[upper_offset + i] * fraction,
+                );
+            }
+            continue;
+        }
+
+        let last_offset = (SOURCE_DEPTH_COUNT - 1) * horizontal_count;
+        let attenuation = (-(depth - source_depths[SOURCE_DEPTH_COUNT - 1]) / 1200.0).exp();
+        for i in 0..horizontal_count {
+            expanded_u.push(u[last_offset + i] * attenuation);
+            expanded_v.push(v[last_offset + i] * attenuation);
+        }
+    }
+
+    let mut velocity = VelocityField::with_coordinates(grid, coordinates);
+    velocity.u_mut().replace(expanded_u);
+    velocity.v_mut().replace(expanded_v);
+    // 入力データに鉛直流速wがないため、根拠のない一定の鉛直流を加えない。
+    velocity.w_mut().fill(0.0);
     println!(
-        "Ocean velocity loaded: {} x {} grid, {} depth levels",
-        GRID_WIDTH, GRID_HEIGHT, DEPTH_COUNT
+        "Ocean velocity loaded: {} x {} grid, {} depth levels ({}m interval, 0-{}m)",
+        GRID_WIDTH, GRID_HEIGHT, depth_count, DEPTH_INTERVAL_M, max_sim_depth_m
     );
 
     // 速度データの統計を表示する。
@@ -131,18 +190,19 @@ fn load_surface_velocity() -> Result<VelocityField> {
 }
 
 /// 海流の開始位置を格子から生成する。
-fn generate_seeds(coordinates: &Coordinates, bounds: &GeoBounds) -> Vec<[f32; 3]> {
+fn generate_seeds(
+    coordinates: &Coordinates,
+    bounds: &GeoBounds,
+    heightmap: &HeightMap,
+) -> Vec<[f32; 3]> {
     let mut seeds = Vec::new();
 
-    // 海面付近の固定深度だけでなく、VelocityFieldに存在する全深度層に
-    // 粒子を配置する。深度座標はデータ側の値を使い、未収録深度は捏造しない。
-    for (depth_index, &depth) in coordinates.depth().iter().enumerate() {
+    for &depth in coordinates.depth() {
         for y in (0..coordinates.height()).step_by(2) {
             for x in 0..coordinates.width() {
                 let Some(lon) = coordinates.longitude_at(x) else {
                     continue;
                 };
-
                 let Some(lat) = coordinates.latitude_at(y) else {
                     continue;
                 };
@@ -155,10 +215,21 @@ fn generate_seeds(coordinates: &Coordinates, bounds: &GeoBounds) -> Vec<[f32; 3]
                     continue;
                 }
 
-                // 深度層ごとに同じ水平格子へ種を配置する。
-                // depth_index は層の列挙を明示し、座標データとの対応を保つ。
-                let _ = depth_index;
-                seeds.push([lon as f32, lat as f32, depth]);
+                // 海底より下に粒子を置かない。地形格子上の最近傍点で水深を確認する。
+                let map_x = (((lon - bounds.lon_min) / (bounds.lon_max - bounds.lon_min))
+                    * (heightmap.width - 1) as f64)
+                    .round() as usize;
+                let map_y = (((lat - bounds.lat_min) / (bounds.lat_max - bounds.lat_min))
+                    * (heightmap.height - 1) as f64)
+                    .round() as usize;
+                let map_x = map_x.min(heightmap.width - 1);
+                let map_y = map_y.min(heightmap.height - 1);
+                let elevation = heightmap.get(map_x, map_y);
+                let seabed_depth = if elevation < 0.0 { -elevation } else { 0.0 };
+
+                if depth <= seabed_depth {
+                    seeds.push([lon as f32, lat as f32, depth]);
+                }
             }
         }
     }
@@ -299,13 +370,19 @@ async fn run() -> Result<()> {
     // 5. 海流データと粒子
     // --------------------------------------------------
 
-    let velocity = load_surface_velocity()?;
+    let max_seabed_depth_m = heightmap
+        .data
+        .iter()
+        .filter(|&&elevation| elevation < 0.0)
+        .map(|&elevation| -elevation)
+        .fold(0.0_f32, f32::max);
+    let velocity = load_surface_velocity(max_seabed_depth_m)?;
 
     let coordinates = velocity
         .coordinates()
         .context("海流データの座標が設定されていません")?;
 
-    let seeds = generate_seeds(coordinates, &bounds);
+    let seeds = generate_seeds(coordinates, &bounds, &heightmap);
 
     anyhow::ensure!(
         !seeds.is_empty(),
@@ -314,7 +391,7 @@ async fn run() -> Result<()> {
 
     let mut particles = FlowParticleSystem::new(&seeds, PARTICLE_TRAIL_POINTS);
 
-    let max_vertices = seeds.len() * (PARTICLE_TRAIL_POINTS - 1) * 2;
+    let max_vertices = seeds.len() * ((PARTICLE_TRAIL_POINTS - 1) * 2 + 6);
 
     let mut gpu_flow = GpuFlowMesh::with_capacity(renderer.device(), max_vertices);
     let mut gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len());
