@@ -134,25 +134,32 @@ fn load_surface_velocity() -> Result<VelocityField> {
 fn generate_seeds(coordinates: &Coordinates, bounds: &GeoBounds) -> Vec<[f32; 3]> {
     let mut seeds = Vec::new();
 
-    for y in (0..coordinates.height()).step_by(2) {
-        for x in 0..coordinates.width() {
-            let Some(lon) = coordinates.longitude_at(x) else {
-                continue;
-            };
+    // 海面付近の固定深度だけでなく、VelocityFieldに存在する全深度層に
+    // 粒子を配置する。深度座標はデータ側の値を使い、未収録深度は捏造しない。
+    for (depth_index, &depth) in coordinates.depth().iter().enumerate() {
+        for y in (0..coordinates.height()).step_by(2) {
+            for x in 0..coordinates.width() {
+                let Some(lon) = coordinates.longitude_at(x) else {
+                    continue;
+                };
 
-            let Some(lat) = coordinates.latitude_at(y) else {
-                continue;
-            };
+                let Some(lat) = coordinates.latitude_at(y) else {
+                    continue;
+                };
 
-            if lon < bounds.lon_min
-                || lon > bounds.lon_max
-                || lat < bounds.lat_min
-                || lat > bounds.lat_max
-            {
-                continue;
+                if lon < bounds.lon_min
+                    || lon > bounds.lon_max
+                    || lat < bounds.lat_min
+                    || lat > bounds.lat_max
+                {
+                    continue;
+                }
+
+                // 深度層ごとに同じ水平格子へ種を配置する。
+                // depth_index は層の列挙を明示し、座標データとの対応を保つ。
+                let _ = depth_index;
+                seeds.push([lon as f32, lat as f32, depth]);
             }
-
-            seeds.push([lon as f32, lat as f32, 100.0]);
         }
     }
 
