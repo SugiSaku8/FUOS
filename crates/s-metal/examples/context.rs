@@ -30,3 +30,8 @@ impl MetalContext {
     }
 }
 
+fn main() {
+    // This file lives in examples/, so Cargo builds it as an executable.
+    // Initialize MetalContext to verify that Metal is available.
+    let _context = MetalContext::new();
+}

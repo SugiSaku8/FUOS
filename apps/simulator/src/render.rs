@@ -73,7 +73,7 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
     ensure!(!seeds.is_empty(), "海底地形と海流格子が重なる領域に粒子の開始点がありません");
     let seed_points = seeds.clone();
     let mut active_seeds = seed_points.clone();
-    let mut last_flow_count = active_seeds.len();
+    let last_flow_count = active_seeds.len();
     let mut particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
     history.push_back((engine.step(), engine.time_seconds(), engine.snapshot()));
     let snapshot_interval = config.simulation.steps_per_frame.max(1) as u64 * 10;
