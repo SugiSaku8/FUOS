@@ -1,0 +1,51 @@
+{
+  "project": {
+    "name": "suruga_bay",
+    "output_root": "runs/suruga_bay",
+    "prepared_sof": "runs/suruga_bay/input.sof"
+  },
+  "terrain": {
+    "source": "suruga_bay.sof/grid.snc",
+    "format": "sof_grid",
+    "vertical_scale": 5.0,
+    "contour_interval_m": 250.0
+  },
+  "ocean_data": {
+    "root": "crates/s-builder/suruga_raw",
+    "u": "u.bin",
+    "v": "v.bin",
+    "temperature": "temperature.bin",
+    "salinity": "salinity.bin",
+    "coordinates": "coordinates.json",
+    "grid": "grid.json",
+    "source_depths_m": [0.0, 10.0, 20.0, 50.0, 100.0, 200.0],
+    "target_depth_interval_m": 250.0,
+    "deep_extension": "exponential_decay",
+    "deep_decay_scale_m": 1200.0,
+    "vertical_velocity_if_missing": 0.0
+  },
+  "simulation": {
+    "dt_seconds": 1.0,
+    "duration_seconds": 3600.0,
+    "steps_per_checkpoint": 60,
+    "steps_per_render_update": 1,
+    "use_metal": true
+  },
+  "render": {
+    "enabled": true,
+    "title": "Suruga Ocean Simulator",
+    "show_terrain": true,
+    "show_streamlines": true,
+    "show_particles": true,
+    "show_depth_layers": true,
+    "streamline_depth_interval_m": 250.0,
+    "vertical_scale": 5.0,
+    "target_fps": 60
+  },
+  "output": {
+    "checkpoint_dir": "runs/suruga_bay/checkpoints",
+    "final_sof": "runs/suruga_bay/final.sof",
+    "write_checkpoint_manifest": true,
+    "keep_checkpoints": true
+  }
+}
