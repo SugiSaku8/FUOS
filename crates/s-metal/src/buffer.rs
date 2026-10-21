@@ -82,6 +82,15 @@ impl MetalBuffer {
 
     #[inline]
 
+    /// Read a completed shared Metal buffer as f32 values.
+    pub fn read_f32(&self) -> Vec<f32> {
+        let count = self.buffer.length() as usize / std::mem::size_of::<f32>();
+        let ptr = self.buffer.contents() as *const f32;
+        if count == 0 || ptr.is_null() { return Vec::new(); }
+        // Buffers allocated with StorageModeShared are CPU-readable.
+        unsafe { std::slice::from_raw_parts(ptr, count).to_vec() }
+    }
+
     pub fn raw(&self) -> &Buffer {
         &self.buffer
     }

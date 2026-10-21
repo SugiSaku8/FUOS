@@ -36,11 +36,11 @@ uint id [[thread_position_in_grid]]
 
     let pipeline = create_compute_pipeline(context.device(), &library, "vector_add");
 
-    let a = MetalBuffer::from_f32(&context, &[1.0, 2.0, 3.0, 4.0]);
+    let a = MetalBuffer::from_f32(context.device(), &[1.0, 2.0, 3.0, 4.0]);
 
-    let b = MetalBuffer::from_f32(&context, &[10.0, 20.0, 30.0, 40.0]);
+    let b = MetalBuffer::from_f32(context.device(), &[10.0, 20.0, 30.0, 40.0]);
 
-    let result = MetalBuffer::empty(&context, 4);
+    let result = MetalBuffer::empty(context.device(), 4);
 
     dispatch(
         &pipeline,

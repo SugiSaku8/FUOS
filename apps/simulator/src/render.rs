@@ -27,6 +27,8 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
             .with_title("SOS 時間ファインダー")
             .with_inner_size(PhysicalSize::new(820, 250)),
     )?);
+    // The time finder is an independent, visible top-level window.
+    time_window.set_visible(true);
     let mut time_finder = pollster::block_on(TimeFinder::new(time_window.clone()))?;
     let main_window_id = window.id();
     let time_window_id = time_window.id();
@@ -195,18 +197,21 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                     eprintln!("Flow vertex capacity exceeded: {} > {}", flow_vertices.len(), max_vertices);
                 }
                 camera_controller.update_with_dt(renderer.camera_mut(), wall_dt);
-                // Prevent the FPS camera from crossing the local bathymetry surface.
+                // Terrain is the only collision boundary. The camera can pass through
+                // the water surface and leave the terrain mesh into the surrounding air.
                 let camera = renderer.camera_mut();
                 let world_scale = config.grid.world_scale.max(1.0);
-                // Keep the camera inside the rendered terrain domain, with a small
-                // margin so the view cannot drift into undefined bathymetry.
-                let margin = (world_scale * 0.002).clamp(50.0, 500.0);
-                camera.position.x = camera.position.x.clamp(margin, (world_scale - margin).max(margin));
-                camera.position.z = camera.position.z.clamp(margin, (world_scale - margin).max(margin));
-                let tx = ((camera.position.x / world_scale).clamp(0.0, 1.0) * (terrain.width.saturating_sub(1)) as f32).round() as usize;
-                let ty = ((camera.position.z / world_scale).clamp(0.0, 1.0) * (terrain.height.saturating_sub(1)) as f32).round() as usize;
-                let seabed_y = terrain.bathymetry[ty.min(terrain.height-1) * terrain.width + tx.min(terrain.width-1)] * config.grid.terrain_vertical_scale;
-                camera.position.y = camera.position.y.max(seabed_y + 250.0);
+                let inside_terrain = camera.position.x >= 0.0
+                    && camera.position.x <= world_scale
+                    && camera.position.z >= 0.0
+                    && camera.position.z <= world_scale;
+                if inside_terrain && terrain.width > 0 && terrain.height > 0 {
+                    let tx = ((camera.position.x / world_scale) * (terrain.width.saturating_sub(1)) as f32).round() as usize;
+                    let ty = ((camera.position.z / world_scale) * (terrain.height.saturating_sub(1)) as f32).round() as usize;
+                    let seabed_y = terrain.bathymetry[ty.min(terrain.height - 1) * terrain.width + tx.min(terrain.width - 1)]
+                        * config.grid.terrain_vertical_scale;
+                    camera.position.y = camera.position.y.max(seabed_y + 250.0);
+                }
                 report_elapsed += wall_dt;
                 report_frames += 1;
                 title_elapsed += wall_dt;

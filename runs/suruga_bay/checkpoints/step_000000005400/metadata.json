@@ -1,0 +1,9 @@
+{
+  "format": "SOS-CHECKPOINT-1",
+  "run_name": "suruga_bay",
+  "step": 5400,
+  "simulation_time_seconds": 53.99999879300594,
+  "dt_seconds": 0.01,
+  "created_unix_seconds": 1792578834,
+  "state_file": "restart.snc"
+}

@@ -1,0 +1,2721 @@
+Last login: Wed Oct 21 19:22:25 on ttys000
+sugisaku@Sugisaku8s-MacBook-Air ~ % cd /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed
+sugisaku@Sugisaku8s-MacBook-Air SOS_simulator_timefinder_metal_fps_fixed % cargo check --workspace
+
+cargo test --workspace
+cargo run -p simulator -- --cpu --fresh
+cargo run -p simulator -- --metal --fresh
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling libm v0.2.16
+   Compiling autocfg v1.5.1
+   Compiling libc v0.2.186
+   Compiling serde_core v1.0.229
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.9
+   Compiling cfg_aliases v0.2.2
+    Checking smallvec v1.15.2
+   Compiling cc v1.3.0
+   Compiling num-traits v0.2.19
+   Compiling paste v1.0.15
+    Checking core-foundation-sys v0.8.7
+   Compiling pkg-config v0.3.33
+   Compiling vcpkg v0.2.15
+    Checking log v0.4.33
+   Compiling cmake v0.1.58
+   Compiling syn v2.0.119
+   Compiling syn v3.0.2
+    Checking cfg-if v1.0.4
+   Compiling memchr v2.8.3
+   Compiling regex-syntax v0.8.11
+   Compiling parking_lot_core v0.9.12
+   Compiling libz-sys v1.1.29
+   Compiling aho-corasick v1.1.4
+   Compiling hdf5-metno-src v0.10.1
+    Checking foreign-types-shared v0.3.1
+    Checking equivalent v1.0.2
+    Checking bitflags v2.13.1
+    Checking scopeguard v1.2.0
+    Checking lock_api v0.4.14
+   Compiling libloading v0.8.9
+   Compiling thiserror v2.0.19
+    Checking byteorder v1.5.0
+    Checking parking_lot v0.12.5
+    Checking malloc_buf v0.0.6
+   Compiling matrixmultiply v0.3.11
+   Compiling zerocopy v0.8.54
+    Checking objc v0.2.7
+    Checking num-integer v0.1.46
+   Compiling regex-automata v0.4.16
+    Checking num-complex v0.4.6
+    Checking approx v0.5.1
+    Checking block v0.1.6
+   Compiling serde v1.0.229
+   Compiling crossbeam-utils v0.8.22
+   Compiling thiserror-impl v2.0.19
+   Compiling objc-sys v0.3.5
+    Checking rawpointer v0.2.1
+   Compiling serde_derive v1.0.229
+   Compiling netcdf-src v0.5.1
+    Checking core-foundation v0.10.1
+   Compiling naga v26.0.0
+   Compiling crossbeam-epoch v0.9.20
+    Checking foldhash v0.1.5
+    Checking hashbrown v0.17.1
+    Checking unicode-width v0.2.2
+    Checking bit-vec v0.8.0
+   Compiling zmij v1.0.23
+   Compiling semver v1.0.28
+    Checking codespan-reporting v0.12.0
+    Checking indexmap v2.14.0
+    Checking bit-set v0.8.0
+    Checking hashbrown v0.15.5
+   Compiling bytemuck_derive v1.11.0
+   Compiling foreign-types-macros v0.2.3
+   Compiling zerocopy-derive v0.8.54
+   Compiling regex v1.13.1
+    Checking core-graphics-types v0.2.0
+    Checking foreign-types v0.5.0
+    Checking core-foundation v0.9.4
+   Compiling wgpu-hal v26.0.6
+   Compiling anyhow v1.0.104
+    Checking rustc-hash v1.1.0
+   Compiling thiserror v1.0.69
+    Checking bytemuck v1.25.2
+   Compiling serde_json v1.0.151
+    Checking glam v0.30.10
+    Checking raw-window-handle v0.6.2
+    Checking safe_arch v0.7.4
+    Checking arrayvec v0.7.8
+    Checking wide v0.7.33
+   Compiling crossbeam-deque v0.8.7
+    Checking once_cell v1.21.4
+    Checking hexf-parse v0.2.1
+    Checking objc2-encode v4.1.0
+    Checking bitflags v1.3.2
+   Compiling hdf5-metno-sys v0.11.3
+    Checking core-graphics-types v0.1.3
+    Checking objc2 v0.5.2
+    Checking wgpu-types v26.0.0
+    Checking metal v0.32.0
+   Compiling thiserror-impl v1.0.69
+    Checking simba v0.9.1
+   Compiling netcdf-sys v0.9.1
+    Checking num-rational v0.4.2
+    Checking profiling v1.0.18
+    Checking either v1.16.0
+    Checking itoa v1.0.18
+    Checking typenum v1.20.1
+   Compiling rayon-core v1.13.0
+    Checking half v2.7.1
+    Checking block2 v0.5.1
+    Checking ndarray v0.16.1
+   Compiling wgpu-core v26.0.1
+    Checking dispatch v0.2.0
+   Compiling heapless v0.8.0
+    Checking utf8parse v0.2.2
+   Compiling litrs v1.0.0
+    Checking anstyle-parse v1.0.0
+    Checking objc2-foundation v0.2.2
+    Checking s-io v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-io)
+    Checking s-field v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-field)
+warning: unused import: `Field`
+ --> crates/s-field/src/salinity.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> crates/s-field/src/temperature.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+
+   Compiling document-features v0.2.12
+warning: unused variable: `grid`
+  --> crates/s-field/src/ocean.rs:44:13
+   |
+44 |         let grid = velocity.grid().clone();
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_grid`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-field` (lib) generated 3 warnings (run `cargo fix --lib -p s-field` to apply 1 suggestion)
+   Compiling netcdf v0.12.1
+    Checking hash32 v0.3.1
+   Compiling winit v0.30.13
+   Compiling wgpu v26.0.1
+    Checking pin-project-lite v0.2.17
+    Checking colorchoice v1.0.5
+   Compiling s-metal v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-metal)
+    Checking jiff-core v0.1.0
+    Checking anstyle v1.0.14
+    Checking tracing-core v0.1.36
+    Checking is_terminal_polyfill v1.70.2
+    Checking stable_deref_trait v1.2.1
+    Checking physics v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/physics)
+    Checking anstyle-query v1.1.5
+    Checking anstream v1.0.0
+    Checking tracing v0.1.44
+    Checking env_filter v2.0.0
+    Checking rayon v1.12.0
+    Checking s-sof v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-sof)
+    Checking jiff v0.2.34
+    Checking core-graphics v0.23.2
+    Checking metal v0.29.0
+warning: unused import: `Field`
+ --> crates/s-sof/src/writer.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:8:1
+  |
+8 | pub mod boundary;
+  | ^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> crates/s-sof/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:9:1
+  |
+9 | pub mod builder;
+  | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:10:1
+   |
+10 | pub mod dataset;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:11:1
+   |
+11 | pub mod error;
+   | ^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:12:1
+   |
+12 | pub mod forcing;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:13:1
+   |
+13 | pub mod format;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:14:1
+   |
+14 | pub mod grid;
+   | ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:15:1
+   |
+15 | pub mod initial;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:18:1
+   |
+18 | pub mod package_reader;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:19:1
+   |
+19 | pub mod reader;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:20:1
+   |
+20 | pub mod restart;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:21:1
+   |
+21 | pub mod velocity;
+   | ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:22:1
+   |
+22 | pub mod writer;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/builder.rs:62:5
+   |
+62 |     pub fn new(name: impl Into<String>) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/builder.rs:86:5
+   |
+86 | /     pub fn grid(
+87 | |         mut self,
+88 | |         grid: Grid4D,
+89 | |         latitude: Vec<f32>,
+...  |
+92 | |         bathymetry: Vec<f32>,
+93 | |     ) -> Self {
+   | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:126:5
+    |
+126 | /     pub fn boundary(
+127 | |         mut self,
+128 | |         field: OceanField
+129 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:140:5
+    |
+140 | /     pub fn initial(
+141 | |         mut self,
+142 | |         field: OceanField
+143 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:155:5
+    |
+155 | /     pub fn restart(
+156 | |         mut self,
+157 | |         field: OceanField
+158 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:170:5
+    |
+170 | /     pub fn forcing(
+171 | |         mut self,
+172 | |         wind_u: Vec<f32>,
+173 | |         wind_v: Vec<f32>,
+174 | |         surface_heat: Vec<f32>,
+175 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:196:5
+    |
+196 | /     pub fn build<P: AsRef<Path>>(
+197 | |         self,
+198 | |         output:P
+199 | |     )->Result<SofPackage>{
+    | |_________________________^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:42:5
+   |
+42 |     pub fn new(name: impl Into<String>, dataset_type: DatasetType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/dataset.rs:71:5
+   |
+71 |     pub fn add_variable(&mut self, variable: VariableInfo) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:87:5
+   |
+87 |     pub fn new(name: impl Into<String>, variable_type: VariableType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> crates/s-sof/src/dataset.rs:99:5
+   |
+99 |     Velocity,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:101:5
+    |
+101 |     Temperature,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:103:5
+    |
+103 |     Salinity,
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:105:5
+    |
+105 |     Coordinate,
+    |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:107:5
+    |
+107 |     Scalar,
+    |     ^^^^^^
+
+warning: missing documentation for a struct
+ --> crates/s-sof/src/forcing.rs:7:1
+  |
+7 | pub struct ForcingWriter {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:12:5
+   |
+12 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:18:5
+   |
+18 |     pub fn write(&mut self, wind_u: &[f32], wind_v: &[f32], surface_heat: &[f32]) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:38:5
+   |
+38 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:45:1
+   |
+45 | pub struct ForcingReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:50:5
+   |
+50 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:56:5
+   |
+56 |     pub fn read(&mut self) -> Result<ForcingData> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:67:1
+   |
+67 | pub struct ForcingData {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:68:5
+   |
+68 |     pub wind_u: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:70:5
+   |
+70 |     pub wind_v: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:72:5
+   |
+72 |     pub surface_heat: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:1:1
+  |
+1 | pub const SOF_MAGIC: &[u8; 8] = b"SOF00001";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:3:1
+  |
+3 | pub const SOF_VERSION: u32 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:13:1
+   |
+13 | pub struct GridWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/grid.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:24:5
+   |
+24 | /     pub fn write(
+25 | |         &mut self,
+26 | |         grid: &Grid4D,
+27 | |         latitude: &[f32],
+...  |
+30 | |         bathymetry: &[f32],
+31 | |     ) -> Result<()> {
+   | |___________________^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:70:5
+   |
+70 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:82:1
+   |
+82 | pub struct GridData {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:83:5
+   |
+83 |     pub size: [usize; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:85:5
+   |
+85 |     pub spacing: [f32; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:87:5
+   |
+87 |     pub latitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:89:5
+   |
+89 |     pub longitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:91:5
+   |
+91 |     pub depth: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:93:5
+   |
+93 |     pub bathymetry: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> crates/s-sof/src/grid.rs:100:1
+    |
+100 | pub struct GridReader {
+    | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> crates/s-sof/src/grid.rs:105:5
+    |
+105 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/grid.rs:111:5
+    |
+111 |     pub fn read(&mut self) -> Result<GridData> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:10:1
+   |
+10 | pub struct InitialWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:13:5
+   |
+13 |     pub fn write<P: AsRef<Path>>(path: P, field: &OceanField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:22:1
+   |
+22 | pub struct InitialReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:25:5
+   |
+25 |     pub fn read<P: AsRef<Path>>(path: P) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:232:5
+    |
+232 |     pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:238:5
+    |
+238 |     pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/reader.rs:10:1
+   |
+10 | pub struct BoundaryReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/reader.rs:15:5
+   |
+15 |     pub fn open(path: &str) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/reader.rs:21:5
+   |
+21 |     pub fn read(&mut self) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:12:1
+   |
+12 | pub struct RestartWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:18:5
+   |
+18 | /     pub fn write<P:AsRef<Path>>(
+19 | |         path:P,
+20 | |         field:&OceanField
+21 | |     )->Result<()> {
+   | |_________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:39:1
+   |
+39 | pub struct RestartReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:46:5
+   |
+46 | /     pub fn read<P:AsRef<Path>>(
+47 | |         path:P
+48 | |     )->Result<OceanField>{
+   | |_________________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:13:1
+   |
+13 | pub struct VelocityWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:24:5
+   |
+24 |     pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:58:5
+   |
+58 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:69:1
+   |
+69 | pub struct VelocityReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:74:5
+   |
+74 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:80:5
+   |
+80 |     pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `s-sof` (lib) generated 76 warnings
+   Compiling nalgebra-macros v0.2.2
+    Checking i_float v1.15.0
+    Checking static_assertions v1.1.0
+    Checking dpi v0.1.2
+    Checking foldhash v0.2.0
+    Checking cursor-icon v1.2.0
+    Checking allocator-api2 v0.2.21
+    Checking smol_str v0.2.2
+    Checking nalgebra v0.33.3
+    Checking objc2-app-kit v0.2.2
+    Checking hashbrown v0.16.1
+    Checking i_shape v1.14.0
+    Checking rstar v0.12.2
+    Checking itertools v0.11.0
+    Checking env_logger v0.11.11
+   Compiling nalgebra-macros v0.3.0
+    Checking i_key_sort v0.6.0
+    Checking robust v1.2.0
+    Checking pollster v0.4.0
+    Checking i_tree v0.16.0
+    Checking nalgebra v0.34.2
+    Checking i_overlay v4.0.7
+    Checking earcutr v0.4.3
+    Checking spade v2.15.1
+    Checking wgpu-core-deps-apple v26.0.0
+    Checking geo-types v0.7.19
+    Checking geographiclib-rs v0.2.7
+    Checking float_next_after v1.0.0
+    Checking s-cpu v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-cpu)
+    Checking s-builder v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-builder)
+    Checking s-math v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-math)
+    Checking util v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/util)
+    Checking geo v0.31.0
+    Checking gui v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/gui)
+    Checking s-core v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-core)
+    Checking s-grid v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-grid)
+    Checking s-renderer v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-renderer)
+warning: unused import: `wgpu::util::DeviceExt`
+ --> crates/s-renderer/src/velocity_renderer.rs:1:5
+  |
+1 | use wgpu::util::DeviceExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-renderer` (lib) generated 1 warning (run `cargo fix --lib -p s-renderer` to apply 1 suggestion)
+    Checking simulator v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/apps/simulator)
+    Checking simulation v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/simulation)
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::create_window`: use `ActiveEventLoop::create_window` instead
+  --> apps/simulator/src/render.rs:22:38
+   |
+22 |     let window = Arc::new(event_loop.create_window(
+   |                                      ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::create_window`: use `ActiveEventLoop::create_window` instead
+  --> apps/simulator/src/render.rs:25:43
+   |
+25 |     let time_window = Arc::new(event_loop.create_window(
+   |                                           ^^^^^^^^^^^^^
+
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::run`: use `EventLoop::run_app` instead
+  --> apps/simulator/src/render.rs:91:16
+   |
+91 |     event_loop.run(move |event, target| {
+   |                ^^^
+
+warning: unused import: `Field`
+ --> apps/simulator/src/engine.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> apps/simulator/src/render.rs:2:28
+  |
+2 | use s_field::{Coordinates, Field};
+  |                            ^^^^^
+
+warning: value captured by `last_flow_count` is never read
+   --> apps/simulator/src/render.rs:113:21
+    |
+113 |                     last_flow_count = active_seeds.len();
+    |                     ^^^^^^^^^^^^^^^
+    |
+    = help: did you mean to capture by reference instead?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `last_flow_count` is never read
+   --> apps/simulator/src/render.rs:113:21
+    |
+113 |                     last_flow_count = active_seeds.len();
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+
+warning: `simulator` (bin "simulator") generated 7 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3m 20s
+   Compiling unicode-ident v1.0.24
+   Compiling glam v0.30.10
+   Compiling memchr v2.8.3
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.186
+   Compiling libm v0.2.16
+   Compiling log v0.4.33
+   Compiling core-foundation-sys v0.8.7
+   Compiling proc-macro2 v1.0.107
+   Compiling byteorder v1.5.0
+   Compiling foreign-types-shared v0.3.1
+   Compiling block v0.1.6
+   Compiling bitflags v1.3.2
+   Compiling physics v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/physics)
+   Compiling quote v1.0.47
+   Compiling malloc_buf v0.0.6
+   Compiling core-foundation v0.9.4
+   Compiling objc v0.2.7
+   Compiling syn v2.0.119
+   Compiling syn v3.0.2
+   Compiling zmij v1.0.23
+   Compiling num-traits v0.2.19
+   Compiling core-graphics-types v0.1.3
+   Compiling cfg-if v1.0.4
+   Compiling itoa v1.0.18
+   Compiling smallvec v1.15.2
+   Compiling anyhow v1.0.104
+   Compiling aho-corasick v1.1.4
+   Compiling equivalent v1.0.2
+   Compiling rawpointer v0.2.1
+   Compiling num-integer v0.1.46
+   Compiling approx v0.5.1
+   Compiling num-complex v0.4.6
+   Compiling matrixmultiply v0.3.11
+   Compiling scopeguard v1.2.0
+   Compiling bitflags v2.13.1
+   Compiling serde_json v1.0.151
+   Compiling lock_api v0.4.14
+   Compiling regex-automata v0.4.16
+   Compiling parking_lot_core v0.9.12
+   Compiling libloading v0.8.9
+   Compiling parking_lot v0.12.5
+   Compiling num-rational v0.4.2
+   Compiling typenum v1.20.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.19
+   Compiling ndarray v0.16.1
+   Compiling core-foundation v0.10.1
+   Compiling hashbrown v0.17.1
+   Compiling unicode-width v0.2.2
+   Compiling foreign-types-macros v0.2.3
+   Compiling thiserror-impl v1.0.69
+   Compiling bytemuck_derive v1.11.0
+   Compiling thiserror v2.0.19
+   Compiling foreign-types v0.5.0
+   Compiling metal v0.29.0
+   Compiling regex v1.13.1
+   Compiling zerocopy-derive v0.8.54
+   Compiling s-field v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-field)
+   Compiling thiserror v1.0.69
+   Compiling hdf5-metno-sys v0.11.3
+   Compiling bytemuck v1.25.2
+   Compiling foldhash v0.1.5
+warning: unused import: `Field`
+ --> crates/s-field/src/salinity.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> crates/s-field/src/temperature.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+
+warning: unused variable: `grid`
+  --> crates/s-field/src/ocean.rs:44:13
+   |
+44 |         let grid = velocity.grid().clone();
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_grid`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling safe_arch v0.7.4
+   Compiling bit-vec v0.8.0
+   Compiling wide v0.7.33
+   Compiling serde v1.0.229
+   Compiling bit-set v0.8.0
+warning: `s-field` (lib) generated 3 warnings (run `cargo fix --lib -p s-field` to apply 1 suggestion)
+   Compiling hashbrown v0.15.5
+   Compiling netcdf-src v0.5.1
+   Compiling indexmap v2.14.0
+   Compiling s-io v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-io)
+   Compiling zerocopy v0.8.54
+   Compiling codespan-reporting v0.12.0
+   Compiling core-graphics-types v0.2.0
+   Compiling s-sof v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-sof)
+   Compiling objc-sys v0.3.5
+   Compiling libz-sys v1.1.29
+   Compiling raw-window-handle v0.6.2
+warning: unused import: `Field`
+ --> crates/s-sof/src/writer.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling objc2-encode v4.1.0
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:8:1
+  |
+8 | pub mod boundary;
+  | ^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> crates/s-sof/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:9:1
+  |
+9 | pub mod builder;
+  | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:10:1
+   |
+10 | pub mod dataset;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:11:1
+   |
+11 | pub mod error;
+   | ^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:12:1
+   |
+12 | pub mod forcing;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:13:1
+   |
+13 | pub mod format;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:14:1
+   |
+14 | pub mod grid;
+   | ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:15:1
+   |
+15 | pub mod initial;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:18:1
+   |
+18 | pub mod package_reader;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:19:1
+   |
+19 | pub mod reader;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:20:1
+   |
+20 | pub mod restart;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:21:1
+   |
+21 | pub mod velocity;
+   | ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:22:1
+   |
+22 | pub mod writer;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/builder.rs:62:5
+   |
+62 |     pub fn new(name: impl Into<String>) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/builder.rs:86:5
+   |
+86 | /     pub fn grid(
+87 | |         mut self,
+88 | |         grid: Grid4D,
+89 | |         latitude: Vec<f32>,
+...  |
+92 | |         bathymetry: Vec<f32>,
+93 | |     ) -> Self {
+   | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:126:5
+    |
+126 | /     pub fn boundary(
+127 | |         mut self,
+128 | |         field: OceanField
+129 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:140:5
+    |
+140 | /     pub fn initial(
+141 | |         mut self,
+142 | |         field: OceanField
+143 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:155:5
+    |
+155 | /     pub fn restart(
+156 | |         mut self,
+157 | |         field: OceanField
+158 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:170:5
+    |
+170 | /     pub fn forcing(
+171 | |         mut self,
+172 | |         wind_u: Vec<f32>,
+173 | |         wind_v: Vec<f32>,
+174 | |         surface_heat: Vec<f32>,
+175 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:196:5
+    |
+196 | /     pub fn build<P: AsRef<Path>>(
+197 | |         self,
+198 | |         output:P
+199 | |     )->Result<SofPackage>{
+    | |_________________________^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:42:5
+   |
+42 |     pub fn new(name: impl Into<String>, dataset_type: DatasetType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/dataset.rs:71:5
+   |
+71 |     pub fn add_variable(&mut self, variable: VariableInfo) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:87:5
+   |
+87 |     pub fn new(name: impl Into<String>, variable_type: VariableType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> crates/s-sof/src/dataset.rs:99:5
+   |
+99 |     Velocity,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:101:5
+    |
+101 |     Temperature,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:103:5
+    |
+103 |     Salinity,
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:105:5
+    |
+105 |     Coordinate,
+    |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:107:5
+    |
+107 |     Scalar,
+    |     ^^^^^^
+
+warning: missing documentation for a struct
+ --> crates/s-sof/src/forcing.rs:7:1
+  |
+7 | pub struct ForcingWriter {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:12:5
+   |
+12 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:18:5
+   |
+18 |     pub fn write(&mut self, wind_u: &[f32], wind_v: &[f32], surface_heat: &[f32]) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:38:5
+   |
+38 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:45:1
+   |
+45 | pub struct ForcingReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:50:5
+   |
+50 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:56:5
+   |
+56 |     pub fn read(&mut self) -> Result<ForcingData> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:67:1
+   |
+67 | pub struct ForcingData {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:68:5
+   |
+68 |     pub wind_u: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:70:5
+   |
+70 |     pub wind_v: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:72:5
+   |
+72 |     pub surface_heat: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:1:1
+  |
+1 | pub const SOF_MAGIC: &[u8; 8] = b"SOF00001";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:3:1
+  |
+3 | pub const SOF_VERSION: u32 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:13:1
+   |
+13 | pub struct GridWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/grid.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:24:5
+   |
+24 | /     pub fn write(
+25 | |         &mut self,
+26 | |         grid: &Grid4D,
+27 | |         latitude: &[f32],
+...  |
+30 | |         bathymetry: &[f32],
+31 | |     ) -> Result<()> {
+   | |___________________^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:70:5
+   |
+70 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:82:1
+   |
+82 | pub struct GridData {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:83:5
+   |
+83 |     pub size: [usize; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:85:5
+   |
+85 |     pub spacing: [f32; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:87:5
+   |
+87 |     pub latitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:89:5
+   |
+89 |     pub longitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:91:5
+   |
+91 |     pub depth: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:93:5
+   |
+93 |     pub bathymetry: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> crates/s-sof/src/grid.rs:100:1
+    |
+100 | pub struct GridReader {
+    | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> crates/s-sof/src/grid.rs:105:5
+    |
+105 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/grid.rs:111:5
+    |
+111 |     pub fn read(&mut self) -> Result<GridData> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:10:1
+   |
+10 | pub struct InitialWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:13:5
+   |
+13 |     pub fn write<P: AsRef<Path>>(path: P, field: &OceanField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:22:1
+   |
+22 | pub struct InitialReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:25:5
+   |
+25 |     pub fn read<P: AsRef<Path>>(path: P) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:232:5
+    |
+232 |     pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:238:5
+    |
+238 |     pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/reader.rs:10:1
+   |
+10 | pub struct BoundaryReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/reader.rs:15:5
+   |
+15 |     pub fn open(path: &str) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/reader.rs:21:5
+   |
+21 |     pub fn read(&mut self) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:12:1
+   |
+12 | pub struct RestartWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:18:5
+   |
+18 | /     pub fn write<P:AsRef<Path>>(
+19 | |         path:P,
+20 | |         field:&OceanField
+21 | |     )->Result<()> {
+   | |_________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:39:1
+   |
+39 | pub struct RestartReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:46:5
+   |
+46 | /     pub fn read<P:AsRef<Path>>(
+47 | |         path:P
+48 | |     )->Result<OceanField>{
+   | |_________________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:13:1
+   |
+13 | pub struct VelocityWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:24:5
+   |
+24 |     pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:58:5
+   |
+58 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:69:1
+   |
+69 | pub struct VelocityReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:74:5
+   |
+74 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:80:5
+   |
+80 |     pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling once_cell v1.21.4
+   Compiling arrayvec v0.7.8
+   Compiling simba v0.9.1
+   Compiling rustc-hash v1.1.0
+   Compiling hexf-parse v0.2.1
+   Compiling objc2 v0.5.2
+   Compiling hdf5-metno-src v0.10.1
+   Compiling metal v0.32.0
+   Compiling wgpu-types v26.0.0
+warning: `s-sof` (lib) generated 76 warnings
+   Compiling regex-syntax v0.8.11
+   Compiling s-metal v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-metal)
+   Compiling profiling v1.0.18
+   Compiling block2 v0.5.1
+   Compiling half v2.7.1
+   Compiling pin-project-lite v0.2.17
+   Compiling dispatch v0.2.0
+   Compiling utf8parse v0.2.2
+   Compiling naga v26.0.0
+   Compiling anstyle-parse v1.0.0
+   Compiling objc2-foundation v0.2.2
+   Compiling anstyle v1.0.14
+   Compiling colorchoice v1.0.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling jiff-core v0.1.0
+   Compiling tracing-core v0.1.36
+   Compiling anstyle-query v1.1.5
+   Compiling anstream v1.0.0
+   Compiling tracing v0.1.44
+   Compiling core-graphics v0.23.2
+   Compiling env_filter v2.0.0
+   Compiling jiff v0.2.34
+   Compiling nalgebra-macros v0.2.2
+   Compiling cursor-icon v1.2.0
+   Compiling smol_str v0.2.2
+   Compiling static_assertions v1.1.0
+   Compiling dpi v0.1.2
+   Compiling nalgebra v0.33.3
+   Compiling pollster v0.4.0
+   Compiling crossbeam-utils v0.8.22
+   Compiling either v1.16.0
+   Compiling nalgebra-macros v0.3.0
+   Compiling crossbeam-epoch v0.9.20
+   Compiling objc2-app-kit v0.2.2
+   Compiling hash32 v0.3.1
+   Compiling crossbeam-deque v0.8.7
+   Compiling stable_deref_trait v1.2.1
+   Compiling rayon-core v1.13.0
+   Compiling heapless v0.8.0
+   Compiling rayon v1.12.0
+   Compiling env_logger v0.11.11
+   Compiling nalgebra v0.34.2
+   Compiling i_float v1.15.0
+   Compiling allocator-api2 v0.2.21
+   Compiling s-math v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-math)
+   Compiling wgpu-hal v26.0.6
+   Compiling foldhash v0.2.0
+   Compiling hashbrown v0.16.1
+   Compiling winit v0.30.13
+   Compiling i_shape v1.14.0
+   Compiling rstar v0.12.2
+   Compiling wgpu-core-deps-apple v26.0.0
+   Compiling wgpu-core v26.0.1
+   Compiling itertools v0.11.0
+   Compiling tokio-macros v2.7.1
+   Compiling i_key_sort v0.6.0
+   Compiling robust v1.2.0
+   Compiling i_tree v0.16.0
+   Compiling earcutr v0.4.3
+   Compiling i_overlay v4.0.7
+   Compiling spade v2.15.1
+   Compiling tokio v1.53.0
+   Compiling geo-types v0.7.19
+   Compiling geographiclib-rs v0.2.7
+   Compiling float_next_after v1.0.0
+   Compiling s-builder v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-builder)
+   Compiling geo v0.31.0
+   Compiling s-core v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-core)
+   Compiling s-cpu v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-cpu)
+   Compiling gui v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/gui)
+   Compiling util v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/util)
+error[E0308]: mismatched types
+  --> crates/s-metal/examples/derivative_x.rs:18:39
+   |
+18 |     let input = MetalBuffer::from_f32(&context, &[0.0, 2.0, 4.0, 6.0]);
+   |                 --------------------- ^^^^^^^^ expected `&Device`, found `&MetalContext`
+   |                 |
+   |                 arguments to this function are incorrect
+   |
+   = note: expected reference `&metal::device::Device`
+              found reference `&MetalContext`
+note: associated function defined here
+  --> /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-metal/src/buffer.rs:18:12
+   |
+18 |     pub fn from_f32(device: &Device, data: &[f32]) -> Self {
+   |            ^^^^^^^^
+
+error[E0308]: mismatched types
+  --> crates/s-metal/examples/derivative_x.rs:20:37
+   |
+20 |     let output = MetalBuffer::empty(&context, 4);
+   |                  ------------------ ^^^^^^^^ expected `&Device`, found `&MetalContext`
+   |                  |
+   |                  arguments to this function are incorrect
+   |
+   = note: expected reference `&metal::device::Device`
+              found reference `&MetalContext`
+note: associated function defined here
+  --> /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-metal/src/buffer.rs:31:12
+   |
+31 |     pub fn empty(device: &Device, count: usize) -> Self {
+   |            ^^^^^
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `s-metal` (example "derivative_x") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error[E0601]: `main` function not found in crate `context`
+  --> crates/s-metal/examples/context.rs:31:2
+   |
+31 | }
+   |  ^ consider adding a `main` function to `crates/s-metal/examples/context.rs`
+
+For more information about this error, try `rustc --explain E0601`.
+error: could not compile `s-metal` (example "context") due to 1 previous error
+   Compiling num-traits v0.2.19
+warning: unused import: `Field`
+ --> crates/s-field/src/salinity.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> crates/s-field/src/temperature.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+
+warning: unused variable: `grid`
+  --> crates/s-field/src/ocean.rs:44:13
+   |
+44 |         let grid = velocity.grid().clone();
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_grid`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling netcdf-sys v0.9.1
+warning: `s-field` (lib) generated 3 warnings (run `cargo fix --lib -p s-field` to apply 1 suggestion)
+   Compiling netcdf-src v0.5.1
+warning: unused import: `Field`
+ --> crates/s-sof/src/writer.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:8:1
+  |
+8 | pub mod boundary;
+  | ^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> crates/s-sof/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:9:1
+  |
+9 | pub mod builder;
+  | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:10:1
+   |
+10 | pub mod dataset;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:11:1
+   |
+11 | pub mod error;
+   | ^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:12:1
+   |
+12 | pub mod forcing;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:13:1
+   |
+13 | pub mod format;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:14:1
+   |
+14 | pub mod grid;
+   | ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:15:1
+   |
+15 | pub mod initial;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:18:1
+   |
+18 | pub mod package_reader;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:19:1
+   |
+19 | pub mod reader;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:20:1
+   |
+20 | pub mod restart;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:21:1
+   |
+21 | pub mod velocity;
+   | ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:22:1
+   |
+22 | pub mod writer;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/builder.rs:62:5
+   |
+62 |     pub fn new(name: impl Into<String>) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/builder.rs:86:5
+   |
+86 | /     pub fn grid(
+87 | |         mut self,
+88 | |         grid: Grid4D,
+89 | |         latitude: Vec<f32>,
+...  |
+92 | |         bathymetry: Vec<f32>,
+93 | |     ) -> Self {
+   | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:126:5
+    |
+126 | /     pub fn boundary(
+127 | |         mut self,
+128 | |         field: OceanField
+129 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:140:5
+    |
+140 | /     pub fn initial(
+141 | |         mut self,
+142 | |         field: OceanField
+143 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:155:5
+    |
+155 | /     pub fn restart(
+156 | |         mut self,
+157 | |         field: OceanField
+158 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:170:5
+    |
+170 | /     pub fn forcing(
+171 | |         mut self,
+172 | |         wind_u: Vec<f32>,
+173 | |         wind_v: Vec<f32>,
+174 | |         surface_heat: Vec<f32>,
+175 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:196:5
+    |
+196 | /     pub fn build<P: AsRef<Path>>(
+197 | |         self,
+198 | |         output:P
+199 | |     )->Result<SofPackage>{
+    | |_________________________^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:42:5
+   |
+42 |     pub fn new(name: impl Into<String>, dataset_type: DatasetType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/dataset.rs:71:5
+   |
+71 |     pub fn add_variable(&mut self, variable: VariableInfo) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:87:5
+   |
+87 |     pub fn new(name: impl Into<String>, variable_type: VariableType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> crates/s-sof/src/dataset.rs:99:5
+   |
+99 |     Velocity,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:101:5
+    |
+101 |     Temperature,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:103:5
+    |
+103 |     Salinity,
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:105:5
+    |
+105 |     Coordinate,
+    |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:107:5
+    |
+107 |     Scalar,
+    |     ^^^^^^
+
+warning: missing documentation for a struct
+ --> crates/s-sof/src/forcing.rs:7:1
+  |
+7 | pub struct ForcingWriter {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:12:5
+   |
+12 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:18:5
+   |
+18 |     pub fn write(&mut self, wind_u: &[f32], wind_v: &[f32], surface_heat: &[f32]) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:38:5
+   |
+38 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:45:1
+   |
+45 | pub struct ForcingReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:50:5
+   |
+50 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:56:5
+   |
+56 |     pub fn read(&mut self) -> Result<ForcingData> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:67:1
+   |
+67 | pub struct ForcingData {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:68:5
+   |
+68 |     pub wind_u: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:70:5
+   |
+70 |     pub wind_v: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:72:5
+   |
+72 |     pub surface_heat: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:1:1
+  |
+1 | pub const SOF_MAGIC: &[u8; 8] = b"SOF00001";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:3:1
+  |
+3 | pub const SOF_VERSION: u32 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:13:1
+   |
+13 | pub struct GridWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/grid.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:24:5
+   |
+24 | /     pub fn write(
+25 | |         &mut self,
+26 | |         grid: &Grid4D,
+27 | |         latitude: &[f32],
+...  |
+30 | |         bathymetry: &[f32],
+31 | |     ) -> Result<()> {
+   | |___________________^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:70:5
+   |
+70 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:82:1
+   |
+82 | pub struct GridData {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:83:5
+   |
+83 |     pub size: [usize; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:85:5
+   |
+85 |     pub spacing: [f32; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:87:5
+   |
+87 |     pub latitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:89:5
+   |
+89 |     pub longitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:91:5
+   |
+91 |     pub depth: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:93:5
+   |
+93 |     pub bathymetry: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> crates/s-sof/src/grid.rs:100:1
+    |
+100 | pub struct GridReader {
+    | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> crates/s-sof/src/grid.rs:105:5
+    |
+105 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/grid.rs:111:5
+    |
+111 |     pub fn read(&mut self) -> Result<GridData> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:10:1
+   |
+10 | pub struct InitialWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:13:5
+   |
+13 |     pub fn write<P: AsRef<Path>>(path: P, field: &OceanField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:22:1
+   |
+22 | pub struct InitialReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:25:5
+   |
+25 |     pub fn read<P: AsRef<Path>>(path: P) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:232:5
+    |
+232 |     pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:238:5
+    |
+238 |     pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/reader.rs:10:1
+   |
+10 | pub struct BoundaryReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/reader.rs:15:5
+   |
+15 |     pub fn open(path: &str) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/reader.rs:21:5
+   |
+21 |     pub fn read(&mut self) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:12:1
+   |
+12 | pub struct RestartWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:18:5
+   |
+18 | /     pub fn write<P:AsRef<Path>>(
+19 | |         path:P,
+20 | |         field:&OceanField
+21 | |     )->Result<()> {
+   | |_________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:39:1
+   |
+39 | pub struct RestartReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:46:5
+   |
+46 | /     pub fn read<P:AsRef<Path>>(
+47 | |         path:P
+48 | |     )->Result<OceanField>{
+   | |_________________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:13:1
+   |
+13 | pub struct VelocityWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:24:5
+   |
+24 |     pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:58:5
+   |
+58 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:69:1
+   |
+69 | pub struct VelocityReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:74:5
+   |
+74 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:80:5
+   |
+80 |     pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `s-sof` (lib) generated 76 warnings
+   Compiling netcdf v0.12.1
+   Compiling half v2.7.1
+   Compiling num-integer v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling approx v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling naga v26.0.0
+   Compiling simba v0.9.1
+   Compiling ndarray v0.16.1
+   Compiling nalgebra v0.33.3
+   Compiling wgpu-hal v26.0.6
+   Compiling wgpu-core-deps-apple v26.0.0
+   Compiling wgpu-core v26.0.1
+   Compiling wgpu v26.0.1
+   Compiling s-renderer v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/crates/s-renderer)
+warning: unused import: `wgpu::util::DeviceExt`
+ --> crates/s-renderer/src/velocity_renderer.rs:1:5
+  |
+1 | use wgpu::util::DeviceExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-renderer` (lib) generated 1 warning (run `cargo fix --lib -p s-renderer` to apply 1 suggestion)
+   Compiling simulator v0.1.0 (/Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/apps/simulator)
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::create_window`: use `ActiveEventLoop::create_window` instead
+  --> apps/simulator/src/render.rs:22:38
+   |
+22 |     let window = Arc::new(event_loop.create_window(
+   |                                      ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::create_window`: use `ActiveEventLoop::create_window` instead
+  --> apps/simulator/src/render.rs:25:43
+   |
+25 |     let time_window = Arc::new(event_loop.create_window(
+   |                                           ^^^^^^^^^^^^^
+
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::run`: use `EventLoop::run_app` instead
+  --> apps/simulator/src/render.rs:91:16
+   |
+91 |     event_loop.run(move |event, target| {
+   |                ^^^
+
+warning: unused import: `Field`
+ --> apps/simulator/src/engine.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> apps/simulator/src/render.rs:2:28
+  |
+2 | use s_field::{Coordinates, Field};
+  |                            ^^^^^
+
+warning: value captured by `last_flow_count` is never read
+   --> apps/simulator/src/render.rs:113:21
+    |
+113 |                     last_flow_count = active_seeds.len();
+    |                     ^^^^^^^^^^^^^^^
+    |
+    = help: did you mean to capture by reference instead?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `last_flow_count` is never read
+   --> apps/simulator/src/render.rs:113:21
+    |
+113 |                     last_flow_count = active_seeds.len();
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+
+warning: `simulator` (bin "simulator") generated 7 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 21.00s
+     Running `target/debug/simulator --cpu --fresh`
+=== Suruga Ocean Simulator ===
+Compute backend: CPU reference
+Config: /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/apps/simulator/config/simulator.json
+Workspace: /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed
+Resume latest checkpoint: false
+[1/7] 設定・入力データを読み込みます
+[2/7] 地形に基づく格子: 13 × 22 × 13 (lon × lat × depth)
+      深度 0..3000m / Δz=250m / dx=7300.1m / dy=4421.6m
+[3/7] 初期状態をSOF化: /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/runs/suruga_bay/input.sof
+      source grid=13×22×13, masked land/sub-bottom cells=3535
+[4/7] CPU計算エンジンを初期化します
+[5/7] リアルタイム表示システムを起動します
+Terrain mesh: 9600 vertices / 56406 indices
+Bathymetry contours: 6600 vertices
+Flow seeds: 139, depth levels: 13
+[6/7] シミュレーションと描画を同じ実行ループで開始します
+FPS: 4.1 | step: 36 | sim t: 0.36s / 60.00s | flow vertices: 1700
+FPS: 2.6 | step: 60 | sim t: 0.60s / 60.00s | flow vertices: 2420
+FPS: 3.2 | step: 88 | sim t: 0.88s / 60.00s | flow vertices: 3136
+FPS: 4.0 | step: 124 | sim t: 1.24s / 60.00s | flow vertices: 3810
+FPS: 4.2 | step: 160 | sim t: 1.60s / 60.00s | flow vertices: 4540
+FPS: 4.3 | step: 196 | sim t: 1.96s / 60.00s | flow vertices: 5186
+FPS: 4.3 | step: 232 | sim t: 2.32s / 60.00s | flow vertices: 5052
+FPS: 4.3 | step: 268 | sim t: 2.68s / 60.00s | flow vertices: 4852
+FPS: 4.5 | step: 304 | sim t: 3.04s / 60.00s | flow vertices: 5076
+FPS: 4.5 | step: 340 | sim t: 3.40s / 60.00s | flow vertices: 4850
+FPS: 4.5 | step: 380 | sim t: 3.80s / 60.00s | flow vertices: 4956
+FPS: 4.6 | step: 420 | sim t: 4.20s / 60.00s | flow vertices: 5046
+FPS: 4.6 | step: 460 | sim t: 4.60s / 60.00s | flow vertices: 5206
+FPS: 4.6 | step: 500 | sim t: 5.00s / 60.00s | flow vertices: 5136
+FPS: 4.6 | step: 540 | sim t: 5.40s / 60.00s | flow vertices: 4820
+FPS: 4.6 | step: 580 | sim t: 5.80s / 60.00s | flow vertices: 4688
+checkpoint saved: /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/runs/suruga_bay/checkpoints/step_000000000600
+FPS: 4.4 | step: 616 | sim t: 6.16s / 60.00s | flow vertices: 5140
+FPS: 4.7 | step: 656 | sim t: 6.56s / 60.00s | flow vertices: 4818
+FPS: 4.7 | step: 696 | sim t: 6.96s / 60.00s | flow vertices: 5010
+FPS: 4.7 | step: 736 | sim t: 7.36s / 60.00s | flow vertices: 4982
+final SOF saved: /Users/sugisaku/Downloads/SOS_simulator_timefinder_metal_fps_fixed/runs/suruga_bay/final.sof
+シミュレーションを途中終了し、現在状態を保存しました (step=744)
+warning: unused import: `Field`
+ --> crates/s-field/src/salinity.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> crates/s-field/src/temperature.rs:3:13
+  |
+3 | use crate::{Field, Field4D, Grid4D};
+  |             ^^^^^
+
+warning: unused variable: `grid`
+  --> crates/s-field/src/ocean.rs:44:13
+   |
+44 |         let grid = velocity.grid().clone();
+   |             ^^^^ help: if this is intentional, prefix it with an underscore: `_grid`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-field` (lib) generated 3 warnings (run `cargo fix --lib -p s-field` to apply 1 suggestion)
+warning: unused import: `Field`
+ --> crates/s-sof/src/writer.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:8:1
+  |
+8 | pub mod boundary;
+  | ^^^^^^^^^^^^^^^^
+  |
+note: the lint level is defined here
+ --> crates/s-sof/src/lib.rs:1:9
+  |
+1 | #![warn(missing_docs)]
+  |         ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+ --> crates/s-sof/src/lib.rs:9:1
+  |
+9 | pub mod builder;
+  | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:10:1
+   |
+10 | pub mod dataset;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:11:1
+   |
+11 | pub mod error;
+   | ^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:12:1
+   |
+12 | pub mod forcing;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:13:1
+   |
+13 | pub mod format;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:14:1
+   |
+14 | pub mod grid;
+   | ^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:15:1
+   |
+15 | pub mod initial;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:18:1
+   |
+18 | pub mod package_reader;
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:19:1
+   |
+19 | pub mod reader;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:20:1
+   |
+20 | pub mod restart;
+   | ^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:21:1
+   |
+21 | pub mod velocity;
+   | ^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a module
+  --> crates/s-sof/src/lib.rs:22:1
+   |
+22 | pub mod writer;
+   | ^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/builder.rs:62:5
+   |
+62 |     pub fn new(name: impl Into<String>) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/builder.rs:86:5
+   |
+86 | /     pub fn grid(
+87 | |         mut self,
+88 | |         grid: Grid4D,
+89 | |         latitude: Vec<f32>,
+...  |
+92 | |         bathymetry: Vec<f32>,
+93 | |     ) -> Self {
+   | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:126:5
+    |
+126 | /     pub fn boundary(
+127 | |         mut self,
+128 | |         field: OceanField
+129 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:140:5
+    |
+140 | /     pub fn initial(
+141 | |         mut self,
+142 | |         field: OceanField
+143 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:155:5
+    |
+155 | /     pub fn restart(
+156 | |         mut self,
+157 | |         field: OceanField
+158 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:170:5
+    |
+170 | /     pub fn forcing(
+171 | |         mut self,
+172 | |         wind_u: Vec<f32>,
+173 | |         wind_v: Vec<f32>,
+174 | |         surface_heat: Vec<f32>,
+175 | |     ) -> Self {
+    | |_____________^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/builder.rs:196:5
+    |
+196 | /     pub fn build<P: AsRef<Path>>(
+197 | |         self,
+198 | |         output:P
+199 | |     )->Result<SofPackage>{
+    | |_________________________^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:42:5
+   |
+42 |     pub fn new(name: impl Into<String>, dataset_type: DatasetType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/dataset.rs:71:5
+   |
+71 |     pub fn add_variable(&mut self, variable: VariableInfo) {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/dataset.rs:87:5
+   |
+87 |     pub fn new(name: impl Into<String>, variable_type: VariableType) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a variant
+  --> crates/s-sof/src/dataset.rs:99:5
+   |
+99 |     Velocity,
+   |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:101:5
+    |
+101 |     Temperature,
+    |     ^^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:103:5
+    |
+103 |     Salinity,
+    |     ^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:105:5
+    |
+105 |     Coordinate,
+    |     ^^^^^^^^^^
+
+warning: missing documentation for a variant
+   --> crates/s-sof/src/dataset.rs:107:5
+    |
+107 |     Scalar,
+    |     ^^^^^^
+
+warning: missing documentation for a struct
+ --> crates/s-sof/src/forcing.rs:7:1
+  |
+7 | pub struct ForcingWriter {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:12:5
+   |
+12 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:18:5
+   |
+18 |     pub fn write(&mut self, wind_u: &[f32], wind_v: &[f32], surface_heat: &[f32]) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:38:5
+   |
+38 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:45:1
+   |
+45 | pub struct ForcingReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/forcing.rs:50:5
+   |
+50 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/forcing.rs:56:5
+   |
+56 |     pub fn read(&mut self) -> Result<ForcingData> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/forcing.rs:67:1
+   |
+67 | pub struct ForcingData {
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:68:5
+   |
+68 |     pub wind_u: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:70:5
+   |
+70 |     pub wind_v: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/forcing.rs:72:5
+   |
+72 |     pub surface_heat: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:1:1
+  |
+1 | pub const SOF_MAGIC: &[u8; 8] = b"SOF00001";
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a constant
+ --> crates/s-sof/src/format.rs:3:1
+  |
+3 | pub const SOF_VERSION: u32 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:13:1
+   |
+13 | pub struct GridWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/grid.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:24:5
+   |
+24 | /     pub fn write(
+25 | |         &mut self,
+26 | |         grid: &Grid4D,
+27 | |         latitude: &[f32],
+...  |
+30 | |         bathymetry: &[f32],
+31 | |     ) -> Result<()> {
+   | |___________________^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/grid.rs:70:5
+   |
+70 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/grid.rs:82:1
+   |
+82 | pub struct GridData {
+   | ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:83:5
+   |
+83 |     pub size: [usize; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:85:5
+   |
+85 |     pub spacing: [f32; 4],
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:87:5
+   |
+87 |     pub latitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:89:5
+   |
+89 |     pub longitude: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:91:5
+   |
+91 |     pub depth: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct field
+  --> crates/s-sof/src/grid.rs:93:5
+   |
+93 |     pub bathymetry: Vec<f32>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> crates/s-sof/src/grid.rs:100:1
+    |
+100 | pub struct GridReader {
+    | ^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+   --> crates/s-sof/src/grid.rs:105:5
+    |
+105 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/grid.rs:111:5
+    |
+111 |     pub fn read(&mut self) -> Result<GridData> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:10:1
+   |
+10 | pub struct InitialWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:13:5
+   |
+13 |     pub fn write<P: AsRef<Path>>(path: P, field: &OceanField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/initial.rs:22:1
+   |
+22 | pub struct InitialReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/initial.rs:25:5
+   |
+25 |     pub fn read<P: AsRef<Path>>(path: P) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:232:5
+    |
+232 |     pub fn write_initial(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+   --> crates/s-sof/src/package.rs:238:5
+    |
+238 |     pub fn write_restart(&self, field: &OceanField) -> Result<()> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/reader.rs:10:1
+   |
+10 | pub struct BoundaryReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/reader.rs:15:5
+   |
+15 |     pub fn open(path: &str) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/reader.rs:21:5
+   |
+21 |     pub fn read(&mut self) -> Result<OceanField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:12:1
+   |
+12 | pub struct RestartWriter;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:18:5
+   |
+18 | /     pub fn write<P:AsRef<Path>>(
+19 | |         path:P,
+20 | |         field:&OceanField
+21 | |     )->Result<()> {
+   | |_________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/restart.rs:39:1
+   |
+39 | pub struct RestartReader;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/restart.rs:46:5
+   |
+46 | /     pub fn read<P:AsRef<Path>>(
+47 | |         path:P
+48 | |     )->Result<OceanField>{
+   | |_________________________^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:13:1
+   |
+13 | pub struct VelocityWriter {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:18:5
+   |
+18 |     pub fn create<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:24:5
+   |
+24 |     pub fn write(&mut self, velocity: &VelocityField) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:58:5
+   |
+58 |     pub fn finish(self) -> Result<()> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+  --> crates/s-sof/src/velocity.rs:69:1
+   |
+69 | pub struct VelocityReader {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for an associated function
+  --> crates/s-sof/src/velocity.rs:74:5
+   |
+74 |     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a method
+  --> crates/s-sof/src/velocity.rs:80:5
+   |
+80 |     pub fn read(&mut self, coordinates: Coordinates) -> Result<VelocityField> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `s-sof` (lib) generated 76 warnings
+warning: unused import: `wgpu::util::DeviceExt`
+ --> crates/s-renderer/src/velocity_renderer.rs:1:5
+  |
+1 | use wgpu::util::DeviceExt;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `s-renderer` (lib) generated 1 warning (run `cargo fix --lib -p s-renderer` to apply 1 suggestion)
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::create_window`: use `ActiveEventLoop::create_window` instead
+  --> apps/simulator/src/render.rs:22:38
+   |
+22 |     let window = Arc::new(event_loop.create_window(
+   |                                      ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::create_window`: use `ActiveEventLoop::create_window` instead
+  --> apps/simulator/src/render.rs:25:43
+   |
+25 |     let time_window = Arc::new(event_loop.create_window(
+   |                                           ^^^^^^^^^^^^^
+
+warning: use of deprecated method `winit::event_loop::EventLoop::<T>::run`: use `EventLoop::run_app` instead
+  --> apps/simulator/src/render.rs:91:16
+   |
+91 |     event_loop.run(move |event, target| {
+   |                ^^^
+
+warning: unused import: `Field`
+ --> apps/simulator/src/engine.rs:3:15
+  |
+3 | use s_field::{Field, OceanField};
+  |               ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Field`
+ --> apps/simulator/src/render.rs:2:28
+  |
+2 | use s_field::{Coordinates, Field};
+  |                            ^^^^^
+
+warning: value captured by `last_flow_count` is never read
+   --> apps/simulator/src/render.rs:113:21
+    |
+113 |                     last_flow_count = active_seeds.len();
+    |                     ^^^^^^^^^^^^^^^
+    |
+    = help: did you mean to capture by reference instead?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `last_flow_count` is never read
+   --> apps/simulator/src/render.rs:113:21
+    |
+113 |                     last_flow_count = active_seeds.len();
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+
+warning: `simulator` (bin "simulator") generated 7 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.37s
+     Running `target/debug/simulator --metal --fresh`
