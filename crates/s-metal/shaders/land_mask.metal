@@ -46,6 +46,13 @@ kernel void land_mask_step(
     {
         out_u[i] = in_u[i];
         out_v[i] = in_v[i];
-        out_w[i] = in_w[i];
+        // Rigid-lid / impermeable-bottom approximation: the current model has
+        // no prognostic free-surface elevation, so normal velocity is constrained.
+        bool vertical_wall = (gid.z == 0 || gid.z + 1 >= grid.nz);
+        if (!vertical_wall && gid.z + 1 < grid.nz) {
+            uint below = (gid.z + 1) * grid.nx * grid.ny + gid.y * grid.nx + gid.x;
+            vertical_wall = mask[below] > 0.5f;
+        }
+        out_w[i] = vertical_wall ? 0.0f : in_w[i];
     }
 }

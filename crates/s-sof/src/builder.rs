@@ -20,6 +20,8 @@ pub struct SofPackageBuilder {
 
     grid: Option<GridDataBuilder>,
 
+    terrain: Option<GridDataBuilder>,
+
     boundary: Option<OceanField>,
 
     initial: Option<OceanField>,
@@ -65,6 +67,8 @@ impl SofPackageBuilder {
 
             grid: None,
 
+            terrain: None,
+
             boundary: None,
 
             initial: None,
@@ -105,7 +109,18 @@ impl SofPackageBuilder {
 
     }
 
-
+    /// Adds a high-resolution terrain dataset separate from the solver grid.
+    pub fn terrain(
+        mut self,
+        grid: Grid4D,
+        latitude: Vec<f32>,
+        longitude: Vec<f32>,
+        depth: Vec<f32>,
+        bathymetry: Vec<f32>,
+    ) -> Self {
+        self.terrain = Some(GridDataBuilder { grid, latitude, longitude, depth, bathymetry });
+        self
+    }
 
 
     pub fn boundary(
@@ -220,6 +235,21 @@ impl SofPackageBuilder {
 
 
 
+        // Optional high-resolution terrain.snc
+        let has_terrain = self.terrain.is_some();
+        if let Some(terrain) = self.terrain {
+            let path = output.join("terrain.snc");
+            let mut writer = GridWriter::create(&path)?;
+            writer.write(
+                &terrain.grid,
+                &terrain.latitude,
+                &terrain.longitude,
+                &terrain.depth,
+                &terrain.bathymetry,
+            )?;
+            writer.finish()?;
+        }
+
         // boundary.snc
 
         if let Some(field)=self.boundary {
@@ -313,6 +343,8 @@ impl SofPackageBuilder {
                 restart: Some("restart.snc".into()),
 
                 forcing: Some("forcing.snc".into()),
+
+                terrain: if has_terrain { Some("terrain.snc".into()) } else { None },
 
             };
 

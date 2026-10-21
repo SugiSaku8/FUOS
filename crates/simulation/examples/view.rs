@@ -49,9 +49,9 @@ fn main() -> Result<()> {
 
     let terrain = TerrainMesh::from_heightmap(&heightmap, bounds, 0.02);
 
-    println!("Terrain vertices : {}", terrain.vertices.len());
+    println!("Terrain vertices : {}", terrain.vertex_count());
 
-    println!("Terrain indices : {}", terrain.indices.len());
+    println!("Terrain indices : {}", terrain.index_count());
 
     //
     // Renderer
@@ -86,7 +86,7 @@ fn main() -> Result<()> {
             }
 
             WindowEvent::RedrawRequested => {
-                if let Err(e) = renderer.render(&gpu_terrain, None, None) {
+                if let Err(e) = renderer.render(&gpu_terrain, None, None, None) {
                     eprintln!("Render error: {}", e);
                 }
             }

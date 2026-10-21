@@ -1,0 +1,8 @@
+[package]
+name = "s-cpu"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+s-field = { path = "../s-field" }
+physics = { path = "../physics" }

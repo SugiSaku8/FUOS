@@ -32,7 +32,7 @@ impl CameraController {
     pub fn new() -> Self {
         Self {
             // 駿河湾のワールド座標に合わせた移動速度。
-            speed: 5000.0,
+            speed: 30000.0,
 
             sensitivity: 0.003,
 
@@ -53,6 +53,9 @@ impl CameraController {
             zoom: 0.0,
         }
     }
+
+    /// Set fly-through speed in world units per second.
+    pub fn set_speed(&mut self, speed: f32) { if speed.is_finite() { self.speed = speed.clamp(100.0, 100_000.0); } }
 
     /// ウィンドウイベントを処理する。
     pub fn process(&mut self, event: &WindowEvent) {
@@ -153,7 +156,7 @@ impl CameraController {
         if self.zoom != 0.0 {
             let forward = Vector3::new(camera.yaw.cos(), 0.0, camera.yaw.sin()).normalize();
 
-            camera.position += forward * self.zoom * 10000.0;
+            camera.position += forward * self.zoom * self.speed;
 
             self.zoom = 0.0;
         }

@@ -43,11 +43,9 @@ kernel void diffusion_step(
     constant GridInfo& grid
         [[buffer(2)]],
 
-    constant float& viscosity
-        [[buffer(3)]],
-
-    constant float& dt
-        [[buffer(4)]],
+    constant float& viscosity_horizontal [[buffer(3)]],
+    constant float& viscosity_vertical [[buffer(4)]],
+    constant float& dt [[buffer(5)]],
 
     uint3 id
         [[thread_position_in_grid]]
@@ -108,53 +106,13 @@ kernel void diffusion_step(
 
 
 
-    float laplacian =
-        (
-            input[xp]
-            +
-            input[xm]
-            -
-            2.0*input[i]
-        )
-        /
-        (grid.dx*grid.dx)
+    float laplacian_horizontal =
+        (input[xp] + input[xm] - 2.0*input[i])/(grid.dx*grid.dx)
+        + (input[yp] + input[ym] - 2.0*input[i])/(grid.dy*grid.dy);
+    float laplacian_vertical =
+        (input[zp] + input[zm] - 2.0*input[i])/(grid.dz*grid.dz);
 
-
-        +
-
-        (
-            input[yp]
-            +
-            input[ym]
-            -
-            2.0*input[i]
-        )
-        /
-        (grid.dy*grid.dy)
-
-
-        +
-
-        (
-            input[zp]
-            +
-            input[zm]
-            -
-            2.0*input[i]
-        )
-        /
-        (grid.dz*grid.dz);
-
-
-
-    output[i]
-        =
-        input[i]
-        +
-        dt
-        *
-        viscosity
-        *
-        laplacian;
+    output[i] = input[i] + dt *
+        (viscosity_horizontal * laplacian_horizontal + viscosity_vertical * laplacian_vertical);
 
 }

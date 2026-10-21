@@ -39,6 +39,7 @@ impl GpuFlowMesh {
         let initial_contents = if vertices.is_empty() {
             bytemuck::cast_slice(&[FlowVertex {
                 position: [0.0, 0.0, 0.0],
+                    color: FlowVertex::CYAN,
             }])
         } else {
             bytemuck::cast_slice(vertices)

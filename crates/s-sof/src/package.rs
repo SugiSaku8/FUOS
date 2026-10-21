@@ -58,6 +58,10 @@ pub struct PackageFiles {
 
     /// External forcing dataset.
     pub forcing: Option<String>,
+
+    /// Optional high-resolution terrain dataset, separate from the solver grid.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub terrain: Option<String>,
 }
 
 /// A SOF package directory.
@@ -116,6 +120,11 @@ impl SofPackage {
         self.manifest.files.boundary.is_some()
     }
 
+    /// Checks high-resolution terrain existence.
+    pub fn has_terrain(&self) -> bool {
+        self.manifest.files.terrain.is_some()
+    }
+
     // --------------------------------------------------
     // Path
     // --------------------------------------------------
@@ -132,6 +141,11 @@ impl SofPackage {
             .boundary
             .as_ref()
             .map(|v| self.root.join(v))
+    }
+
+    /// High-resolution terrain file path.
+    pub fn terrain_path(&self) -> Option<PathBuf> {
+        self.manifest.files.terrain.as_ref().map(|v| self.root.join(v))
     }
 
     // --------------------------------------------------
@@ -171,6 +185,13 @@ impl SofPackage {
 
         let mut reader = GridReader::open(path)?;
 
+        reader.read()
+    }
+
+    /// Reads optional high-resolution terrain dataset.
+    pub fn read_terrain(&self) -> Result<GridData> {
+        let path = self.terrain_path().expect("terrain dataset is not defined");
+        let mut reader = GridReader::open(path)?;
         reader.read()
     }
 

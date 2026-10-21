@@ -17,4 +17,4 @@ anyhow = "1"
 
 name = "run_suruga"
 
-path = "examples/run_suruga.rs"
+path = "examples/run.rs"

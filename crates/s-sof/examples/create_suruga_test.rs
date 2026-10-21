@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use s_field::{
-    Coordinates, Field, Grid4D, Metadata, OceanField, SalinityField, TemperatureField,
+    BoundaryField, Coordinates, Field, Grid4D, Metadata, OceanField, SalinityField, TemperatureField,
     VelocityField,
 };
 
@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Grid
     //
 
-    let grid = Grid4D::new([32, 32, 10, 1], [0.01, 0.01, 10.0, 1.0]);
+    let grid = Grid4D::new([1, 10, 32, 32], [1.0, 50.0, 1_100.0, 900.0]);
 
     //
     // Coordinates
@@ -92,6 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         velocity,
         temperature,
         salinity,
+        BoundaryField::zeros(grid.clone()),
     );
     //
     // Create SOF package

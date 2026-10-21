@@ -9,3 +9,4 @@ edition = "2021"
 metal = "0.29"
 objc = "0.2"
 s-field = {path = "../s-field"}
+physics = { path = "../physics" }

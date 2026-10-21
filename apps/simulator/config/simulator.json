@@ -1,51 +1,45 @@
 {
-  "project": {
-    "name": "suruga_bay",
-    "output_root": "runs/suruga_bay",
-    "prepared_sof": "runs/suruga_bay/input.sof"
+  "name": "suruga_bay",
+  "input": {
+    "terrain_grid": "suruga_bay.sof/grid.snc",
+    "source_coordinates": "crates/s-builder/suruga_raw/coordinates.json",
+    "velocity_u": "crates/s-builder/suruga_raw/u.bin",
+    "velocity_v": "crates/s-builder/suruga_raw/v.bin",
+    "temperature": "crates/s-builder/suruga_raw/temperature.bin",
+    "salinity": "crates/s-builder/suruga_raw/salinity.bin"
   },
-  "terrain": {
-    "source": "suruga_bay.sof/grid.snc",
-    "format": "sof_grid",
-    "vertical_scale": 5.0,
-    "contour_interval_m": 250.0
-  },
-  "ocean_data": {
-    "root": "crates/s-builder/suruga_raw",
-    "u": "u.bin",
-    "v": "v.bin",
-    "temperature": "temperature.bin",
-    "salinity": "salinity.bin",
-    "coordinates": "coordinates.json",
-    "grid": "grid.json",
-    "source_depths_m": [0.0, 10.0, 20.0, 50.0, 100.0, 200.0],
-    "target_depth_interval_m": 250.0,
-    "deep_extension": "exponential_decay",
-    "deep_decay_scale_m": 1200.0,
-    "vertical_velocity_if_missing": 0.0
+  "grid": {
+    "depth_interval_m": 250.0,
+    "deep_velocity_decay_scale_m": 1200.0,
+    "terrain_vertical_scale": 5.0,
+    "world_scale": 100000.0
   },
   "simulation": {
-    "dt_seconds": 1.0,
-    "duration_seconds": 3600.0,
-    "steps_per_checkpoint": 60,
-    "steps_per_render_update": 1,
-    "use_metal": true
+    "dt_seconds": 0.01,
+    "duration_seconds": 60.0,
+    "steps_per_frame": 4,
+    "steps_per_checkpoint": 600,
+    "use_metal": true,
+    "kuroshio_inflow": true,
+    "scalar_diffusivity_m2_s": 1e-05,
+    "horizontal_viscosity_m2_s": 10.0,
+    "vertical_viscosity_m2_s": 0.0001,
+    "bottom_drag_coefficient": 0.0025
   },
   "render": {
     "enabled": true,
-    "title": "Suruga Ocean Simulator",
-    "show_terrain": true,
-    "show_streamlines": true,
-    "show_particles": true,
-    "show_depth_layers": true,
-    "streamline_depth_interval_m": 250.0,
-    "vertical_scale": 5.0,
-    "target_fps": 60
+    "show_ocean_surface": true,
+    "show_bathymetry_contours": true,
+    "contour_interval_m": 250.0,
+    "particle_trail_points": 48,
+    "particle_speed_multiplier": 240.0,
+    "seed_stride_x": 1,
+    "seed_stride_y": 1
   },
   "output": {
-    "checkpoint_dir": "runs/suruga_bay/checkpoints",
-    "final_sof": "runs/suruga_bay/final.sof",
-    "write_checkpoint_manifest": true,
-    "keep_checkpoints": true
+    "root": "runs/suruga_bay",
+    "save_checkpoints": true,
+    "save_final": true,
+    "resume_from_latest": false
   }
 }

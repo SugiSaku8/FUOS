@@ -20,6 +20,17 @@ pub fn generate_bathymetry_contours(
     vertical_scale: f32,
     interval_m: f32,
 ) -> Vec<FlowVertex> {
+    generate_bathymetry_contours_with_scale(heightmap, bounds, vertical_scale, interval_m, 100_000.0)
+}
+
+/// 指定ワールドスケールで海底等深線を生成する。
+pub fn generate_bathymetry_contours_with_scale(
+    heightmap: &HeightMap,
+    bounds: GeoBounds,
+    vertical_scale: f32,
+    interval_m: f32,
+    world_scale: f32,
+) -> Vec<FlowVertex> {
     let width = heightmap.width;
     let height = heightmap.height;
 
@@ -27,7 +38,7 @@ pub fn generate_bathymetry_contours(
         return Vec::new();
     }
 
-    let converter = GeoConverter::new(bounds, 100_000.0);
+    let converter = GeoConverter::new(bounds, world_scale);
     let mut vertices = Vec::new();
 
     // 250 mなど、指定された間隔ごとに等深線を生成する。
@@ -135,9 +146,9 @@ pub fn generate_bathymetry_contours(
                     world_a[1] = y;
                     world_b[1] = y;
 
-                    vertices.push(FlowVertex { position: world_a });
+                    vertices.push(FlowVertex { position: world_a, color: FlowVertex::CONTOUR });
 
-                    vertices.push(FlowVertex { position: world_b });
+                    vertices.push(FlowVertex { position: world_b, color: FlowVertex::CONTOUR });
                 }
             }
         }

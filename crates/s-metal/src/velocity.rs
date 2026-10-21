@@ -29,13 +29,15 @@ impl GpuVelocityField {
 
         let spacing = velocity.spacing();
 
+        // CPU storage is [depth, latitude, longitude] with longitude contiguous.
+        // Metal kernels index x=longitude, y=latitude, z=depth.
         let grid = GridInfo::new(
-            shape[0] as u32,
-            shape[1] as u32,
             shape[2] as u32,
-            spacing[0],
-            spacing[1],
+            shape[1] as u32,
+            shape[0] as u32,
+            spacing[3],
             spacing[2],
+            spacing[1],
         );
 
         //
@@ -56,16 +58,6 @@ impl GpuVelocityField {
 
             grid,
         };
-
-        //
-        // Debug upload check
-        //
-        let center =
-            (shape[2] / 2) * shape[0] * shape[1] + (shape[1] / 2) * shape[0] + shape[0] / 2;
-
-        let uploaded = gpu.u.download(context);
-
-        println!("GPU upload center = {}", uploaded[center]);
 
         gpu
     }
@@ -101,8 +93,8 @@ impl GpuVelocityField {
         let nz = self.grid.nz() as usize;
 
         let grid = s_field::Grid4D::new(
-            [nx, ny, nz, 1],
-            [self.grid.dx(), self.grid.dy(), self.grid.dz(), 1.0],
+            [1, nz, ny, nx],
+            [1.0, self.grid.dz(), self.grid.dy(), self.grid.dx()],
         );
 
         //

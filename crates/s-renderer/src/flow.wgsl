@@ -12,16 +12,16 @@ struct VertexInput {
 
     @location(0)
     position: vec3<f32>,
+    @location(1)
+    color: vec3<f32>,
 
 };
 
 
 
 struct VertexOutput {
-
-    @builtin(position)
-    position: vec4<f32>,
-
+    @builtin(position) position: vec4<f32>,
+    @location(0) color: vec3<f32>,
 };
 
 
@@ -36,13 +36,8 @@ fn vs_main(
     var out:VertexOutput;
 
 
-    out.position =
-        camera.view_proj
-        *
-        vec4<f32>(
-            input.position,
-            1.0
-        );
+    out.position = camera.view_proj * vec4<f32>(input.position, 1.0);
+    out.color = input.color;
 
 
     return out;
@@ -52,16 +47,6 @@ fn vs_main(
 
 
 @fragment
-fn fs_main()
--> @location(0) vec4<f32>
-{
-
-    //
-    // 黒潮表示用
-    //
-    // 後で速度値によって
-    // 色変更する
-    //
-
-    return vec4<f32>(0.0, 0.9, 1.0, 1.0);
+fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
+    return vec4<f32>(input.color, 1.0);
 }

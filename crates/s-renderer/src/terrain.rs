@@ -16,6 +16,16 @@ impl TerrainMesh {
     ///
     /// vertical_scaleは高さ方向の倍率。
     pub fn from_heightmap(heightmap: &HeightMap, bounds: GeoBounds, vertical_scale: f32) -> Self {
+        Self::from_heightmap_with_scale(heightmap, bounds, vertical_scale, 100_000.0)
+    }
+
+    /// HeightMapから指定ワールドスケールで地形メッシュを生成する。
+    pub fn from_heightmap_with_scale(
+        heightmap: &HeightMap,
+        bounds: GeoBounds,
+        vertical_scale: f32,
+        world_scale: f32,
+    ) -> Self {
         assert!(heightmap.width >= 2);
         assert!(heightmap.height >= 2);
 
@@ -23,7 +33,7 @@ impl TerrainMesh {
 
         assert!(vertical_scale.is_finite());
 
-        let converter = GeoConverter::new(bounds, 100_000.0);
+        let converter = GeoConverter::new(bounds, world_scale);
 
         let mut vertices = Vec::with_capacity(heightmap.width * heightmap.height);
 
@@ -99,6 +109,11 @@ pub struct OceanSurfaceMesh {
 
 impl OceanSurfaceMesh {
     pub fn new(bounds: GeoBounds, heightmap: &HeightMap) -> Self {
+        Self::new_with_scale(&bounds, heightmap, 100_000.0)
+    }
+
+    /// 指定ワールドスケールで海面メッシュを生成する。
+    pub fn new_with_scale(bounds: &GeoBounds, heightmap: &HeightMap, world_scale: f32) -> Self {
         assert!(heightmap.width >= 2);
         assert!(heightmap.height >= 2);
         assert_eq!(heightmap.data.len(), heightmap.width * heightmap.height);
@@ -106,7 +121,7 @@ impl OceanSurfaceMesh {
         let width = heightmap.width;
         let height = heightmap.height;
 
-        let converter = GeoConverter::new(bounds, 100_000.0);
+        let converter = GeoConverter::new(*bounds, world_scale);
 
         let mut vertices = Vec::with_capacity(width * height);
 

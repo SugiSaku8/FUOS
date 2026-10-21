@@ -15,5 +15,6 @@ members = [
     "crates/s-renderer",
     "crates/gui",
     "crates/util",
-    "crates/s-metal"
- , "crates/simulation"]
+    "crates/s-metal",
+    "crates/s-cpu"
+]

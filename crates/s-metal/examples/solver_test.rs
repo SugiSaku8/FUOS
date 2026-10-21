@@ -1,8 +1,6 @@
-use s_field::{
-    Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField,
-};
-
-use s_metal::{MetalContext, OceanSolver};
+use s_field::{Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField, BoundaryField};
+use s_metal::{GpuOceanState, MetalContext, OceanSolver};
+use std::sync::Arc;
 
 fn main() {
     //
@@ -18,7 +16,7 @@ fn main() {
     let nz = 16;
     let nt = 1;
 
-    let grid = Grid4D::new([nx, ny, nz, nt], [1.0, 1.0, 1.0, 1.0]);
+    let grid = Grid4D::new([nt, nz, ny, nx], [1.0, 1.0, 1.0, 1.0]);
 
     //
     // Coordinates
@@ -43,7 +41,7 @@ fn main() {
     //
     // OceanField
     //
-    let mut ocean = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
+    let mut ocean = OceanField::new(coordinates, metadata, velocity, temperature, salinity, BoundaryField::zeros(grid));
 
     //
     // Initial velocity
@@ -110,14 +108,16 @@ fn main() {
     //
     // Solver
     //
-    let solver = OceanSolver::new(context);
-
-    solver.step(&mut ocean, 0.01);
+    let context = Arc::new(context);
+    let solver = OceanSolver::new(context.clone());
+    let mut gpu_state = GpuOceanState::from_ocean(&context, &ocean);
+    solver.step(&mut gpu_state, 0.01);
+    let result = gpu_state.download_velocity(&context);
 
     //
     // CPU result
     //
-    let after = ocean.velocity().u().time_slice(0).unwrap();
+    let after = result.u().time_slice(0).unwrap();
 
     println!("CPU after center = {}", after[cz * nx * ny + cy * nx + cx]);
 

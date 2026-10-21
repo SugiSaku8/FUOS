@@ -1,10 +1,14 @@
 pub mod advection;
+mod buoyancy;
+pub mod bottom_drag;
+pub mod coriolis;
 mod boundary;
 pub mod buffer;
 pub mod compute;
 pub mod context;
 pub mod diffusion;
 mod divergence;
+pub mod equation_of_state;
 pub mod export;
 pub mod field;
 pub mod gradient;
@@ -23,6 +27,9 @@ pub mod velocity_gradient;
 pub mod velocity_gradient_operator;
 
 pub use advection::AdvectionOperator;
+pub use buoyancy::BuoyancyOperator;
+pub use bottom_drag::BottomDragOperator;
+pub use coriolis::CoriolisOperator;
 pub use boundary::BoundaryOperator;
 pub use buffer::MetalBuffer;
 pub use context::MetalContext;

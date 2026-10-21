@@ -92,10 +92,12 @@ impl FlowGenerator {
 
                 vertices.push(FlowVertex {
                     position: world_start,
+                    color: FlowVertex::CYAN,
                 });
 
                 vertices.push(FlowVertex {
                     position: world_end,
+                    color: FlowVertex::CYAN,
                 });
 
                 longitude = next_longitude;
@@ -117,12 +119,14 @@ struct FlowParticle {
     depth: f32,
 
     trail: Vec<[f32; 3]>,
+    flow_color: [f32; 3],
 }
 
 /// 流速データを使って粒子を時間発展させるシステム。
 pub struct FlowParticleSystem {
     particles: Vec<FlowParticle>,
     max_trail_points: usize,
+    vertical_scale: f32,
 }
 
 impl FlowParticleSystem {
@@ -130,6 +134,11 @@ impl FlowParticleSystem {
     ///
     /// seedsは[経度、緯度、深度]。
     pub fn new(seeds: &[[f32; 3]], max_trail_points: usize) -> Self {
+        Self::new_with_vertical_scale(seeds, max_trail_points, OCEAN_VERTICAL_SCALE)
+    }
+
+    /// 深度方向の表示倍率を指定して粒子を作成する。
+    pub fn new_with_vertical_scale(seeds: &[[f32; 3]], max_trail_points: usize, vertical_scale: f32) -> Self {
         let particles = seeds
             .iter()
             .map(|seed| FlowParticle {
@@ -141,12 +150,14 @@ impl FlowParticleSystem {
                 depth: seed[2],
 
                 trail: Vec::new(),
+                flow_color: FlowVertex::CYAN,
             })
             .collect();
 
         Self {
             particles,
             max_trail_points: max_trail_points.max(2),
+            vertical_scale: if vertical_scale.is_finite() && vertical_scale > 0.0 { vertical_scale } else { OCEAN_VERTICAL_SCALE },
         }
     }
 
@@ -159,11 +170,32 @@ impl FlowParticleSystem {
         speed_multiplier: f32,
         time: f64,
     ) {
+        self.update_with_temperature(velocity, &[], converter, dt_seconds, speed_multiplier, time);
+    }
+
+    /// Updates particles and colors them by temperature anomaly and vertical flow.
+    /// Cyan/green highlights upward motion; warm/cold anomalies use orange/blue.
+    pub fn update_with_temperature(
+        &mut self,
+        velocity: &VelocityField,
+        temperature: &[f32],
+        converter: &GeoConverter,
+        dt_seconds: f32,
+        speed_multiplier: f32,
+        time: f64,
+    ) {
         let Some(coordinates) = velocity.coordinates() else {
             return;
         };
 
         let bounds = converter.bounds();
+        let temperature_reference = if temperature.is_empty() {
+            10.0
+        } else {
+            let (sum, count) = temperature.iter().copied().filter(|value| value.is_finite())
+                .fold((0.0_f32, 0_usize), |(sum, count), value| (sum + value, count + 1));
+            if count == 0 { 10.0 } else { sum / count as f32 }
+        };
 
         let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 100.0;
 
@@ -201,6 +233,34 @@ impl FlowParticleSystem {
             if !u.is_finite() || !v.is_finite() || !w.is_finite() {
                 Self::reset_particle(particle);
                 continue;
+            }
+
+            // Nearest-cell temperature anomaly. This is a visual diagnostic, not a
+            // substitute for the buoyancy term in the momentum equation.
+            if !temperature.is_empty() {
+                let ix = nearest_axis_index(coordinates.longitude(), particle.longitude);
+                let iy = nearest_axis_index(coordinates.latitude(), particle.latitude);
+                let iz = coordinates.depth().iter().enumerate()
+                    .min_by(|(_, a), (_, b)| (**a - particle.depth).abs().total_cmp(&(**b - particle.depth).abs()))
+                    .map(|(i, _)| i).unwrap_or(0);
+                let nx = coordinates.width(); let ny = coordinates.height();
+                let idx = iz.saturating_mul(nx * ny).saturating_add(iy.saturating_mul(nx)).saturating_add(ix);
+                let t = temperature.get(idx).copied().filter(|value| value.is_finite()).unwrap_or(temperature_reference);
+                // Use the domain mean rather than a hard-coded 10 C baseline so
+                // both warm and cold local anomalies remain visible in other seasons.
+                let anomaly = ((t - temperature_reference) / 4.0).clamp(-1.0, 1.0);
+                particle.flow_color = if w > 0.015 {
+                    [0.15, 1.0, 0.45] // local upwelling
+                } else if w < -0.015 {
+                    [0.95, 0.35, 0.12] // downwelling
+                } else if anomaly >= 0.0 {
+                    [1.0, 0.35 + 0.45 * (1.0 - anomaly), 0.08]
+                } else {
+                    [0.10, 0.45 + 0.35 * (1.0 + anomaly), 1.0]
+                };
+            } else {
+                // Turning temperature visualization off restores a neutral flow color.
+                particle.flow_color = FlowVertex::CYAN;
             }
 
             if u.hypot(v).hypot(w) < 0.02 {
@@ -245,8 +305,8 @@ impl FlowParticleSystem {
             let mut world_end = converter.ocean_to_world(next_longitude, next_latitude, next_depth);
 
             // 海面をY=0、深度を下向きにし、海底地形と同じ垂直倍率で表示する。
-            world_start[1] = -particle.depth * OCEAN_VERTICAL_SCALE;
-            world_end[1] = -next_depth * OCEAN_VERTICAL_SCALE;
+            world_start[1] = -particle.depth * self.vertical_scale;
+            world_end[1] = -next_depth * self.vertical_scale;
 
             if particle.trail.is_empty() {
                 particle.trail.push(world_start);
@@ -293,10 +353,12 @@ impl FlowParticleSystem {
             for segment in particle.trail.windows(2) {
                 vertices.push(FlowVertex {
                     position: segment[0],
+                    color: particle.flow_color,
                 });
 
                 vertices.push(FlowVertex {
                     position: segment[1],
+                    color: particle.flow_color,
                 });
             }
 
@@ -315,28 +377,34 @@ impl FlowParticleSystem {
             // X方向の線分。
             vertices.push(FlowVertex {
                 position: [x - marker_size, y, z],
+                    color: particle.flow_color,
             });
 
             vertices.push(FlowVertex {
                 position: [x + marker_size, y, z],
+                    color: particle.flow_color,
             });
 
             // Y方向の線分。
             vertices.push(FlowVertex {
                 position: [x, y - marker_size, z],
+                    color: particle.flow_color,
             });
 
             vertices.push(FlowVertex {
                 position: [x, y + marker_size, z],
+                    color: particle.flow_color,
             });
 
             // Z方向の線分。
             vertices.push(FlowVertex {
                 position: [x, y, z - marker_size],
+                    color: particle.flow_color,
             });
 
             vertices.push(FlowVertex {
                 position: [x, y, z + marker_size],
+                    color: particle.flow_color,
             });
         }
 
@@ -346,4 +414,8 @@ impl FlowParticleSystem {
     pub fn particle_count(&self) -> usize {
         self.particles.len()
     }
+}
+
+fn nearest_axis_index(axis: &[f64], value: f64) -> usize {
+    axis.iter().enumerate().min_by(|(_, a), (_, b)| (**a - value).abs().total_cmp(&(**b - value).abs())).map(|(i, _)| i).unwrap_or(0)
 }

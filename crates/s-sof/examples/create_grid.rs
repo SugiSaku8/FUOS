@@ -4,7 +4,7 @@ use s_sof::package::SofPackage;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let package = SofPackage::open("dummy_ocean.sof")?;
 
-    let grid = Grid4D::new([5, 2, 2, 1], [1.0, 1.0, 10.0, 1.0]);
+    let grid = Grid4D::new([1, 2, 2, 5], [1.0, 50.0, 1_100.0, 9_000.0]);
 
     let latitude = vec![35.0, 35.1];
 

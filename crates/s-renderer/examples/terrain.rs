@@ -227,7 +227,7 @@ fn generate_seeds(
                 let elevation = heightmap.get(map_x, map_y);
                 let seabed_depth = if elevation < 0.0 { -elevation } else { 0.0 };
 
-                if depth <= seabed_depth {
+                if elevation < 0.0 && depth <= seabed_depth {
                     seeds.push([lon as f32, lat as f32, depth]);
                 }
             }
@@ -361,8 +361,6 @@ async fn run() -> Result<()> {
         contour_vertices.len(),
         CONTOUR_INTERVAL_M
     );
-
-    let converter = GeoConverter::new(bounds, 100_000.0);
 
     let converter = GeoConverter::new(bounds, 100_000.0);
 

@@ -217,15 +217,44 @@ impl<T: Default> Field4D<T> {
 }
 
 impl<T> Field4D<T> {
+    /// Returns the contiguous data slice without requiring the `Field` trait
+    /// to be imported by downstream crates.
     #[inline]
-
-    pub fn data(&self) -> &[T] {
+    pub fn as_slice(&self) -> &[T] {
         self.storage.as_slice()
     }
 
+    /// Returns the mutable contiguous data slice without requiring the `Field`
+    /// trait to be imported by downstream crates.
     #[inline]
-
-    pub fn data_mut(&mut self) -> &mut [T] {
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
         self.storage.as_mut_slice()
+    }
+
+    /// Backwards-compatible alias for the contiguous data slice.
+    #[inline]
+    pub fn data(&self) -> &[T] {
+        self.as_slice()
+    }
+
+    /// Backwards-compatible alias for the mutable contiguous data slice.
+    #[inline]
+    pub fn data_mut(&mut self) -> &mut [T] {
+        self.as_mut_slice()
+    }
+}
+
+#[cfg(test)]
+mod slice_api_tests {
+    use super::*;
+    use crate::Grid4D;
+
+    #[test]
+    fn inherent_slice_accessors_work_without_trait_dispatch() {
+        let grid = Grid4D::new([1, 1, 2, 2], [1.0; 4]);
+        let mut field = Field4D::from_vec(grid, vec![1_u32, 2, 3, 4]);
+        assert_eq!(field.as_slice(), &[1, 2, 3, 4]);
+        field.as_mut_slice()[2] = 9;
+        assert_eq!(field.data(), &[1, 2, 9, 4]);
     }
 }

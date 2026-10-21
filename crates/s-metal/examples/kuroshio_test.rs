@@ -1,129 +1,44 @@
-use s_field::{
-    Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField,
-};
+use std::sync::Arc;
 
-use s_metal::{MetalContext, OceanSolver};
+use s_field::{BoundaryField, Coordinates, Grid4D, Metadata, OceanField, SalinityField, TemperatureField, VelocityField};
+use s_metal::{GpuOceanState, MetalContext, OceanSolver};
 
 fn main() {
-    //
-    // Grid
-    //
-    let grid = Grid4D::new([32, 32, 16, 1], [1000.0, 1000.0, 50.0, 1.0]);
-
+    let nx = 32;
+    let ny = 32;
+    let nz = 16;
+    let grid = Grid4D::new([1, nz, ny, nx], [1.0, 1000.0, 1000.0, 1000.0]);
     let coordinates = Coordinates::new(
-        grid.clone(),
-        vec![0.0; 32],
-        vec![0.0; 32],
-        vec![0.0; 16],
+        grid,
+        (0..ny).map(|i| 34.5 + i as f64 * 0.01).collect(),
+        (0..nx).map(|i| 138.5 + i as f64 * 0.01).collect(),
+        (0..nz).map(|i| i as f32 * 50.0).collect(),
         vec![0.0],
     );
-
-    let metadata = Metadata::default();
-
-    //
-    // Velocity
-    //
-    let mut velocity = VelocityField::new(grid.clone());
-
-    //
-    // 黒潮初期条件
-    //
-    {
-        let nx = 32;
-        let ny = 32;
-        let nz = 16;
-
-        //
-        // u component
-        //
-        {
-            let u = velocity.u_mut().time_slice_mut(0).unwrap();
-
-            for z in 0..nz {
-                for y in 0..ny {
-                    for x in 0..nx {
-                        let i = z * nx * ny + y * nx + x;
-
-                        if y < 4 {
-                            u[i] = 0.5;
-                        }
-
-                        if x > 12 && x < 20 && y > 12 && y < 20 {
-                            u[i] += 0.05;
-                        }
-                    }
+    let mut velocity = VelocityField::new(grid);
+    for z in 0..nz {
+        for y in 0..ny {
+            for x in 0..nx {
+                let i = z * nx * ny + y * nx + x;
+                if y < 4 {
+                    velocity.u_mut().as_mut_slice()[i] = 0.5;
+                    velocity.v_mut().as_mut_slice()[i] = 0.15;
                 }
             }
         }
-
-        //
-        // v component
-        //
-        {
-            let v = velocity.v_mut().time_slice_mut(0).unwrap();
-
-            for z in 0..nz {
-                for y in 0..ny {
-                    for x in 0..nx {
-                        let i = z * nx * ny + y * nx + x;
-
-                        if y < 4 {
-                            v[i] = 0.15;
-                        }
-
-                        if x > 12 && x < 20 && y > 12 && y < 20 {
-                            v[i] -= 0.05;
-                        }
-                    }
-                }
-            }
-        }
-
-        //
-        // w component
-        //
-        {
-            let w = velocity.w_mut().time_slice_mut(0).unwrap();
-
-            for value in w.iter_mut() {
-                *value = 0.0;
-            }
-        }
     }
-
-    let temperature = TemperatureField::new(grid.clone());
-
-    let salinity = SalinityField::new(grid.clone());
-
-    let mut ocean = OceanField::new(coordinates, metadata, velocity, temperature, salinity);
-
-    //
-    // Metal solver
-    //
-    let context = MetalContext::new();
-
-    let solver = OceanSolver::new(context);
-
-    let center = 8 * 32 * 32 + 16 * 32 + 16;
-
-    println!(
-        "initial u = {}",
-        ocean.velocity().u().time_slice(0).unwrap()[center]
+    velocity.set_coordinates(coordinates.clone());
+    let field = OceanField::new(
+        coordinates, Metadata::default(), velocity, TemperatureField::new(grid),
+        SalinityField::new(grid), BoundaryField::zeros(grid),
     );
-
-    for step in 0..100 {
-        solver.step(&mut ocean, 1.0);
-
-        if step % 10 == 0 {
-            let u = ocean.velocity().u().time_slice(0).unwrap()[center];
-
-            println!("step {} : u = {}", step, u);
-        }
+    let context = Arc::new(MetalContext::new());
+    let solver = OceanSolver::new_with_kuroshio_inflow(context.clone(), true);
+    let mut state = GpuOceanState::from_ocean(&context, &field);
+    for step in 0..10 {
+        solver.step(&mut state, 0.01);
+        println!("step {} completed", step + 1);
     }
-    let snapshot = gpu_velocity.snapshot(&context);
-    println!(
-        "velocity size={} center={}",
-        snapshot.size(),
-        snapshot.u[snapshot.index(8, 8, 8)]
-    );
+    let snapshot = state.velocity.snapshot(&context);
+    println!("velocity cells={} center_u={:.6}", snapshot.size(), snapshot.u[snapshot.index(nx / 2, ny / 2, nz / 2)]);
 }

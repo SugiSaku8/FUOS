@@ -1,0 +1,53 @@
+{
+  "suite": "SOS independent numerical reference checks",
+  "python": "3.13.5",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "numpy": "2.3.5",
+  "scope_warning": "These tests execute independent Python reference operators; they do NOT compile or execute SOS Rust/Metal source.",
+  "results": [
+    {
+      "name": "pressure_residual_relative",
+      "value": 3.041819437891743e-05,
+      "threshold": 0.001,
+      "passed": true,
+      "detail": "periodic manufactured Poisson problem, n=24, Jacobi iterations=300; residual-based criterion"
+    },
+    {
+      "name": "projection_divergence_ratio",
+      "value": 6.259424285065531e-08,
+      "threshold": 0.05,
+      "passed": true,
+      "detail": "periodic constant-density manufactured projection, n=20, Jacobi iterations=500; after/before RMS divergence"
+    },
+    {
+      "name": "periodic_scalar_mass_relative_drift",
+      "value": 0.0,
+      "threshold": 1e-12,
+      "passed": true,
+      "detail": "finite-volume upwind transport, n=128, steps=100; periodic closed domain"
+    },
+    {
+      "name": "advection_refinement_order_min",
+      "value": 1.9979035464647645,
+      "threshold": 1.7,
+      "passed": true,
+      "detail": "periodic smooth solution; L2 errors=[0.0014246295677133468, 0.00035667531856931945, 8.920122806439283e-05]; observed orders=(1.998,1.999)"
+    },
+    {
+      "name": "ssp_rk2_timestep_order_min",
+      "value": 2.0275584296989777,
+      "threshold": 1.8,
+      "passed": true,
+      "detail": "linear decay manufactured solution; errors=[0.00048717426547151277, 0.00011714380550761905, 2.873183892276865e-05]; observed orders=(2.056,2.028)"
+    },
+    {
+      "name": "advection_grid_refinement_order_min",
+      "value": 1.997921333208619,
+      "threshold": 1.7,
+      "passed": true,
+      "detail": "fixed low CFL; L2 errors=[0.0014240832027086162, 0.0003565341330098624, 8.916564061915064e-05]; observed orders=(1.998,1.999)"
+    }
+  ],
+  "passed": 6,
+  "failed": 0
+}

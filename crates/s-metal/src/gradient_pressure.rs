@@ -24,19 +24,26 @@ impl GradientPressureOperator {
         Self { pipeline }
     }
 
-    pub fn compute(
+    /// Compatibility wrapper for callers using a constant density.
+    pub fn compute(&self, context: &MetalContext, velocity: &GpuVelocityField,
+        pressure: &GpuField3D, dt: f32, rho: f32) -> GpuVelocityField {
+        assert!(rho.is_finite() && rho > 0.0, "rho must be positive and finite");
+        self.compute_variable_density(context, velocity, pressure, dt,
+            &vec![rho; velocity.grid().count()], &vec![0.0; velocity.grid().count()])
+    }
+
+    pub fn compute_variable_density(
         &self,
         context: &MetalContext,
-
         velocity: &GpuVelocityField,
-
         pressure: &GpuField3D,
-
         dt: f32,
-
-        rho: f32,
+        density: &[f32],
+        land_mask: &[f32],
     ) -> GpuVelocityField {
         let grid = velocity.grid();
+        assert_eq!(density.len(), grid.count(), "density field must match velocity grid");
+        assert_eq!(land_mask.len(), grid.count(), "land mask must match velocity grid");
 
         let output = GpuVelocityField::empty(context, grid);
 
@@ -84,11 +91,12 @@ impl GradientPressureOperator {
         encoder.set_buffer(8, Some(dt_buffer.buffer()), 0);
 
         //
-        // density
-        //
-        let rho_buffer = MetalBuffer::from_f32(context.device(), &[rho]);
+        // Variable density at cell centres. The shader uses face-averaged inverse density.
+        let density_buffer = MetalBuffer::from_f32(context.device(), density);
 
-        encoder.set_buffer(9, Some(rho_buffer.buffer()), 0);
+        encoder.set_buffer(9, Some(density_buffer.buffer()), 0);
+        let mask_buffer = MetalBuffer::from_f32(context.device(), land_mask);
+        encoder.set_buffer(10, Some(mask_buffer.buffer()), 0);
 
         let threads = MTLSize {
             width: 8,

@@ -20,7 +20,7 @@ fn main() {
     let ny = 16;
     let nz = 16;
 
-    let grid = Grid4D::new([nx, ny, nz, 1], [1.0, 1.0, 1.0, 1.0]);
+    let grid = Grid4D::new([1, nz, ny, nx], [1.0, 1.0, 1.0, 1.0]);
 
     //
     // Velocity field

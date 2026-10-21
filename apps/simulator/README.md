@@ -1,27 +1,66 @@
-# SOS Simulator app
+# Suruga Ocean Simulator (`apps/simulator`)
 
-`apps/simulator` is the orchestration entry point. Run from the repository root:
+The simulator coordinates source-data validation, grid preparation, SOF serialization, a CPU reference solver or Apple Metal solver, live WGPU visualization, checkpointing and final output.
 
-```sh
-cargo run -p simulator -- apps/simulator/config/simulator.json
+## Run
+
+From the workspace root on macOS with a Rust toolchain:
+
+```bash
+cargo fmt --all -- --check
+cargo check --workspace
+cargo test --workspace
+cargo run -p simulator -- --help
 ```
 
-The JSON config is the single place for source paths, grid/depth expansion policy, numerical time settings, render toggles, and output/checkpoint destinations.
+Default backend is controlled by `simulation.use_metal` in `apps/simulator/config/simulator.json` (Metal in the supplied config). Override for one invocation:
 
-## Intended runtime pipeline
+```bash
+cargo run -p simulator -- --metal --fresh
+cargo run -p simulator -- --cpu --fresh
+```
 
-1. Load and validate `simulator.json` and all configured inputs.
-2. Load bathymetry and construct the simulation `Grid`/mask.
-3. Normalize the raw current/scalar fields to that grid and write a prepared SOF package (`grid.snc`, `boundary.snc`, `initial.snc`, manifest).
-4. Initialize `simulation::Simulation` with the Metal context and prepared fields; advance in fixed `dt_seconds` increments.
-5. Run the renderer on the window/event-loop thread. The solver publishes immutable snapshots through a bounded latest-value channel; rendering must not block the solver.
-6. Render terrain and flow particles/streamlines from the latest simulation snapshot, with depth positions derived from the same configured depth axis and vertical scale.
-7. Save immutable step checkpoints under `output.checkpoint_dir`; after normal completion, write one final SOF package under `output.final_sof`.
+- `--fresh`: ignore checkpoints and start from configured source inputs.
+- `--resume`: resume from the latest valid checkpoint in the configured output root.
+- `--cpu`: use the serial CPU reference implementation.
+- `--metal`: use Apple Metal compute.
 
-## Current implementation status
+## Pipeline
 
-The first commit adds the app config schema, input validation/bootstrap, and an atomic binary checkpoint writer. It deliberately does **not** claim that steps 2–7 are already executing: the current `terrain.rs` example still visualizes a prepared/source velocity field, while the full SOF-to-Metal-to-renderer snapshot bridge is the next integration task. This separation prevents static source data from being mistaken for live solver output.
+1. Read the config, terrain grid SNC, source coordinates JSON and little-endian f32 U/V/temperature/salinity files.
+2. Build a solver grid with the configured vertical interval and mask land/sub-bottom cells.
+3. Create `input.sof`, including solver grid, high-resolution terrain, boundary, initial, restart and forcing datasets; read the initial field back before initializing the solver.
+4. Advance momentum with SSP-RK2 advection, latitude-dependent Coriolis rotation, configurable anisotropic background viscosity, quadratic bottom drag, EOS-80-based density anomaly buoyancy, wet-cell masking and variable-density pressure projection. Momentum substeps are chosen from an estimated advective CFL.
+5. Advance temperature and salinity with TVD minmod-limited gradients, SSP-RK2 and stability-limited explicit diffusion.
+6. If rendering is enabled, update the WGPU terrain and particle-flow view from the latest CPU-visible field.
+7. Publish checkpoints and final SOF output through staged writes.
 
-## Checkpoint format (intermediate)
+## Configuration notes
 
-Each `step_XXXXXXXXXXXX/` directory contains `u.bin`, `v.bin`, `w.bin`, and `metadata.json`. The three fields are little-endian `f32`, flattened in `z × y × x` order. A directory is first written as a temporary staging directory and renamed only after all files are flushed. The final deliverable remains a SOF package, independent of these intermediate snapshots.
+- `horizontal_viscosity_m2_s`: background horizontal viscosity; default `10.0`.
+- `vertical_viscosity_m2_s`: background vertical viscosity; default `1e-4`.
+- `bottom_drag_coefficient`: quadratic bottom-drag coefficient; default `0.0025`.
+- `scalar_diffusivity_m2_s`: background tracer diffusivity; default `1e-5`.
+
+These defaults are starting parameters, not calibrated Suruga Bay coefficients. They require sensitivity testing against observations.
+
+## Source data layout
+
+The supplied config expects:
+
+- `suruga_bay.sof/grid.snc`
+- `crates/s-builder/suruga_raw/coordinates.json`
+- `crates/s-builder/suruga_raw/u.bin`
+- `crates/s-builder/suruga_raw/v.bin`
+- `crates/s-builder/suruga_raw/temperature.bin`
+- `crates/s-builder/suruga_raw/salinity.bin`
+
+Raw arrays are little-endian `f32` in `(depth, latitude, longitude)` order. `coordinates.json` must contain strictly increasing depth, latitude and longitude arrays whose product matches each raw array length.
+
+## Scientific limitations
+
+This is a lightweight collocated-grid prototype, **not a ROMS-equivalent model**. The current source field is coarse (13×22 horizontal points) and has a single time slice; deeper values are extrapolated/attenuated. The prescribed open boundary is fixed to the initial source face. The vertical boundary is a rigid-lid/no-normal-flow approximation; there is no prognostic sea-surface elevation/barotropic mode. The model does not yet have an Arakawa C-grid, a validated turbulence closure, TEOS-10, time-varying radiation/nudging boundaries, complete coastline finite-volume fluxes, tides, wind stress, heat/freshwater fluxes, or independent observation-based skill validation.
+
+The CPU backend is intended for reference calculations and small-grid comparisons. It is serial and will generally be slower than Metal for larger grids. The Metal path is the intended performance backend on Apple Silicon.
+
+See `apps/simulator/IMPLEMENTATION_STATUS.md`, `docs/ROMS_LEVEL_GAP_ANALYSIS.md`, and `docs/VALIDATE_SOS.md` for the implementation boundary and validation procedure.
