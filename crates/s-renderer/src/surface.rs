@@ -41,7 +41,8 @@ impl RenderSurface {
 
             height: size.height,
 
-            present_mode: wgpu::PresentMode::Fifo,
+            // Disable 60 Hz FIFO vsync; the simulator event loop applies a 100 FPS cap.
+            present_mode: wgpu::PresentMode::AutoNoVsync,
 
             alpha_mode: capabilities.alpha_modes[0],
 

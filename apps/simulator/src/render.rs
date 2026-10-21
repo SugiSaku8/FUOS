@@ -7,10 +7,79 @@ use s_renderer::{
     flow_generator::FlowParticleSystem,
     terrain::OceanSurfaceMesh,
 };
-use std::{collections::VecDeque, sync::Arc, time::Instant};
-use winit::{dpi::PhysicalSize, event::{ElementState, Event, MouseButton, WindowEvent}, event_loop::EventLoop, window::WindowAttributes};
+use std::{collections::VecDeque, sync::{Arc, mpsc}, thread, time::{Duration, Instant}};
+use winit::{dpi::PhysicalSize, event::{ElementState, Event, MouseButton, WindowEvent}, event_loop::{ControlFlow, EventLoop}, window::WindowAttributes};
 
 use crate::{config::Config, dataset::TerrainData, engine::SimulationEngine, time_finder::TimeFinder};
+
+struct SimulationSnapshot {
+    step: u64,
+    time_seconds: f64,
+    field: s_field::OceanField,
+    finished: bool,
+    published_at: Instant,
+}
+
+enum SimulationCommand {
+    Restore { field: s_field::OceanField, step: u64, time_seconds: f64 },
+    Finish,
+}
+
+fn simulation_worker(
+    mut engine: SimulationEngine,
+    steps_per_batch: usize,
+    snapshot_tx: mpsc::Sender<SimulationSnapshot>,
+    command_rx: mpsc::Receiver<SimulationCommand>,
+) {
+    let mut last_publish = Instant::now() - Duration::from_millis(100);
+    let publish_interval = Duration::from_millis(100);
+    loop {
+        let mut should_stop = false;
+        while let Ok(command) = command_rx.try_recv() {
+            match command {
+                SimulationCommand::Restore { field, step, time_seconds } => {
+                    engine.restore_snapshot(field, step, time_seconds);
+                    last_publish = Instant::now() - publish_interval;
+                }
+                SimulationCommand::Finish => {
+                    if let Err(error) = engine.finish_early() {
+                        eprintln!("Final save error: {error:#}");
+                    }
+                    should_stop = true;
+                    break;
+                }
+            }
+        }
+        if should_stop { break; }
+
+        if !engine.is_finished() {
+            if let Err(error) = engine.advance(steps_per_batch) {
+                eprintln!("Simulation error: {error:#}");
+                if let Err(save_error) = engine.finish_early() {
+                    eprintln!("Could not save partial state: {save_error:#}");
+                }
+            }
+        }
+
+        if last_publish.elapsed() >= publish_interval {
+            let snapshot = SimulationSnapshot {
+                step: engine.step(),
+                time_seconds: engine.time_seconds(),
+                field: engine.snapshot(),
+                finished: engine.is_finished(),
+                published_at: Instant::now(),
+            };
+            if snapshot_tx.send(snapshot).is_err() { break; }
+            last_publish = Instant::now();
+        }
+
+        if engine.is_finished() {
+            thread::sleep(Duration::from_millis(10));
+        } else {
+            thread::yield_now();
+        }
+    }
+}
 
 #[allow(deprecated)] // winit 0.30 legacy bootstrap; migration to ApplicationHandler is a separate refactor.
 pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
@@ -75,16 +144,35 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
     let mut active_seeds = seed_points.clone();
     let last_flow_count = active_seeds.len();
     let mut particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
-    history.push_back((engine.step(), engine.time_seconds(), engine.snapshot()));
+    let initial_step = engine.step();
+    let initial_time = engine.time_seconds();
+    let initial_field = engine.snapshot();
+    history.push_back((initial_step, initial_time, initial_field.clone()));
+    let mut displayed_field = initial_field;
+    let mut displayed_step = initial_step;
+    let mut displayed_time = initial_time;
+    let mut latest_computed_step = initial_step;
+    let mut latest_computed_time = initial_time;
+    let mut latest_computed_finished = engine.is_finished();
+    let mut delay_queue: VecDeque<SimulationSnapshot> = VecDeque::new();
+    let (snapshot_tx, snapshot_rx) = mpsc::channel();
+    let (command_tx, command_rx) = mpsc::channel();
+    let steps_per_batch = config.simulation.steps_per_frame.max(1);
+    let mut worker_handle = Some(thread::Builder::new().name("sos-simulation-worker".into()).spawn(move || {
+        simulation_worker(engine, steps_per_batch, snapshot_tx, command_rx);
+    }).context("シミュレーション計算スレッドを起動できません")?);
     let snapshot_interval = config.simulation.steps_per_frame.max(1) as u64 * 10;
+    let render_delay = Duration::from_secs(3);
     let max_vertices = seeds.len() * ((config.render.particle_trail_points - 1) * 2 + 6);
     let mut gpu_flow = GpuFlowMesh::with_capacity(renderer.device(), max_vertices);
     let gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len());
     let mut camera_controller = CameraController::new();
     println!("Flow seeds: {}, depth levels: {}", seeds.len(), coordinates.depth_levels());
-    println!("[6/7] シミュレーションと描画を同じ実行ループで開始します");
+    println!("[6/7] 計算スレッドと描画を分離して起動します（描画遅延3秒 / 最大100 FPS）");
 
     let mut last_frame = Instant::now();
+    let mut next_frame = Instant::now();
+    let frame_interval = Duration::from_millis(10);
     let mut report_elapsed = 0.0_f32;
     let mut report_frames = 0_u64;
     let mut title_elapsed = 0.0_f32;
@@ -92,7 +180,10 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
     event_loop.run(move |event, target| {
         match event {
             Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == main_window_id => {
-                if let Err(error) = engine.finish_early() { eprintln!("Final save error: {error:#}"); }
+                let _ = command_tx.send(SimulationCommand::Finish);
+                if let Some(handle) = worker_handle.take() {
+                    let _ = handle.join();
+                }
                 target.exit();
             }
             Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == time_window_id => {
@@ -101,7 +192,15 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
             }
             Event::WindowEvent { window_id, event: WindowEvent::Resized(size) } if window_id == main_window_id => renderer.resize(size),
             Event::WindowEvent { window_id, event: WindowEvent::Resized(size) } if window_id == time_window_id => time_finder.resize(size),
-            Event::AboutToWait => { window.request_redraw(); if time_window.is_visible().unwrap_or(false) { time_window.request_redraw(); } },
+            Event::AboutToWait => {
+                let now = Instant::now();
+                if now >= next_frame {
+                    window.request_redraw();
+                    if time_window.is_visible().unwrap_or(false) { time_window.request_redraw(); }
+                    next_frame = now + frame_interval;
+                }
+                target.set_control_flow(ControlFlow::WaitUntil(next_frame));
+            },
             Event::WindowEvent { window_id, event: WindowEvent::CursorMoved { position, .. } } if window_id == time_window_id => {
                 time_cursor_x = position.x;
                 time_cursor_y = position.y;
@@ -141,7 +240,14 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                         let index = ((history.len() - 1) as f64 * fraction).round() as usize;
                         if let Some((step, time, field)) = history.get(index).map(|(s, t, f)| (*s, *t, (*f).clone())) {
                             history.truncate(index + 1);
-                            engine.restore_snapshot(field, step, time);
+                            let _ = command_tx.send(SimulationCommand::Restore { field: field.clone(), step, time_seconds: time });
+                            while snapshot_rx.try_recv().is_ok() {}
+                            delay_queue.clear();
+                            displayed_field = field;
+                            displayed_step = step;
+                            displayed_time = time;
+                            latest_computed_step = step;
+                            latest_computed_time = time;
                             particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
                             println!("Time Finder: seek to step={} t={:.3}s", step, time);
                         }
@@ -154,8 +260,8 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                 let history_end = history.back().map(|(_, t, _)| *t).unwrap_or(max_time);
                 let span = (history_end - history_start).max(1.0e-9);
                 time_finder.render(
-                    ((engine.time_seconds() - history_start) / span) as f32,
-                    history.len(), engine.time_seconds(), max_time,
+                    ((displayed_time - history_start) / span) as f32,
+                    history.len(), displayed_time, max_time,
                     options_open, show_temperature, flow_fraction,
                 );
             }
@@ -164,38 +270,42 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                 let wall_dt = now.duration_since(last_frame).as_secs_f32();
                 last_frame = now;
 
-                if !engine.is_finished() {
-                    if let Err(error) = engine.advance(config.simulation.steps_per_frame) {
-                        eprintln!("Simulation error: {error:#}");
-                        if let Err(save_error) = engine.finish_early() {
-                            eprintln!("Could not save partial state: {save_error:#}");
-                        }
-                    }
-                }
-
-                if engine.step() % snapshot_interval == 0 {
-                    let should_push = history.back().map(|(step, _, _)| *step != engine.step()).unwrap_or(true);
+                while let Ok(snapshot) = snapshot_rx.try_recv() {
+                    latest_computed_step = snapshot.step;
+                    latest_computed_time = snapshot.time_seconds;
+                    latest_computed_finished = snapshot.finished;
+                    let should_push = snapshot.step > 0
+                        && snapshot.step / snapshot_interval > history.back().map(|(step, _, _)| *step / snapshot_interval).unwrap_or(0);
                     if should_push {
-                        history.push_back((engine.step(), engine.time_seconds(), engine.snapshot()));
+                        history.push_back((snapshot.step, snapshot.time_seconds, snapshot.field.clone()));
                         while history.len() > 180 { history.pop_front(); }
+                    }
+                    delay_queue.push_back(snapshot);
+                    while delay_queue.len() > 45 { delay_queue.pop_front(); }
+                }
+                while delay_queue.front().map(|snapshot| snapshot.published_at.elapsed() >= render_delay).unwrap_or(false) {
+                    if let Some(snapshot) = delay_queue.pop_front() {
+                        displayed_step = snapshot.step;
+                        displayed_time = snapshot.time_seconds;
+                        displayed_field = snapshot.field;
                     }
                 }
                 if show_temperature {
                     particles.update_with_temperature(
-                        engine.field().velocity(), engine.field().temperature().field().as_slice(), &converter, wall_dt,
-                        config.render.particle_speed_multiplier, engine.time_seconds(),
+                        displayed_field.velocity(), displayed_field.temperature().field().as_slice(), &converter, wall_dt.min(0.05),
+                        config.render.particle_speed_multiplier, displayed_time,
                     );
                 } else {
                     particles.update(
-                        engine.field().velocity(), &converter, wall_dt,
-                        config.render.particle_speed_multiplier, engine.time_seconds(),
+                        displayed_field.velocity(), &converter, wall_dt.min(0.05),
+                        config.render.particle_speed_multiplier, displayed_time,
                     );
                 }
                 let flow_vertices = particles.vertices();
                 if !gpu_flow.update_vertices(renderer.queue(), &flow_vertices) {
                     eprintln!("Flow vertex capacity exceeded: {} > {}", flow_vertices.len(), max_vertices);
                 }
-                camera_controller.update_with_dt(renderer.camera_mut(), wall_dt);
+                camera_controller.update_with_dt(renderer.camera_mut(), wall_dt.min(0.05));
                 // Terrain is the only collision boundary. The camera can pass through
                 // the water surface and leave the terrain mesh into the surrounding air.
                 let camera = renderer.camera_mut();
@@ -215,16 +325,16 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                 report_frames += 1;
                 title_elapsed += wall_dt;
                 if title_elapsed >= 0.5 {
-                    let state = if engine.is_finished() { "完了" } else { "計算中" };
+                    let state = if latest_computed_finished { "完了" } else { "計算中" };
                     window.set_title(&format!(
                         "Suruga Ocean Simulator | {} | step {} | t={:.2}/{:.2}s",
-                        state, engine.step(), engine.time_seconds(), config.simulation.duration_seconds
+                        state, latest_computed_step, latest_computed_time, config.simulation.duration_seconds
                     ));
                     title_elapsed = 0.0;
                 }
                 if report_elapsed >= 2.0 {
                     println!("FPS: {:.1} | step: {} | sim t: {:.2}s / {:.2}s | flow vertices: {}",
-                        report_frames as f32 / report_elapsed, engine.step(), engine.time_seconds(),
+                        report_frames as f32 / report_elapsed, displayed_step, displayed_time,
                         config.simulation.duration_seconds, flow_vertices.len());
                     report_elapsed = 0.0;
                     report_frames = 0;
@@ -272,22 +382,54 @@ fn generate_seeds(
     stride_y: usize,
 ) -> Vec<[f32; 3]> {
     let mut seeds = Vec::new();
+    let stride_x = stride_x.max(1);
+    let stride_y = stride_y.max(1);
+
+    // Every model depth layer (configured at 250 m intervals) gets its own seeds.
+    // Add one seed at the centre of every horizontal grid cell as well as the
+    // existing grid nodes: this nearly doubles streamline coverage without the
+    // 4x particle cost of halving both horizontal spacings everywhere.
     for &depth in coordinates.depth() {
         for y in (0..coordinates.height()).step_by(stride_y) {
             for x in (0..coordinates.width()).step_by(stride_x) {
-                let Some(lon) = coordinates.longitude_at(x) else { continue; };
-                let Some(lat) = coordinates.latitude_at(y) else { continue; };
-                if lon < bounds.lon_min || lon > bounds.lon_max || lat < bounds.lat_min || lat > bounds.lat_max { continue; }
-                let tx = nearest_index(&terrain.longitude, lon as f32).min(terrain.width - 1);
-                let ty = nearest_index(&terrain.latitude, lat as f32).min(terrain.height - 1);
-                let elevation = terrain.bathymetry[ty * terrain.width + tx];
-                if elevation < 0.0 && depth <= -elevation {
-                    seeds.push([lon as f32, lat as f32, depth]);
+                let (Some(lon), Some(lat)) = (coordinates.longitude_at(x), coordinates.latitude_at(y)) else { continue; };
+                push_seed_if_wet(&mut seeds, lon, lat, depth, bounds, terrain);
+            }
+        }
+
+        if coordinates.width() > 1 && coordinates.height() > 1 {
+            for y in 0..coordinates.height() - 1 {
+                let (Some(lat0), Some(lat1)) = (coordinates.latitude_at(y), coordinates.latitude_at(y + 1)) else { continue; };
+                let lat = (lat0 + lat1) * 0.5;
+                for x in 0..coordinates.width() - 1 {
+                    let (Some(lon0), Some(lon1)) = (coordinates.longitude_at(x), coordinates.longitude_at(x + 1)) else { continue; };
+                    let lon = (lon0 + lon1) * 0.5;
+                    push_seed_if_wet(&mut seeds, lon, lat, depth, bounds, terrain);
                 }
             }
         }
     }
     seeds
+}
+
+fn push_seed_if_wet(
+    seeds: &mut Vec<[f32; 3]>,
+    lon: f64,
+    lat: f64,
+    depth: f32,
+    bounds: &GeoBounds,
+    terrain: &TerrainData,
+) {
+    if lon < bounds.lon_min || lon > bounds.lon_max || lat < bounds.lat_min || lat > bounds.lat_max {
+        return;
+    }
+    let tx = nearest_index(&terrain.longitude, lon as f32).min(terrain.width - 1);
+    let ty = nearest_index(&terrain.latitude, lat as f32).min(terrain.height - 1);
+    let elevation = terrain.bathymetry[ty * terrain.width + tx];
+    // Keep seeds inside the water column and never below the local seabed.
+    if elevation < 0.0 && depth <= -elevation {
+        seeds.push([lon as f32, lat as f32, depth]);
+    }
 }
 
 fn nearest_index(values: &[f32], value: f32) -> usize {

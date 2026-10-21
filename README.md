@@ -1,5 +1,5 @@
-# FUOS
-## Made By Sugisaku8
-#### Four-dimensional User-friendly Ocean Simulation
 
-Once data is entered, the system performs a simulation in four dimensions—three spatial dimensions (x, y, z) plus time—and takes the user straight through to the observation
+
+### Streamline coverage
+
+Streamline seeds are placed on every vertical model layer (250 m interval in the default configuration). Extra seeds are also placed at the centre of each horizontal grid cell to increase coverage while keeping the particle count lower than a full half-cell subdivision.

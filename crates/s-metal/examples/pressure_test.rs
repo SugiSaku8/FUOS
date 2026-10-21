@@ -46,7 +46,7 @@ fn main() {
 
     let solver = PressureSolver::new(&context);
 
-    let pressure = solver.solve(&context, &divergence, 100);
+    let pressure = solver.solve(&context, &divergence, 0.01, 1025.0, 100);
 
     let result = pressure.download(&context);
 
