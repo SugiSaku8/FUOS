@@ -15,9 +15,9 @@ fn main() {
     //
     // f(x)=2x
     //
-    let input = MetalBuffer::from_f32(&context, &[0.0, 2.0, 4.0, 6.0]);
+    let input = MetalBuffer::from_f32(context.device(), &[0.0, 2.0, 4.0, 6.0]);
 
-    let output = MetalBuffer::empty(&context, 4);
+    let output = MetalBuffer::empty(context.device(), 4);
 
     let grid = GridInfo::new(4, 1, 1, 1.0, 1.0, 1.0);
     let grid_buffer = MetalBuffer::from_struct(&context, &grid);

@@ -6,8 +6,6 @@ use s_metal::{
 use std::f64::consts::PI;
 use std::time::Instant;
 
-const JACOBI_ITERATIONS: usize = 1000;
-
 fn index3d(x: usize, y: usize, z: usize, nx: usize, ny: usize) -> usize {
     z * nx * ny + y * nx + x
 }

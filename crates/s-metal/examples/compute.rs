@@ -23,7 +23,7 @@ uint id [[thread_position_in_grid]]
 
     let library = context.load_library(shader);
 
-    let pipeline = create_compute_pipeline(context.device(), &library, "vector_add");
+    let _pipeline = create_compute_pipeline(context.device(), &library, "vector_add");
 
     println!("Compute pipeline created");
 }
