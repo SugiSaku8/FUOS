@@ -4,6 +4,8 @@ use s_field::VelocityField;
 
 /// terrain.rs と同じ深度方向の表示倍率。
 const OCEAN_VERTICAL_SCALE: f32 = 5.0;
+/// Treat sub-0.1 mm/s numerical residue as effectively stationary.
+const FLOW_STOP_SPEED_MPS: f64 = 1.0e-4;
 
 /// 静的な流線を生成する。
 pub struct FlowGenerator;
@@ -50,7 +52,7 @@ impl FlowGenerator {
                 let u = vel[0] as f64;
                 let v = vel[1] as f64;
 
-                if !u.is_finite() || !v.is_finite() || u.hypot(v) < 0.02 {
+                if !u.is_finite() || !v.is_finite() || u.hypot(v) <= FLOW_STOP_SPEED_MPS {
                     break;
                 }
 
@@ -235,6 +237,15 @@ impl FlowParticleSystem {
                 continue;
             }
 
+            // A stationary particle must not leave a stale trail or marker behind.
+            // Clear the trail and keep the particle at its current position; if the
+            // current becomes non-zero later, a new trail can grow from there.
+            // The tiny epsilon avoids treating floating-point residue as real flow.
+            if u.hypot(v).hypot(w) <= FLOW_STOP_SPEED_MPS {
+                particle.trail.clear();
+                continue;
+            }
+
             // Nearest-cell temperature anomaly. This is a visual diagnostic, not a
             // substitute for the buoyancy term in the momentum equation.
             if !temperature.is_empty() {
@@ -261,10 +272,6 @@ impl FlowParticleSystem {
             } else {
                 // Turning temperature visualization off restores a neutral flow color.
                 particle.flow_color = FlowVertex::CYAN;
-            }
-
-            if u.hypot(v).hypot(w) < 0.02 {
-                continue;
             }
 
             let east_m = u * dt as f64;
