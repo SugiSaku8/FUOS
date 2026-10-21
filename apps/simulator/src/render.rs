@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, ensure};
-use s_field::{Coordinates, Field};
+use s_field::Coordinates;
 use s_renderer::{
     GeoBounds, GeoConverter, GpuFlowMesh, HeightMap, Renderer, TerrainMesh, TerrainVertex,
     camera_controller::CameraController,
@@ -12,6 +12,7 @@ use winit::{dpi::PhysicalSize, event::{ElementState, Event, MouseButton, WindowE
 
 use crate::{config::Config, dataset::TerrainData, engine::SimulationEngine, time_finder::TimeFinder};
 
+#[allow(deprecated)] // winit 0.30 legacy bootstrap; migration to ApplicationHandler is a separate refactor.
 pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
     println!("[5/7] リアルタイム表示システムを起動します");
     let terrain = engine.terrain().clone();
@@ -110,7 +111,6 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                     flow_fraction = (((nx + 0.60) / 1.42).clamp(0.0, 1.0) * 0.95 + 0.05).clamp(0.05, 1.0);
                     let desired = ((seed_points.len() as f32 * flow_fraction).round() as usize).clamp(1, seed_points.len().max(1));
                     active_seeds = select_seed_subset(&seed_points, desired);
-                    last_flow_count = active_seeds.len();
                     particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
                 }
             }
@@ -133,7 +133,6 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                     flow_fraction = (((nx + 0.60) / 1.42).clamp(0.0, 1.0) * 0.95 + 0.05).clamp(0.05, 1.0);
                     let desired = ((seed_points.len() as f32 * flow_fraction).round() as usize).clamp(1, seed_points.len().max(1));
                     active_seeds = select_seed_subset(&seed_points, desired);
-                    last_flow_count = active_seeds.len();
                     particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
                     println!("OPTIONS: 流線 {}本 / 全{}本", last_flow_count, seed_points.len());
                 } else if ny >= -0.82 && ny <= -0.38 && nx >= -0.96 && nx <= 0.96 {

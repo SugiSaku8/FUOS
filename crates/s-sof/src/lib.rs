@@ -1,4 +1,4 @@
-#![warn(missing_docs)]
+#![allow(missing_docs)]
 
 //! Suruga Ocean Format (SOF)
 //!

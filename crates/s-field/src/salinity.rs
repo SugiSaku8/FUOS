@@ -1,6 +1,6 @@
 //! Salinity field.
 
-use crate::{Field, Field4D, Grid4D};
+use crate::{Field4D, Grid4D};
 
 /// Practical Salinity field.
 ///

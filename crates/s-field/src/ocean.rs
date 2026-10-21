@@ -41,7 +41,6 @@ impl OceanField {
         salinity: SalinityField,
         boundary: BoundaryField,
     ) -> Self {
-        let grid = velocity.grid().clone();
         Self {
             coordinates,
             metadata,

@@ -1,5 +1,3 @@
-use wgpu::util::DeviceExt;
-
 pub struct VelocityRenderer {
     pipeline: wgpu::RenderPipeline,
 }

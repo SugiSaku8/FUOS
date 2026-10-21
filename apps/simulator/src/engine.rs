@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
-use s_field::{Field, OceanField};
+use s_field::OceanField;
 use s_metal::{GpuOceanState, MetalContext, OceanSolver};
 use s_sof::restart::{RestartReader, RestartWriter};
 use std::{

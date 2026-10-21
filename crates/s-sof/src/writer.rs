@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use s_field::{Field, OceanField};
+use s_field::OceanField;
 
 use s_io::{Metadata, SioWriter};
 
