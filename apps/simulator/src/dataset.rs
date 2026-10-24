@@ -247,7 +247,8 @@ fn derive_boundary_field(source: &VelocityField) -> BoundaryField {
     let mut east = VelocityField::new(grid.clone());
     let mut north = VelocityField::new(grid.clone());
     let mut south = VelocityField::new(grid);
-    let mut edge_data = [[vec![0.0_f32; count]; 3]; 4];
+    let mut edge_data: [[Vec<f32>; 3]; 4] =
+        std::array::from_fn(|_| std::array::from_fn(|_| vec![0.0_f32; count]));
     for z in 0..nz {
         for y in 0..ny {
             for x in 0..nx {
