@@ -13,8 +13,7 @@ Suruga Ocean Format（SOF）は、Suruga Ocean Simulator専用に設計された
 
 SOFは
 
-- Pythonによるデータ取得・前処理
-- Rustによるシミュレーション
+- Rustによる公開データ取得・前処理・SOF生成・シミュレーション
 - GPUによる可視化
 
 の共通フォーマットとして利用する。
@@ -31,7 +30,7 @@ SOFは以下の原則に従う。
 - 高速
 - 拡張可能
 - 人間が理解しやすい
-- PythonとRustの橋渡しを行う
+- 外部データ形式とシミュレーションを分離する
 - 特定の海洋モデル（ROMS・MITgcm等）に依存しない
 
 ---
@@ -293,78 +292,20 @@ compute_pressure()
 
 ---
 
-# 11. Pythonの役割
+# 11. データ生成の役割
 
-Pythonは
-
-```
-HYCOM
-
-↓
-
-GEBCO
-
-↓
-
-切り出し
-
-↓
-
-補間
-
-↓
-
-SOF生成
-```
-
-のみ担当する。
-
----
-
-# 12. Rustの役割
-
-Rustは
-
-```
-SOF
-
-↓
-
-読み込み
-
-↓
-
-格子生成
-
-↓
-
-シミュレーション
-
-↓
-
-GPU
-
-↓
-
-描画
-```
-
-のみ担当する。
-
-RustはSOFを生成しない。
+Rustが公開NetCDF / GeoTIFFの読み込み、検査、前処理を行い、`s-sof` を通じてSOFパッケージを生成する。
 
 ---
 
 # 13. データフロー
 
 ```
-HYCOM
-
-GEBCO
+HYCOM / GEBCO
 
 ↓
 
-Python
+Rust input pipeline + s-sof
 
 ↓
 

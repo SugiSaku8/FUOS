@@ -66,6 +66,11 @@ pub fn diagnose(config: &Config) -> DiagnosticReport {
         dataset: config.name.clone(), status: "PASS".into(), terrain: None, source: None,
         files: Vec::new(), findings: Vec::new(), recommendations: Vec::new(),
     };
+    if let Some(netcdf) = &config.input.netcdf {
+        inspect_file(&mut report, "public_terrain_netcdf", &config.resolve(&netcdf.terrain_file));
+        inspect_file(&mut report, "public_ocean_netcdf", &config.resolve(&netcdf.ocean_file));
+        inspect_file(&mut report, "netcdf_preprocess_manifest", &config.resolve(&netcdf.prepared_dir).join("preprocess_manifest.json"));
+    }
 
     let terrain_setting = config.input.terrain_source.as_ref().or(config.input.terrain_grid.as_ref());
     let terrain = if let Some(setting) = terrain_setting {
@@ -227,7 +232,7 @@ fn load_source_for_diagnostics(config: &Config, report: &mut DiagnosticReport) -
     let velocity_pair = u.is_some() && v.is_some();
     let temperature = read_optional(&config.input.temperature, "temperature", report);
     let salinity = read_optional(&config.input.salinity, "salinity", report);
-    Some(SourceBundle { coordinates, velocity_u: if velocity_pair { u } else { None }, velocity_v: if velocity_pair { v } else { None }, temperature, salinity })
+    Some(SourceBundle { coordinates, velocity_u: if velocity_pair { u } else { None }, velocity_v: if velocity_pair { v } else { None }, velocity_w: None, temperature, salinity })
 }
 
 fn read_raw_f32(path: &std::path::Path, expected: usize) -> Result<Vec<f32>> {
@@ -260,6 +265,7 @@ fn inspect_source(report: &mut DiagnosticReport, source: SourceBundle, terrain: 
     for (name, values, bounds) in [
         ("u", source.velocity_u.as_deref(), Some((-5.0, 5.0))),
         ("v", source.velocity_v.as_deref(), Some((-5.0, 5.0))),
+        ("w", source.velocity_w.as_deref(), Some((-2.0, 2.0))),
         ("temperature_C", source.temperature.as_deref(), Some((-3.0, 40.0))),
         ("salinity_PSU", source.salinity.as_deref(), Some((0.0, 45.0))),
     ] {

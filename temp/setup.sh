@@ -7,7 +7,6 @@ git init
 # Workspace用ディレクトリ
 mkdir crates
 mkdir apps
-mkdir python
 mkdir assets
 mkdir docs
 mkdir tests
@@ -18,11 +17,6 @@ mkdir -p assets/hycom
 mkdir -p assets/cache
 mkdir -p assets/shaders
 mkdir -p assets/textures
-
-# Python
-mkdir -p python/download
-mkdir -p python/preprocess
-mkdir -p python/convert
 
 # シミュレーション設定
 mkdir -p simulation/boundary
@@ -45,12 +39,6 @@ cargo new crates/util --lib
 
 # 実行アプリ
 cargo new apps/simulator
-
-# =========================
-# Python
-# =========================
-
-python3 -m venv .venv
 
 # =========================
 # Git

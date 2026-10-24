@@ -15,7 +15,7 @@ pub fn diagnose_inputs(config: &Config) -> Result<DiagnosticReport> {
     Ok(report)
 }
 
-/// Normal non-interactive pipeline used by Simulator startup.
+/// Shared diagnostic-gated builder for creating the SOF consumed by Simulator.
 pub fn build(config: &Config) -> Result<DatasetBundle> {
     let report = diagnose_inputs(config)?;
     build_with_report(config, &report)

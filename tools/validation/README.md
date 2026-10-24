@@ -1,13 +1,9 @@
-# SOS validation helpers
+# Numerical validation
 
-`validate_numerics.py` runs six portable manufactured/reference tests for pressure residual, projection divergence, scalar conservation, time convergence, and grid convergence.
-
-Requirements: Python 3.10+ and NumPy.
-
-Run:
+Use the Rust workspace tests as the maintained validation entry point:
 
 ```bash
-python3 tools/validation/validate_numerics.py
+cargo test --workspace
 ```
 
-Important: these are independent reference-operator tests, not tests of the SOS Rust or Metal implementation. See `docs/validation/VALIDATION_REPORT.md` for the result and limits.
+The former standalone reference runner has been removed so validation uses the Rust workspace only. Historical reports that were produced by that runner should not be interpreted as current Rust-source validation; they must be replaced by Rust tests before being used as release evidence.

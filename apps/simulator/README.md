@@ -62,3 +62,18 @@ This is a lightweight collocated-grid prototype, **not a ROMS-equivalent model**
 The CPU backend is intended for reference calculations and small-grid comparisons. It is serial and will generally be slower than Metal for larger grids. The Metal path is the intended performance backend on Apple Silicon.
 
 See `apps/simulator/IMPLEMENTATION_STATUS.md`, `docs/ROMS_LEVEL_GAP_ANALYSIS.md`, and `docs/VALIDATE_SOS.md` for the implementation boundary and validation procedure.
+
+## Public terrain and HYCOM inputs
+
+The configured terrain file can be a public NetCDF grid or GeoTIFF (`.tif`/`.tiff`). GeoTIFF is warped virtually to EPSG:4326 and cropped to the configured region; NetCDF terrain support is retained. Ocean fields are still read from NetCDF.
+
+```bash
+# Download the configured Suruga Bay subset from the public HYCOM GOFS 3.1 endpoint
+cargo run -p simulator -- get --hycom
+# Force a new download
+cargo run -p simulator -- get --hycom --force
+# If terrain exists but ocean input is missing, --all downloads HYCOM before generation
+cargo run -p simulator -- --all
+```
+
+NetCDF ingestion is native Rust. GeoTIFF support requires GDAL (`brew install gdal` on macOS). HYCOM retrieval depends on the public NCSS service and may not represent real-time ocean conditions. See `docs/NETCDF_INPUT_PIPELINE.md`.

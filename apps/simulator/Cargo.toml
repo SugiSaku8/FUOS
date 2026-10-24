@@ -16,3 +16,8 @@ s-sof = { path = "../../crates/s-sof" }
 s-metal = { path = "../../crates/s-metal" }
 s-cpu = { path = "../../crates/s-cpu" }
 s-renderer = { path = "../../crates/s-renderer" }
+
+# Native NetCDF input; static feature avoids a separate NetCDF runtime install.
+netcdf = { version = "0.12", features = ["static"] }
+# GeoTIFF reader. Install GDAL with Homebrew on macOS: brew install gdal
+gdal = "0.18"

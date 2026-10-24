@@ -1,41 +1,55 @@
 {
+  "name": "suruga_bay",
+  "input": {
+    "terrain_source": "runs/suruga_bay/preprocessed/terrain_source.snc",
+    "source_bundle": "runs/suruga_bay/preprocessed/ocean_source.sosdata",
+    "netcdf": {
+      "terrain_file": "data/raw/gebco_suruga.nc",
+      "ocean_file": "data/raw/hycom_suruga.nc",
+      "prepared_dir": "runs/suruga_bay/preprocessed",
+      "region": {
+        "longitude_min": 137.5,
+        "longitude_max": 139.5,
+        "latitude_min": 33.5,
+        "latitude_max": 35.5
+      },
+      "time_index": 0,
+      "variables": {},
+      "hycom_max_depth_m": 2000.0
+    }
+  },
   "grid": {
-    "deep_velocity_decay_scale_m": 1200.0,
     "depth_interval_m": 250.0,
+    "deep_velocity_decay_scale_m": 1200.0,
     "terrain_vertical_scale": 5.0,
     "world_scale": 100000.0
   },
-  "input": {
-    "source_bundle": "crates/s-builder/suruga_raw/ocean_source.sosdata",
-    "terrain_source": "suruga_bay.sof/terrain_source.snc"
-  },
-  "name": "suruga_bay",
-  "output": {
-    "resume_from_latest": false,
-    "root": "runs/suruga_bay",
-    "save_checkpoints": true,
-    "save_final": true
-  },
-  "render": {
-    "contour_interval_m": 250.0,
-    "enabled": true,
-    "particle_speed_multiplier": 240.0,
-    "particle_trail_points": 48,
-    "seed_stride_x": 1,
-    "seed_stride_y": 1,
-    "show_bathymetry_contours": true,
-    "show_ocean_surface": true
-  },
   "simulation": {
-    "bottom_drag_coefficient": 0.0025,
     "dt_seconds": 0.01,
     "duration_seconds": 60.0,
-    "horizontal_viscosity_m2_s": 10.0,
-    "kuroshio_inflow": true,
-    "scalar_diffusivity_m2_s": 0.00001,
-    "steps_per_checkpoint": 600,
     "steps_per_frame": 4,
+    "steps_per_checkpoint": 600,
     "use_metal": true,
-    "vertical_viscosity_m2_s": 0.0001
+    "kuroshio_inflow": true,
+    "scalar_diffusivity_m2_s": 1e-05,
+    "horizontal_viscosity_m2_s": 10.0,
+    "vertical_viscosity_m2_s": 0.0001,
+    "bottom_drag_coefficient": 0.0025
+  },
+  "render": {
+    "enabled": true,
+    "show_ocean_surface": true,
+    "show_bathymetry_contours": true,
+    "contour_interval_m": 250.0,
+    "particle_trail_points": 48,
+    "particle_speed_multiplier": 240.0,
+    "seed_stride_x": 1,
+    "seed_stride_y": 1
+  },
+  "output": {
+    "root": "runs/suruga_bay",
+    "save_checkpoints": true,
+    "save_final": true,
+    "resume_from_latest": false
   }
 }

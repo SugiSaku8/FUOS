@@ -17,15 +17,7 @@ OUT="sos_diagnostics.txt"
     rustc --version
     cargo --version
     cargo metadata --no-deps --format-version 1 2>/dev/null \
-        | python3 -c '
-import json,sys
-try:
-    d=json.load(sys.stdin)
-    for p in d["packages"]:
-        print(f"{p[\"name\"]}: {p[\"manifest_path\"]}")
-except Exception as e:
-    print("Cargo metadata error:",e)
-'
+        | ruby -rjson -e 'JSON.parse(STDIN.read)["packages"].each { |p| puts "#{p["name"]}: #{p["manifest_path"]}" }'
 
     echo
     echo "========== 3. SOURCE FILES =========="

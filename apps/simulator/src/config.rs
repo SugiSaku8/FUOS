@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, ensure};
-use serde::Deserialize;
-use std::{fs, path::{Path, PathBuf}};
+use serde::{Deserialize, Serialize};
+use std::{collections::BTreeMap, fs, path::{Path, PathBuf}};
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Config {
@@ -36,7 +36,59 @@ pub struct InputConfig {
     pub temperature: Option<PathBuf>,
     #[serde(default)]
     pub salinity: Option<PathBuf>,
+    /// Public NetCDF input configuration (GEBCO terrain + HYCOM/ocean fields).
+    #[serde(default)]
+    pub netcdf: Option<NetcdfInputConfig>,
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct NetcdfInputConfig {
+    /// Public bathymetry/terrain NetCDF or GeoTIFF (for example GEBCO).
+    pub terrain_file: PathBuf,
+    /// Public ocean physical-field NetCDF (for example HYCOM).
+    pub ocean_file: PathBuf,
+    #[serde(default = "default_prepared_dir")]
+    pub prepared_dir: PathBuf,
+    #[serde(default)]
+    pub region: NetcdfRegionConfig,
+    #[serde(default)]
+    pub time_index: usize,
+    /// Maximum depth (m, positive down) retrieved by `get --hycom`.
+    #[serde(default = "default_hycom_max_depth")]
+    pub hycom_max_depth_m: f64,
+    /// Optional HYCOM OPeNDAP endpoint override.
+    #[serde(default)]
+    pub hycom_url: Option<String>,
+    /// Explicit NetCDF variable/coordinate overrides. Keys are documented in tools/netcdf/README.md.
+    #[serde(default)]
+    pub variables: BTreeMap<String, String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct NetcdfRegionConfig {
+    #[serde(default = "default_lon_min")]
+    pub longitude_min: f64,
+    #[serde(default = "default_lon_max")]
+    pub longitude_max: f64,
+    #[serde(default = "default_lat_min")]
+    pub latitude_min: f64,
+    #[serde(default = "default_lat_max")]
+    pub latitude_max: f64,
+}
+
+impl Default for NetcdfRegionConfig {
+    fn default() -> Self {
+        Self { longitude_min: default_lon_min(), longitude_max: default_lon_max(),
+            latitude_min: default_lat_min(), latitude_max: default_lat_max() }
+    }
+}
+
+fn default_prepared_dir() -> PathBuf { PathBuf::from("runs/suruga_bay/preprocessed") }
+fn default_hycom_max_depth() -> f64 { 2000.0 }
+fn default_lon_min() -> f64 { 137.5 }
+fn default_lon_max() -> f64 { 139.5 }
+fn default_lat_min() -> f64 { 33.5 }
+fn default_lat_max() -> f64 { 35.5 }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct GridConfig {
@@ -121,6 +173,25 @@ impl Config {
 
     pub fn validate(&self) -> Result<()> {
         ensure!(!self.name.trim().is_empty(), "name は空にできません");
+        if let Some(netcdf) = &self.input.netcdf {
+            ensure!(netcdf.region.longitude_min.is_finite() && netcdf.region.longitude_max.is_finite()
+                && netcdf.region.latitude_min.is_finite() && netcdf.region.latitude_max.is_finite(),
+                "input.netcdf.region は有限値で指定してください");
+            ensure!(netcdf.region.longitude_min < netcdf.region.longitude_max,
+                "input.netcdf.region.longitude_min は longitude_max より小さくしてください");
+            ensure!(netcdf.region.latitude_min < netcdf.region.latitude_max,
+                "input.netcdf.region.latitude_min は latitude_max より小さくしてください");
+            ensure!(netcdf.hycom_max_depth_m.is_finite() && netcdf.hycom_max_depth_m > 0.0,
+                "input.netcdf.hycom_max_depth_m は正の有限値にしてください");
+            if let Some(url) = &netcdf.hycom_url {
+                ensure!(url.starts_with("https://") || url.starts_with("http://"),
+                    "input.netcdf.hycom_url は http(s) URL にしてください");
+            }
+            for (key, value) in &netcdf.variables {
+                ensure!(!key.trim().is_empty() && !value.trim().is_empty(),
+                    "input.netcdf.variables のキー・値は空にできません");
+            }
+        }
         ensure!(self.grid.depth_interval_m.is_finite() && self.grid.depth_interval_m > 0.0,
             "grid.depth_interval_m は正の有限値にしてください");
         ensure!(self.grid.deep_velocity_decay_scale_m.is_finite() && self.grid.deep_velocity_decay_scale_m > 0.0,
