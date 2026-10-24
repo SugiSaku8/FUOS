@@ -1,12 +1,8 @@
 {
   "name": "suruga_bay",
   "input": {
-    "terrain_grid": "suruga_bay.sof/grid.snc",
-    "source_coordinates": "crates/s-builder/suruga_raw/coordinates.json",
-    "velocity_u": "crates/s-builder/suruga_raw/u.bin",
-    "velocity_v": "crates/s-builder/suruga_raw/v.bin",
-    "temperature": "crates/s-builder/suruga_raw/temperature.bin",
-    "salinity": "crates/s-builder/suruga_raw/salinity.bin"
+    "terrain_source": "suruga_bay.sof/terrain_source.snc",
+    "source_bundle": "crates/s-builder/suruga_raw/ocean_source.sosdata"
   },
   "grid": {
     "depth_interval_m": 250.0,

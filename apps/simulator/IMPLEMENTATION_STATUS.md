@@ -47,3 +47,22 @@ These are background numerical/physical parameters, not regionally calibrated va
 ## Verification status
 
 The editing environment used to prepare this stage has no Rust toolchain and no Apple Metal runtime. Therefore no claim is made that `cargo check`, the Metal shader compiler, runtime tests, or prediction-skill metrics have passed here. Run the commands in `docs/VALIDATE_SOS.md` on the target Apple Silicon Mac before using this build for experiments.
+
+## Data generation pipeline (Phases 1–7)
+
+- Added `cargo run -p simulator -- generate`, an interactive Y/N wizard that consolidates the raw source arrays and coordinates into a single `.sosdata` file, persists the new config input, and optionally creates the simulator SOF package immediately.
+- Added a versioned `SOSSRC01` bundle reader/writer with coordinate/length/finite-value validation and a round-trip unit test.
+- Added `GridBuilder`, which derives the solver grid from source coordinate axes, terrain depth, and the configured vertical spacing. `grid.snc` is generated as an output, not requested as a separate solver-grid input.
+- The field builder interpolates selected source fields to the generated vertical grid and applies a terrain-derived bottom/land mask. If a variable is omitted, the builder prints a warning and uses explicit placeholder initial values (zero velocity, 15 °C temperature, 35 PSU salinity); these are not observationally reconstructed values.
+- The initial, boundary, restart, forcing, grid, terrain and manifest files are written into the SOF package. Boundary edge arrays are derived from the generated initial velocity field.
+- Normal simulator startup consumes `source_bundle` and no longer requires separate coordinate, u, v, temperature and salinity paths. The old individual paths remain supported only as a migration fallback.
+- See `docs/DATA_GENERATION_PIPELINE.md` for the bundle format and execution instructions.
+
+## Source diagnostics and shared pipeline (added)
+
+- Added `diagnose` CLI and machine-readable `diagnostics.json` output.
+- Checks configured source file existence, SOF terrain shape/axes/spacing/bathymetry, source coordinate ordering/ranges/spacing, bundle validation, field sample counts, finite values, min/max/mean/zero fractions, common physical range outliers, constant fields, missing variables, terrain coverage, and source-depth coverage.
+- `ERROR` findings block data generation. The Y/N wizard requires explicit confirmation when only warnings are present. Normal startup performs the same preflight and blocks errors.
+- Added `pipeline.rs` as the common orchestration layer. Both the wizard and normal startup now use the same diagnostic -> validation gate -> dataset builder route. Future grid generation, interpolation, masking, initialization, and SOF output improvements should remain behind this shared pipeline.
+- The diagnostic is a structural/plausibility check, not scientific certification. Units, source timestamps, provider-specific missing values, source-grid staggering, and model skill still require domain-specific verification.
+- Rust compilation/runtime tests were not run in the current environment because `cargo`/`rustc` are unavailable; run `cargo check --workspace` and `cargo test --workspace` on the Apple Silicon Mac.

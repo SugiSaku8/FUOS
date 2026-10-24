@@ -16,12 +16,26 @@ pub struct Config {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct InputConfig {
-    pub terrain_grid: PathBuf,
-    pub source_coordinates: PathBuf,
-    pub velocity_u: PathBuf,
-    pub velocity_v: PathBuf,
-    pub temperature: PathBuf,
-    pub salinity: PathBuf,
+    /// Preferred explicit name for the terrain source (not the generated solver grid).
+    #[serde(default)]
+    pub terrain_source: Option<PathBuf>,
+    /// Legacy config key retained for existing users.
+    #[serde(default)]
+    pub terrain_grid: Option<PathBuf>,
+    /// Preferred compact source file containing coordinates and selected physical fields.
+    #[serde(default)]
+    pub source_bundle: Option<PathBuf>,
+    /// Legacy paths are retained for backward compatibility and one-time bundling.
+    #[serde(default)]
+    pub source_coordinates: Option<PathBuf>,
+    #[serde(default)]
+    pub velocity_u: Option<PathBuf>,
+    #[serde(default)]
+    pub velocity_v: Option<PathBuf>,
+    #[serde(default)]
+    pub temperature: Option<PathBuf>,
+    #[serde(default)]
+    pub salinity: Option<PathBuf>,
 }
 
 #[derive(Clone, Debug, Deserialize)]

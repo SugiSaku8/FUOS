@@ -117,7 +117,24 @@ impl BoundaryReader {
         let salinity = self.reader.read_dataset("salinity")?;
 
         let salinity = SalinityField::from_field(Field4D::from_vec(*coordinates.grid(), salinity));
-        let boundary = BoundaryField::zeros(*coordinates.grid());
+        let mut boundary = BoundaryField::zeros(*coordinates.grid());
+        // Older SOF boundary files did not store edge arrays; retain zero-boundary
+        // compatibility for those files and read explicit faces when available.
+        let has_boundary_faces = self.reader.datasets().iter().any(|d| d.name == "boundary_west_u");
+        if has_boundary_faces {
+            boundary.west.u_mut().replace(self.reader.read_dataset("boundary_west_u")?);
+            boundary.west.v_mut().replace(self.reader.read_dataset("boundary_west_v")?);
+            boundary.west.w_mut().replace(self.reader.read_dataset("boundary_west_w")?);
+            boundary.east.u_mut().replace(self.reader.read_dataset("boundary_east_u")?);
+            boundary.east.v_mut().replace(self.reader.read_dataset("boundary_east_v")?);
+            boundary.east.w_mut().replace(self.reader.read_dataset("boundary_east_w")?);
+            boundary.north.u_mut().replace(self.reader.read_dataset("boundary_north_u")?);
+            boundary.north.v_mut().replace(self.reader.read_dataset("boundary_north_v")?);
+            boundary.north.w_mut().replace(self.reader.read_dataset("boundary_north_w")?);
+            boundary.south.u_mut().replace(self.reader.read_dataset("boundary_south_u")?);
+            boundary.south.v_mut().replace(self.reader.read_dataset("boundary_south_v")?);
+            boundary.south.w_mut().replace(self.reader.read_dataset("boundary_south_w")?);
+        }
         //
         // OceanField
         //

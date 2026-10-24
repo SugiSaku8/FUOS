@@ -46,16 +46,14 @@ These defaults are starting parameters, not calibrated Suruga Bay coefficients. 
 
 ## Source data layout
 
-The supplied config expects:
+The supplied config now expects only two inputs:
 
-- `suruga_bay.sof/grid.snc`
-- `crates/s-builder/suruga_raw/coordinates.json`
-- `crates/s-builder/suruga_raw/u.bin`
-- `crates/s-builder/suruga_raw/v.bin`
-- `crates/s-builder/suruga_raw/temperature.bin`
-- `crates/s-builder/suruga_raw/salinity.bin`
+- `suruga_bay.sof/terrain_source.snc` (terrain source; retained as a separate input)
+- `crates/s-builder/suruga_raw/ocean_source.sosdata` (one compact bundle with coordinates and selected physical fields)
 
-Raw arrays are little-endian `f32` in `(depth, latitude, longitude)` order. `coordinates.json` must contain strictly increasing depth, latitude and longitude arrays whose product matches each raw array length.
+To rebuild the bundle and the simulator SOF package interactively, run `cargo run -p simulator -- generate`. The legacy `coordinates.json` and individual little-endian `f32` files remain as raw source material for that wizard. Raw arrays are ordered `(depth, latitude, longitude)`.
+
+See `docs/DATA_GENERATION_PIPELINE.md` for the bundle format, all seven implementation phases, fallback behavior, and validation commands.
 
 ## Scientific limitations
 

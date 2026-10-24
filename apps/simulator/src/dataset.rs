@@ -1,7 +1,6 @@
 use anyhow::{Context, Result, ensure};
-use serde::Deserialize;
 use s_field::{
-    BoundaryField, Coordinates, Field4D, Grid4D, Metadata, OceanField, SalinityField,
+    BoundaryField, Field4D, Grid4D, Metadata, OceanField, SalinityField,
     TemperatureField, VelocityField,
 };
 use s_sof::{
@@ -11,6 +10,9 @@ use s_sof::{
     package_reader::SofPackageReader,
 };
 use std::{fs, path::Path};
+
+use crate::source_bundle::{SourceBundle, SourceCoordinates};
+use crate::grid_builder::GridBuilder;
 
 use crate::config::Config;
 
@@ -61,30 +63,20 @@ pub struct DatasetBundle {
     pub depths: Vec<f32>,
 }
 
-#[derive(Deserialize)]
-struct SourceCoordinates {
-    depth: Vec<f32>,
-    latitude: Vec<f64>,
-    longitude: Vec<f64>,
-}
-
-pub fn build(config: &Config) -> Result<DatasetBundle> {
+pub fn build_from_validated(config: &Config) -> Result<DatasetBundle> {
     println!("[1/7] 設定・入力データを読み込みます");
-    let terrain_path = config.resolve(&config.input.terrain_grid);
+    let terrain_source = config.input.terrain_source.as_ref()
+        .or(config.input.terrain_grid.as_ref())
+        .ok_or_else(|| anyhow::anyhow!("input.terrain_source が必要です（terrain_grid は旧設定名です）"))?;
+    let terrain_path = config.resolve(terrain_source);
     let mut terrain_reader = GridReader::open(&terrain_path)
         .with_context(|| format!("地形SOFを開けません: {}", terrain_path.display()))?;
     let terrain = TerrainData::from_grid(
         terrain_reader.read().context("地形SOFの読み込みに失敗しました")?,
     )?;
 
-    let coordinate_path = config.resolve(&config.input.source_coordinates);
-    let coordinate_bytes = fs::read(&coordinate_path)
-        .with_context(|| format!("座標JSONを読めません: {}", coordinate_path.display()))?;
-    let source_coordinates: SourceCoordinates = serde_json::from_slice(&coordinate_bytes)
-        .with_context(|| format!("座標JSONが不正です: {}", coordinate_path.display()))?;
-    ensure!(source_coordinates.depth.len() >= 2, "元データには深度が2層以上必要です");
-    ensure!(source_coordinates.latitude.len() >= 2 && source_coordinates.longitude.len() >= 2,
-        "元データの緯度・経度格子は2点以上必要です");
+    let source = load_source_bundle(config)?;
+    let source_coordinates = source.coordinates;
     ensure!(strictly_increasing(&source_coordinates.depth), "元データの深度は昇順である必要があります");
     ensure!(strictly_increasing_f64(&source_coordinates.latitude), "元データの緯度は昇順である必要があります");
     ensure!(strictly_increasing_f64(&source_coordinates.longitude), "元データの経度は昇順である必要があります");
@@ -93,10 +85,11 @@ pub fn build(config: &Config) -> Result<DatasetBundle> {
     let source_height = source_coordinates.latitude.len();
     let source_plane = source_width * source_height;
     let source_count = source_plane * source_coordinates.depth.len();
-    let source_u = read_f32(config.resolve(&config.input.velocity_u).as_path())?;
-    let source_v = read_f32(config.resolve(&config.input.velocity_v).as_path())?;
-    let source_t = read_f32(config.resolve(&config.input.temperature).as_path())?;
-    let source_s = read_f32(config.resolve(&config.input.salinity).as_path())?;
+    // Missing fields are explicit initial defaults, not recovered observations.
+    let source_u = source.velocity_u.unwrap_or_else(|| { println!("      注意: 速度データなし。u=0 m/s で初期化します。"); vec![0.0; source_count] });
+    let source_v = source.velocity_v.unwrap_or_else(|| { println!("      注意: 速度データなし。v=0 m/s で初期化します。"); vec![0.0; source_count] });
+    let source_t = source.temperature.unwrap_or_else(|| { println!("      注意: 水温データなし。初期値15°Cで初期化します（観測値ではありません）。"); vec![15.0; source_count] });
+    let source_s = source.salinity.unwrap_or_else(|| { println!("      注意: 塩分データなし。初期値35 PSUで初期化します（観測値ではありません）。"); vec![35.0; source_count] });
     for (name, values) in [
         ("u", &source_u), ("v", &source_v),
         ("temperature", &source_t), ("salinity", &source_s),
@@ -106,29 +99,16 @@ pub fn build(config: &Config) -> Result<DatasetBundle> {
             name, values.len(), source_count, source_coordinates.depth.len(), source_height, source_width);
     }
 
+    let generated_grid = GridBuilder::build(&terrain, &source_coordinates, config.grid.depth_interval_m)?;
+    let grid = generated_grid.grid;
+    let coordinates = generated_grid.coordinates;
+    let depths = generated_grid.depths;
     let interval = config.grid.depth_interval_m;
-    let max_depth = terrain.max_depth_m();
-    let max_sim_depth = (max_depth / interval).ceil() * interval;
-    let depth_count = (max_sim_depth / interval).round() as usize + 1;
-    let depths = (0..depth_count).map(|i| i as f32 * interval).collect::<Vec<_>>();
+    let depth_count = depths.len();
 
-    // The Metal solver uses metres for all three spatial grid spacings.
-    let mean_lat = (source_coordinates.latitude[0]
-        + source_coordinates.latitude[source_height - 1]) * 0.5;
-    let dx_m = average_step_f64(&source_coordinates.longitude) as f32
-        * 111_320.0 * (mean_lat.to_radians().cos() as f32).abs().max(0.01);
-    let dy_m = average_step_f64(&source_coordinates.latitude) as f32 * 110_540.0;
-    let grid = Grid4D::new([1, depth_count, source_height, source_width], [1.0, interval, dy_m, dx_m]);
-    let coordinates = Coordinates::new(
-        grid,
-        source_coordinates.latitude.clone(),
-        source_coordinates.longitude.clone(),
-        depths.clone(),
-        vec![0.0],
-    );
-
-    println!("[2/7] 地形に基づく格子: {} × {} × {} (lon × lat × depth)", source_width, source_height, depth_count);
-    println!("      深度 0..{:.0}m / Δz={:.0}m / dx={:.1}m / dy={:.1}m", max_sim_depth, interval, dx_m, dy_m);
+    println!("[2/7] GridBuilder: {} × {} × {} (lon × lat × depth)", source_width, source_height, depth_count);
+    println!("      深度 0..{:.0}m / Δz={:.0}m / dx={:.1}m / dy={:.1}m",
+        generated_grid.max_sim_depth_m, interval, generated_grid.dx_m, generated_grid.dy_m);
 
     let mut u = expand_profile(&source_u, &source_coordinates.depth, &depths, source_plane,
         config.grid.deep_velocity_decay_scale_m, true);
@@ -158,16 +138,18 @@ pub fn build(config: &Config) -> Result<DatasetBundle> {
     metadata.set_source("Configured raw velocity, temperature, salinity and bathymetry inputs");
     metadata.set_history("Generated by apps/simulator dataset preparation");
     metadata.set_comment("Velocity below the deepest source layer is initialized using exponential attenuation; it is not source-observed deep data.");
+    let boundary = derive_boundary_field(&velocity);
     let field = OceanField::new(
-        coordinates, metadata, velocity, temperature, salinity, BoundaryField::zeros(grid),
+        coordinates, metadata, velocity, temperature, salinity, boundary,
     );
+    println!("[5/7] 初期状態・境界条件・再開状態の元フィールドを構築しました。");
 
     let output_root = config.output_root();
     fs::create_dir_all(&output_root)
         .with_context(|| format!("出力先を作成できません: {}", output_root.display()))?;
     let input_package_path = output_root.join("input.sof");
     write_package(&input_package_path, &config.name, &field, &terrain, &depths, interval)?;
-    println!("[3/7] 初期状態をSOF化: {}", input_package_path.display());
+    println!("[6/7] SOFパッケージを生成: {}", input_package_path.display());
 
     // Use the serialized SOF as the actual simulation input.
     let package = SofPackageReader::open(&input_package_path)?;
@@ -178,6 +160,7 @@ pub fn build(config: &Config) -> Result<DatasetBundle> {
     let terrain_from_sof = TerrainData::from_grid(
         terrain_package.read_terrain().context("生成したSOFのterrain.sncを再読込できません")?,
     )?;
+    println!("[7/7] SOFを再読込して検証しました。");
     println!("      source grid={}×{}×{}, masked land/sub-bottom cells={}",
         source_width, source_height, depth_count, masked_cells);
 
@@ -245,6 +228,82 @@ fn resample_bathymetry(terrain: &TerrainData, latitude: &[f32], longitude: &[f32
         }
     }
     values
+}
+
+
+/// Extracts the four edge faces from the generated velocity field for boundary.snc.
+/// Values are copied from the source-derived initial state; they are not a forecast.
+fn derive_boundary_field(source: &VelocityField) -> BoundaryField {
+    let grid = *source.grid();
+    let nx = grid.width();
+    let ny = grid.height();
+    let nz = grid.depth();
+    let plane = nx * ny;
+    let count = grid.len();
+    let su = source.u().as_slice();
+    let sv = source.v().as_slice();
+    let sw = source.w().as_slice();
+    let mut west = VelocityField::new(grid.clone());
+    let mut east = VelocityField::new(grid.clone());
+    let mut north = VelocityField::new(grid.clone());
+    let mut south = VelocityField::new(grid);
+    let mut edge_data = [[vec![0.0_f32; count]; 3]; 4];
+    for z in 0..nz {
+        for y in 0..ny {
+            for x in 0..nx {
+                let i = z * plane + y * nx + x;
+                let values = [su[i], sv[i], sw[i]];
+                if x == 0 { edge_data[0][0][i] = values[0]; edge_data[0][1][i] = values[1]; edge_data[0][2][i] = values[2]; }
+                if x + 1 == nx { edge_data[1][0][i] = values[0]; edge_data[1][1][i] = values[1]; edge_data[1][2][i] = values[2]; }
+                if y + 1 == ny { edge_data[2][0][i] = values[0]; edge_data[2][1][i] = values[1]; edge_data[2][2][i] = values[2]; }
+                if y == 0 { edge_data[3][0][i] = values[0]; edge_data[3][1][i] = values[1]; edge_data[3][2][i] = values[2]; }
+            }
+        }
+    }
+    west.u_mut().replace(edge_data[0][0].clone());
+    west.v_mut().replace(edge_data[0][1].clone());
+    west.w_mut().replace(edge_data[0][2].clone());
+    east.u_mut().replace(edge_data[1][0].clone());
+    east.v_mut().replace(edge_data[1][1].clone());
+    east.w_mut().replace(edge_data[1][2].clone());
+    north.u_mut().replace(edge_data[2][0].clone());
+    north.v_mut().replace(edge_data[2][1].clone());
+    north.w_mut().replace(edge_data[2][2].clone());
+    south.u_mut().replace(edge_data[3][0].clone());
+    south.v_mut().replace(edge_data[3][1].clone());
+    south.w_mut().replace(edge_data[3][2].clone());
+    BoundaryField::new(west, east, north, south)
+}
+
+fn load_source_bundle(config: &Config) -> Result<SourceBundle> {
+    if let Some(bundle_path) = &config.input.source_bundle {
+        let path = config.resolve(bundle_path);
+        if path.exists() {
+            return SourceBundle::read(&path)
+                .with_context(|| format!("ソースバンドルを読み込めません: {}", path.display()));
+        }
+        // A configured bundle is authoritative; do not silently fall back to stale raw files.
+        anyhow::bail!("ソースバンドルがありません: {}。`cargo run -p simulator -- generate` を実行してください。", path.display());
+    }
+    let coordinates_path = config.input.source_coordinates.as_ref()
+        .ok_or_else(|| anyhow::anyhow!("source_bundle または source_coordinates が必要です"))?;
+    let coordinate_path = config.resolve(coordinates_path);
+    let coordinate_bytes = fs::read(&coordinate_path)
+        .with_context(|| format!("座標JSONを読めません: {}", coordinate_path.display()))?;
+    let coordinates: SourceCoordinates = serde_json::from_slice(&coordinate_bytes)
+        .with_context(|| format!("座標JSONが不正です: {}", coordinate_path.display()))?;
+    let read_optional = |value: &Option<std::path::PathBuf>, name: &str| -> Result<Option<Vec<f32>>> {
+        match value {
+            Some(path) => Ok(Some(read_f32(config.resolve(path).as_path())?)),
+            None => { println!("      注意: legacy 設定に {} がありません。デフォルト値を使用します。", name); Ok(None) }
+        }
+    };
+    let u = read_optional(&config.input.velocity_u, "velocity_u")?;
+    let v = read_optional(&config.input.velocity_v, "velocity_v")?;
+    ensure!(u.is_some() == v.is_some(), "legacy 入力では u と v を両方指定してください");
+    Ok(SourceBundle { coordinates, velocity_u: u, velocity_v: v,
+        temperature: read_optional(&config.input.temperature, "temperature")?,
+        salinity: read_optional(&config.input.salinity, "salinity")? })
 }
 
 fn read_f32(path: &Path) -> Result<Vec<f32>> {
@@ -322,10 +381,6 @@ fn nearest_index(values: &[f32], value: f32) -> usize {
 fn average_step(values: &[f32]) -> f32 {
     if values.len() < 2 { return 1.0; }
     values.windows(2).map(|w| (w[1] - w[0]).abs()).sum::<f32>() / (values.len() - 1) as f32
-}
-fn average_step_f64(values: &[f64]) -> f64 {
-    if values.len() < 2 { return 1.0; }
-    values.windows(2).map(|w| (w[1] - w[0]).abs()).sum::<f64>() / (values.len() - 1) as f64
 }
 fn strictly_increasing(values: &[f32]) -> bool { values.windows(2).all(|w| w[1] > w[0]) }
 fn strictly_increasing_f64(values: &[f64]) -> bool { values.windows(2).all(|w| w[1] > w[0]) }

@@ -119,6 +119,18 @@ impl BoundaryWriter {
         self.writer
             .write_array("salinity", field.salinity().field().as_slice())?;
 
+        // Store the actual four boundary faces in addition to the full initial field.
+        for (side, velocity) in [
+            ("west", &field.boundary().west),
+            ("east", &field.boundary().east),
+            ("north", &field.boundary().north),
+            ("south", &field.boundary().south),
+        ] {
+            self.writer.write_array(&format!("boundary_{}_u", side), velocity.u().as_slice())?;
+            self.writer.write_array(&format!("boundary_{}_v", side), velocity.v().as_slice())?;
+            self.writer.write_array(&format!("boundary_{}_w", side), velocity.w().as_slice())?;
+        }
+
         Ok(())
     }
 
