@@ -30,7 +30,7 @@
   "simulation": {
     "dt_seconds": 0.01,
     "duration_seconds": 60.0,
-    "steps_per_frame": 4,
+    "steps_per_frame": 1,
     "steps_per_checkpoint": 600,
     "use_metal": true,
     "kuroshio_inflow": true,
@@ -44,7 +44,7 @@
     "show_ocean_surface": true,
     "show_bathymetry_contours": true,
     "contour_interval_m": 100.0,
-    "flow_line_count": 500,
+    "flow_line_count": 3600,
     "particle_trail_points": 48,
     "particle_speed_multiplier": 10.0,
     "particle_disappear_speed_mps": 0.1,
