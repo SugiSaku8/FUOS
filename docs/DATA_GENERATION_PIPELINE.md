@@ -63,15 +63,14 @@ The header records which variables are actually present. It does not pretend mis
 
 ## Inputs and outputs
 
-The terrain source (`terrain_source.snc`) remains a separate required input because it is both used to construct the solver depth range and retained as high-resolution rendering terrain. The preferred config now contains only:
+The public terrain source (`input.terrain_source`) is a NetCDF or GeoTIFF. Rust converts it to `input.terrain_output` (SNC), which the solver uses as its bathymetry grid. The scientific objective is set by `study.goal`; HYCOM variables and the default download filename are derived from that goal. The config shape is:
 
 ```json
 "input": {
-  "terrain_source": "runs/suruga_bay/preprocessed/terrain_source.snc",
+  "terrain_source": "data/raw/gebco_suruga.nc",
+  "terrain_output": "runs/suruga_bay/preprocessed/terrain_source.snc",
   "source_bundle": "runs/suruga_bay/preprocessed/ocean_source.sosdata",
   "netcdf": {
-    "terrain_file": "data/raw/gebco_suruga.nc",
-    "ocean_file": "data/raw/hycom_suruga.nc",
     "prepared_dir": "runs/suruga_bay/preprocessed",
     "region": {"longitude_min": 137.5, "longitude_max": 139.5, "latitude_min": 33.5, "latitude_max": 35.5},
     "time_index": 0,
@@ -94,7 +93,6 @@ The bundle reader validates magic, format version, coordinate monotonicity, fiel
 cargo check --workspace
 cargo test -p simulator
 cargo test --workspace
-cargo run -p simulator -- generate
 cargo run -p simulator -- generate
 cargo run -p simulator -- --simulation --cpu
 ```

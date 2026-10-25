@@ -1,22 +1,25 @@
 {
   "name": "suruga_bay",
+  "study": {
+    "goal": "kuroshio_transport"
+  },
   "input": {
-    "terrain_source": "runs/suruga_bay/preprocessed/terrain_source.snc",
+    "terrain_source": "data/raw/gebco_2026_n35.9_s33.2_w137.5_e139.4.nc",
     "source_bundle": "runs/suruga_bay/preprocessed/ocean_source.sosdata",
     "netcdf": {
-      "terrain_file": "data/raw/gebco_suruga.nc",
-      "ocean_file": "data/raw/hycom_suruga.nc",
       "prepared_dir": "runs/suruga_bay/preprocessed",
       "region": {
         "longitude_min": 137.5,
-        "longitude_max": 139.5,
-        "latitude_min": 33.5,
-        "latitude_max": 35.5
+        "longitude_max": 139.4,
+        "latitude_min": 33.9,
+        "latitude_max": 35.3
       },
       "time_index": 0,
+      "hycom_time": "2019-09-04T21:00:00Z",
       "variables": {},
-      "hycom_max_depth_m": 2000.0
-    }
+      "hycom_max_depth_m": 9000.0
+    },
+    "terrain_output": "runs/suruga_bay/preprocessed/terrain_source.snc"
   },
   "grid": {
     "depth_interval_m": 250.0,
@@ -40,9 +43,11 @@
     "enabled": true,
     "show_ocean_surface": true,
     "show_bathymetry_contours": true,
-    "contour_interval_m": 250.0,
+    "contour_interval_m": 100.0,
+    "flow_line_count": 500,
     "particle_trail_points": 48,
-    "particle_speed_multiplier": 240.0,
+    "particle_speed_multiplier": 10.0,
+    "particle_disappear_speed_mps": 0.1,
     "seed_stride_x": 1,
     "seed_stride_y": 1
   },

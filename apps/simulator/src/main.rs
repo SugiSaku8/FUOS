@@ -25,26 +25,37 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    let config_arg = args.iter()
-        .find(|arg| !arg.starts_with('-'))
-        .map(String::as_str)
-        .unwrap_or(DEFAULT_CONFIG);
-
-    if args.first().map(String::as_str) == Some("get") {
-        if !args.iter().any(|arg| arg == "--hycom") {
-            anyhow::bail!("get では --hycom を指定してください。例: cargo run -p simulator -- get --hycom");
+    // Parse the command before looking for a config path. This prevents tokens
+    // such as `get`, `generate`, and `diagnose` from being mistaken for JSON paths.
+    let command = args.first().map(String::as_str).filter(|s| !s.starts_with('-'));
+    match command {
+        Some("get") => {
+            let rest = &args[1..];
+            if !rest.iter().any(|arg| arg == "--hycom") {
+                anyhow::bail!("get では --hycom を指定してください。例: cargo run -p simulator -- get --hycom");
+            }
+            let config_arg = rest.iter().find(|arg| !arg.starts_with('-')).map(String::as_str).unwrap_or(DEFAULT_CONFIG);
+            let force = rest.iter().any(|arg| arg == "--force");
+            return get_hycom(config_arg, force);
         }
-        let config_arg = args.iter().skip(1).find(|arg| !arg.starts_with('-')).map(String::as_str).unwrap_or(DEFAULT_CONFIG);
-        let force = args.iter().any(|arg| arg == "--force");
-        return get_hycom(config_arg, force);
-    }
-    if args.first().map(String::as_str) == Some("generate") {
-        return generator_cli::run(args.iter().skip(1).find(|a| !a.starts_with('-')).map(String::as_str));
-    }
-    if args.first().map(String::as_str) == Some("diagnose") {
-        return run_diagnose(&args[1..]);
+        Some("generate") => {
+            let config_arg = args[1..].iter().find(|a| !a.starts_with('-')).map(String::as_str);
+            return generator_cli::run(config_arg);
+        }
+        Some("diagnose") => return run_diagnose(&args[1..]),
+        Some("simulate") | Some("simulation") => {
+            let config_arg = args[1..].iter().find(|a| !a.starts_with('-')).map(String::as_str).unwrap_or(DEFAULT_CONFIG);
+            return run_simulation(config_arg, &args[1..]);
+        }
+        Some(other) if other.ends_with(".json") || other.contains('/') => {
+            // Backward compatibility: a config path as the first argument.
+            return run_simulation(other, &args[1..]);
+        }
+        Some(other) => anyhow::bail!("不明なコマンド: {other}\n\n{HELP_TEXT}"),
+        None => {}
     }
 
+    let config_arg = args.iter().find(|arg| !arg.starts_with('-')).map(String::as_str).unwrap_or(DEFAULT_CONFIG);
     if args.iter().any(|arg| arg == "--y") {
         if confirm("すべての処理を Y で実行しますか？")? {
             return run_all(config_arg, true);
@@ -58,8 +69,7 @@ fn main() -> Result<()> {
     if args.iter().any(|arg| arg == "--simulation") || args.is_empty() || args.iter().all(|a| a.starts_with('-')) {
         return run_simulation(config_arg, &args);
     }
-
-    // Backward compatibility: a config path plus solver flags means simulation-only.
+    // A config path plus solver flags remains supported.
     run_simulation(config_arg, &args)
 }
 
@@ -78,8 +88,8 @@ fn get_hycom(config_arg: &str, force: bool) -> Result<()> {
         .with_context(|| format!("設定ファイルを読み込めません: {config_arg}"))?;
     println!("=== HYCOM 自動取得（Rust/curl） ===");
     println!("保存先: {}", config.input.netcdf.as_ref()
-        .map(|nc| config.resolve(&nc.ocean_file).display().to_string())
-        .unwrap_or_else(|| "input.netcdf.ocean_file 未設定".to_string()));
+        .map(|nc| config.resolve(config.hycom_output_path(nc)).display().to_string())
+        .unwrap_or_else(|| "input.netcdf 設定がありません".to_string()));
     netcdf_pipeline::download_hycom(&config, force)
 }
 
@@ -88,8 +98,11 @@ fn ensure_hycom_if_only_terrain_exists(config_arg: &str) -> Result<()> {
     let config = Config::load(config_arg)
         .with_context(|| format!("設定ファイルを読み込めません: {config_arg}"))?;
     let Some(netcdf) = config.input.netcdf.as_ref() else { return Ok(()); };
-    let terrain = config.resolve(&netcdf.terrain_file);
-    let ocean = config.resolve(&netcdf.ocean_file);
+    let Some(terrain_source) = config.input.terrain_source.as_ref().or(netcdf.terrain_file.as_ref()) else {
+        return Ok(());
+    };
+    let terrain = config.resolve(terrain_source);
+    let ocean = config.resolve(config.hycom_output_path(netcdf));
     if terrain.is_file() && !ocean.is_file() {
         println!("[AUTO] 地形データはありますが海洋入力がありません。HYCOMを自動取得します。\n");
         get_hycom(config_arg, false)?;
@@ -175,6 +188,6 @@ fn confirm(question: &str) -> Result<bool> {
     }
 }
 
-fn print_help() {
-    println!("Suruga Ocean Simulator\n\nUsage:\n  cargo run -p simulator -- generate [config.json]\n  cargo run -p simulator -- diagnose [config.json] [--json report.json]\n  cargo run -p simulator -- get --hycom [config.json] [--force]\n  cargo run -p simulator -- --simulation [config.json] [--fresh|--resume] [--cpu|--metal]\n  cargo run -p simulator -- --all [config.json]\n  cargo run -p simulator -- --y [config.json]\n\nCommands:\n  generate      Generate the source bundle and SOF input package (interactive)\n  get --hycom   Download the Suruga Bay HYCOM subset to the configured data/raw path\n  diagnose      Diagnose configured input data and write diagnostics.json\n  --simulation  Run only from an existing input.sof; does not generate inputs\n  --all         Run generate, diagnose, and simulation in sequence\n  --y           Ask once; Y auto-answers all generator prompts, N runs simulation only\n\nSimulation options:\n  --fresh       Ignore checkpoints and start from SOF initial state\n  --resume      Resume from the latest valid checkpoint\n  --cpu         Use the CPU reference solver\n  --metal       Use Apple Metal compute\n");
-}
+const HELP_TEXT: &str = "Suruga Ocean Simulator\n\nUsage:\n  cargo run -p simulator -- get --hycom [config.json] [--force]\n  cargo run -p simulator -- generate [config.json]\n  cargo run -p simulator -- diagnose [config.json] [--json report.json]\n  cargo run -p simulator -- simulate [config.json] [--fresh|--resume] [--cpu|--metal]\n  cargo run -p simulator -- --simulation [config.json] [--fresh|--resume] [--cpu|--metal]\n  cargo run -p simulator -- --all [config.json]\n  cargo run -p simulator -- --y [config.json]\n\nCommands:\n  get --hycom   Download the HYCOM subset for input.netcdf.region\n  generate      Prepare NetCDF inputs and generate input.sof\n  diagnose      Validate inputs and write diagnostics.json\n  simulate      Run only from an existing input.sof\n  --all         Run get-if-needed, generate, diagnose, and simulation\n  --y           Ask once; Y runs the full pipeline, N runs simulation only\n\nOptions:\n  --force       Re-download HYCOM even if the target file exists\n  --fresh       Ignore checkpoints and start from SOF initial state\n  --resume      Resume from the latest valid checkpoint\n  --cpu         Use the CPU reference solver\n  --metal       Use Apple Metal compute";
+
+fn print_help() { println!("{HELP_TEXT}"); }

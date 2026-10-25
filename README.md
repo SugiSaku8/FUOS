@@ -51,7 +51,7 @@ cargo run -p simulator -- generate
 
 ### Public input data (NetCDF / GeoTIFF)
 
-Terrain may be provided as a NetCDF grid or GeoTIFF (`.tif` / `.tiff`); ocean physical fields remain NetCDF. Set `input.netcdf.terrain_file` in `apps/simulator/config/simulator.json` to the desired terrain file.
+Terrain may be provided as a NetCDF grid or GeoTIFF (`.tif` / `.tiff`); ocean physical fields remain NetCDF. Set `input.terrain_source` in `apps/simulator/config/simulator.json` to the desired terrain file.
 
 ```bash
 # Download a regional HYCOM GOFS 3.1 subset into data/raw/
@@ -60,8 +60,16 @@ cargo run -p simulator -- get --hycom
 # Force re-download
 cargo run -p simulator -- get --hycom --force
 
+The command parser treats `get`, `generate`, and `diagnose` as subcommands (not as config-file paths). An optional config path goes after the command, for example `cargo run -p simulator -- get --hycom apps/simulator/config/simulator.json --force`. The shared horizontal study window is `input.netcdf.region`; `get` reports the actual HYCOM coordinate-centre extent, and `generate` clips the rendered terrain to that same actual HYCOM coverage before building the solver grid.
+
 # With terrain present but ocean input missing, --all downloads HYCOM automatically
 cargo run -p simulator -- --all
 ```
 
 NetCDF ingestion is implemented in Rust. GeoTIFF support requires GDAL (`brew install gdal` on macOS). See `docs/NETCDF_INPUT_PIPELINE.md` for supported formats and limits.
+
+### Study objective selects HYCOM data
+
+Set `study.goal` in `apps/simulator/config/simulator.json` instead of configuring a specific ocean input filename. The downloader derives `data/raw/hycom_<goal>.nc` and requests only the variables needed by that objective. Supported values: `kuroshio_transport`, `current_field`, `temperature_distribution`, `salinity_distribution`, `heat_transport`, `water_mass`, `full_ocean_state`. `input.terrain_source` selects the public NetCDF/GeoTIFF terrain; `input.terrain_output` is the generated SNC grid.
+
+Projected/rotated GeoTIFFs are automatically reprojected and clipped to the configured region using GDAL `gdalwarp` (included with `brew install gdal`). Python is fully excluded.

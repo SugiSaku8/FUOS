@@ -4,8 +4,6 @@ use s_field::VelocityField;
 
 /// terrain.rs と同じ深度方向の表示倍率。
 const OCEAN_VERTICAL_SCALE: f32 = 5.0;
-/// Treat sub-0.1 mm/s numerical residue as effectively stationary.
-const FLOW_STOP_SPEED_MPS: f64 = 1.0e-4;
 
 /// 静的な流線を生成する。
 pub struct FlowGenerator;
@@ -52,7 +50,7 @@ impl FlowGenerator {
                 let u = vel[0] as f64;
                 let v = vel[1] as f64;
 
-                if !u.is_finite() || !v.is_finite() || u.hypot(v) <= FLOW_STOP_SPEED_MPS {
+                if !u.is_finite() || !v.is_finite() || u.hypot(v) < 0.02 {
                     break;
                 }
 
@@ -127,7 +125,6 @@ struct FlowParticle {
 /// 流速データを使って粒子を時間発展させるシステム。
 pub struct FlowParticleSystem {
     particles: Vec<FlowParticle>,
-    max_trail_points: usize,
     vertical_scale: f32,
 }
 
@@ -151,14 +148,15 @@ impl FlowParticleSystem {
                 latitude: seed[1] as f64,
                 depth: seed[2],
 
-                trail: Vec::new(),
+                // `max_trail_points` is an initial allocation hint only; trails
+                // grow until the configured speed threshold clears them.
+                trail: Vec::with_capacity(max_trail_points.max(2)),
                 flow_color: FlowVertex::CYAN,
             })
             .collect();
 
         Self {
             particles,
-            max_trail_points: max_trail_points.max(2),
             vertical_scale: if vertical_scale.is_finite() && vertical_scale > 0.0 { vertical_scale } else { OCEAN_VERTICAL_SCALE },
         }
     }
@@ -172,7 +170,21 @@ impl FlowParticleSystem {
         speed_multiplier: f32,
         time: f64,
     ) {
-        self.update_with_temperature(velocity, &[], converter, dt_seconds, speed_multiplier, time);
+        self.update_with_temperature_and_disappear_speed(velocity, &[], converter, dt_seconds, speed_multiplier, time, 0.02);
+    }
+
+    pub fn update_with_disappear_speed(
+        &mut self,
+        velocity: &VelocityField,
+        converter: &GeoConverter,
+        dt_seconds: f32,
+        speed_multiplier: f32,
+        time: f64,
+        disappear_speed_mps: f32,
+    ) {
+        self.update_with_temperature_and_disappear_speed(
+            velocity, &[], converter, dt_seconds, speed_multiplier, time, disappear_speed_mps,
+        );
     }
 
     /// Updates particles and colors them by temperature anomaly and vertical flow.
@@ -185,6 +197,23 @@ impl FlowParticleSystem {
         dt_seconds: f32,
         speed_multiplier: f32,
         time: f64,
+    ) {
+        self.update_with_temperature_and_disappear_speed(
+            velocity, temperature, converter, dt_seconds, speed_multiplier, time, 0.02,
+        );
+    }
+
+    /// The trail grows continuously. It is cleared only when local 3-D speed
+    /// reaches or falls below `disappear_speed_mps` (or the particle exits the domain).
+    pub fn update_with_temperature_and_disappear_speed(
+        &mut self,
+        velocity: &VelocityField,
+        temperature: &[f32],
+        converter: &GeoConverter,
+        dt_seconds: f32,
+        speed_multiplier: f32,
+        time: f64,
+        disappear_speed_mps: f32,
     ) {
         let Some(coordinates) = velocity.coordinates() else {
             return;
@@ -199,9 +228,11 @@ impl FlowParticleSystem {
             if count == 0 { 10.0 } else { sum / count as f32 }
         };
 
-        let dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 100.0;
+        // 視覚化用の時間倍率。倍率を完全に外すと広域の海流では移動が
+        // 見えにくくなるため、加速は維持しつつ、下で格子幅に応じて制限する。
+        let base_dt = dt_seconds.clamp(0.0, 0.05) * speed_multiplier.max(0.0) * 10.0;
 
-        if !dt.is_finite() || dt <= 0.0 {
+        if !base_dt.is_finite() || base_dt <= 0.0 {
             return;
         }
 
@@ -237,15 +268,6 @@ impl FlowParticleSystem {
                 continue;
             }
 
-            // A stationary particle must not leave a stale trail or marker behind.
-            // Clear the trail and keep the particle at its current position; if the
-            // current becomes non-zero later, a new trail can grow from there.
-            // The tiny epsilon avoids treating floating-point residue as real flow.
-            if u.hypot(v).hypot(w) <= FLOW_STOP_SPEED_MPS {
-                particle.trail.clear();
-                continue;
-            }
-
             // Nearest-cell temperature anomaly. This is a visual diagnostic, not a
             // substitute for the buoyancy term in the momentum equation.
             if !temperature.is_empty() {
@@ -274,8 +296,45 @@ impl FlowParticleSystem {
                 particle.flow_color = FlowVertex::CYAN;
             }
 
-            let east_m = u * dt as f64;
-            let north_m = v * dt as f64;
+            let local_speed = u.hypot(v).hypot(w);
+            let disappear_threshold = if disappear_speed_mps.is_finite() {
+                disappear_speed_mps.max(0.0) as f64
+            } else { 0.02 };
+            if local_speed <= disappear_threshold {
+                // Do not keep a stale trail when the flow slows to the configured
+                // threshold. The particle remains at its current location; if the
+                // current later accelerates, a new trail begins there.
+                particle.trail.clear();
+                continue;
+            }
+
+            // 1フレームで格子幅を飛び越えないように、水平・鉛直成分ごとに
+            // 移動時間を制限する。これにより領域外判定→軌跡全消去の連発を防ぐ。
+            let cos_lat_abs = particle.latitude.to_radians().cos().abs().max(1.0e-6);
+            let min_lon_step = coordinates.longitude().windows(2)
+                .map(|pair| (pair[1] - pair[0]).abs()).fold(f64::INFINITY, f64::min);
+            let min_lat_step = coordinates.latitude().windows(2)
+                .map(|pair| (pair[1] - pair[0]).abs()).fold(f64::INFINITY, f64::min);
+            let min_depth_step = coordinates.depth().windows(2)
+                .map(|pair| (pair[1] - pair[0]).abs() as f64).fold(f64::INFINITY, f64::min);
+
+            let horizontal_cell_m = (min_lon_step * 111_320.0 * cos_lat_abs)
+                .min(min_lat_step * 110_540.0);
+            let vertical_cell_m = min_depth_step;
+            let horizontal_speed = u.hypot(v);
+            let mut dt = base_dt as f64;
+            if horizontal_cell_m.is_finite() && horizontal_cell_m > 0.0 && horizontal_speed > 1.0e-9 {
+                dt = dt.min(horizontal_cell_m * 0.20 / horizontal_speed);
+            }
+            if vertical_cell_m.is_finite() && vertical_cell_m > 0.0 && w.abs() > 1.0e-9 {
+                dt = dt.min(vertical_cell_m * 0.20 / w.abs());
+            }
+            if !dt.is_finite() || dt <= 0.0 {
+                continue;
+            }
+
+            let east_m = u * dt;
+            let north_m = v * dt;
 
             let delta_lat = north_m / 110_540.0;
 
@@ -293,7 +352,7 @@ impl FlowParticleSystem {
             let next_latitude = particle.latitude + delta_lat;
 
             // 深度は海面0、下向きを正とする。
-            let next_depth = particle.depth - (w as f32) * dt;
+            let next_depth = particle.depth - (w * dt) as f32;
             let next_position_is_valid = next_depth.is_finite()
                 && coordinates.contains(next_longitude, next_latitude, next_depth)
                 && next_longitude >= bounds.lon_min
@@ -320,12 +379,6 @@ impl FlowParticleSystem {
             }
 
             particle.trail.push(world_end);
-
-            if particle.trail.len() > self.max_trail_points {
-                let excess = particle.trail.len() - self.max_trail_points;
-
-                particle.trail.drain(0..excess);
-            }
 
             particle.longitude = next_longitude;
             particle.latitude = next_latitude;

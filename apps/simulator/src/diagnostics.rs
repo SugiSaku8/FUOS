@@ -67,12 +67,16 @@ pub fn diagnose(config: &Config) -> DiagnosticReport {
         files: Vec::new(), findings: Vec::new(), recommendations: Vec::new(),
     };
     if let Some(netcdf) = &config.input.netcdf {
-        inspect_file(&mut report, "public_terrain_netcdf", &config.resolve(&netcdf.terrain_file));
-        inspect_file(&mut report, "public_ocean_netcdf", &config.resolve(&netcdf.ocean_file));
+        if let Some(terrain_source) = config.input.terrain_source.as_ref().or(netcdf.terrain_file.as_ref()) {
+            inspect_file(&mut report, "public_terrain_source", &config.resolve(terrain_source));
+        } else {
+            finding(&mut report, "ERROR", "TERRAIN_SOURCE_NOT_CONFIGURED", "input.terrain_source が未設定です。", "NetCDFまたはGeoTIFFの地形ソースを指定してください。");
+        }
+        inspect_file(&mut report, "public_ocean_netcdf", &config.resolve(config.hycom_output_path(netcdf)));
         inspect_file(&mut report, "netcdf_preprocess_manifest", &config.resolve(&netcdf.prepared_dir).join("preprocess_manifest.json"));
     }
 
-    let terrain_setting = config.input.terrain_source.as_ref().or(config.input.terrain_grid.as_ref());
+    let terrain_setting = config.input.terrain_output.as_ref();
     let terrain = if let Some(setting) = terrain_setting {
         let path = config.resolve(setting);
         inspect_file(&mut report, "terrain", &path);
@@ -81,12 +85,12 @@ pub fn diagnose(config: &Config) -> DiagnosticReport {
                 Some(t) => Some(t), None => None,
             },
             Err(e) => {
-                finding(&mut report, "ERROR", "TERRAIN_READ", format!("地形データを読み込めません: {} ({e})", path.display()), "terrain_source のパスと SOF/SNC 形式を確認してください。");
+                finding(&mut report, "ERROR", "TERRAIN_READ", format!("地形データを読み込めません: {} ({e})", path.display()), "terrain_output のパスと SOF/SNC 形式を確認してください。");
                 None
             }
         }
     } else {
-        finding(&mut report, "ERROR", "TERRAIN_NOT_CONFIGURED", "input.terrain_source が設定されていません。", "地形SOF/SNCファイルを指定してください。");
+        finding(&mut report, "ERROR", "TERRAIN_NOT_CONFIGURED", "input.terrain_output が設定されていません。", "生成済み地形SOF/SNCファイルを指定してください。");
         None
     };
 

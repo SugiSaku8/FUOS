@@ -6,6 +6,8 @@ use std::{collections::BTreeMap, fs, path::{Path, PathBuf}};
 pub struct Config {
     pub name: String,
     pub input: InputConfig,
+    #[serde(default)]
+    pub study: StudyConfig,
     pub grid: GridConfig,
     pub simulation: SimulationConfig,
     pub render: RenderConfig,
@@ -16,12 +18,12 @@ pub struct Config {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct InputConfig {
-    /// Preferred explicit name for the terrain source (not the generated solver grid).
+    /// Public source terrain file (NetCDF or GeoTIFF).
     #[serde(default)]
     pub terrain_source: Option<PathBuf>,
-    /// Legacy config key retained for existing users.
-    #[serde(default)]
-    pub terrain_grid: Option<PathBuf>,
+    /// Generated terrain SNC consumed by the solver. `terrain_grid` is a legacy alias.
+    #[serde(default, alias = "terrain_grid")]
+    pub terrain_output: Option<PathBuf>,
     /// Preferred compact source file containing coordinates and selected physical fields.
     #[serde(default)]
     pub source_bundle: Option<PathBuf>,
@@ -41,24 +43,58 @@ pub struct InputConfig {
     pub netcdf: Option<NetcdfInputConfig>,
 }
 
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct StudyConfig {
+    /// Scientific objective controls which HYCOM variables are requested.
+    #[serde(default = "default_study_goal")]
+    pub goal: String,
+}
+impl Default for StudyConfig {
+    fn default() -> Self { Self { goal: default_study_goal() } }
+}
+fn default_study_goal() -> String { "kuroshio_transport".to_string() }
+
+impl StudyConfig {
+    pub fn requested_fields(&self) -> Result<Vec<&'static str>> {
+        let fields = match self.goal.as_str() {
+            "current_field" => vec!["u", "v"],
+            "kuroshio_transport" | "full_ocean_state" => vec!["u", "v", "w", "temperature", "salinity"],
+            "temperature_distribution" => vec!["u", "v", "temperature"],
+            "salinity_distribution" => vec!["u", "v", "salinity"],
+            "heat_transport" => vec!["u", "v", "temperature"],
+            "water_mass" => vec!["u", "v", "temperature", "salinity"],
+            other => anyhow::bail!("study.goal '{}' は未対応です。kuroshio_transport / current_field / temperature_distribution / salinity_distribution / heat_transport / water_mass / full_ocean_state から選んでください", other),
+        };
+        Ok(fields)
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct NetcdfInputConfig {
-    /// Public bathymetry/terrain NetCDF or GeoTIFF (for example GEBCO).
-    pub terrain_file: PathBuf,
+    /// Legacy terrain input override. Prefer input.terrain_source.
+    #[serde(default)]
+    pub terrain_file: Option<PathBuf>,
     /// Public ocean physical-field NetCDF (for example HYCOM).
-    pub ocean_file: PathBuf,
+    /// Optional legacy output override. Normally derived from study.goal.
+    #[serde(default)]
+    pub ocean_file: Option<PathBuf>,
     #[serde(default = "default_prepared_dir")]
     pub prepared_dir: PathBuf,
     #[serde(default)]
     pub region: NetcdfRegionConfig,
     #[serde(default)]
     pub time_index: usize,
-    /// Maximum depth (m, positive down) retrieved by `get --hycom`.
+    /// Legacy compatibility setting. All available depth levels are retained; this value is not used to limit depth.
     #[serde(default = "default_hycom_max_depth")]
     pub hycom_max_depth_m: f64,
-    /// Optional HYCOM OPeNDAP endpoint override.
+    /// Optional HYCOM NCSS endpoint override.
     #[serde(default)]
     pub hycom_url: Option<String>,
+    /// Exact timestamp requested from the archived GLBy0.08/expt_93.0 dataset.
+    /// The archive currently ends at 2024-09-04T21:00:00Z.
+    #[serde(default)]
+    pub hycom_time: Option<String>,
     /// Explicit NetCDF variable/coordinate overrides. Keys are documented in tools/netcdf/README.md.
     #[serde(default)]
     pub variables: BTreeMap<String, String>,
@@ -122,11 +158,20 @@ pub struct RenderConfig {
     pub show_ocean_surface: bool,
     pub show_bathymetry_contours: bool,
     pub contour_interval_m: f32,
+    /// Maximum number of particle seeds rendered; trails may grow until their speed threshold is met.
+    #[serde(default = "default_flow_line_count")]
+    pub flow_line_count: usize,
+    /// Initial capacity hint for each particle trail, not a hard maximum length.
     pub particle_trail_points: usize,
     pub particle_speed_multiplier: f32,
+    /// Clear a trail when local 3-D speed is at or below this threshold (m/s).
+    #[serde(default = "default_particle_disappear_speed")]
+    pub particle_disappear_speed_mps: f32,
     pub seed_stride_x: usize,
     pub seed_stride_y: usize,
 }
+fn default_flow_line_count() -> usize { 9676 }
+fn default_particle_disappear_speed() -> f32 { 0.02 }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct OutputConfig {
@@ -171,8 +216,14 @@ impl Config {
         self.resolve(&self.output.root)
     }
 
+    /// HYCOM output is derived from the requested scientific objective unless a legacy override is set.
+    pub fn hycom_output_path(&self, netcdf: &NetcdfInputConfig) -> PathBuf {
+        netcdf.ocean_file.clone().unwrap_or_else(|| PathBuf::from(format!("data/raw/hycom_{}.nc", self.study.goal)))
+    }
+
     pub fn validate(&self) -> Result<()> {
         ensure!(!self.name.trim().is_empty(), "name は空にできません");
+        self.study.requested_fields()?;
         if let Some(netcdf) = &self.input.netcdf {
             ensure!(netcdf.region.longitude_min.is_finite() && netcdf.region.longitude_max.is_finite()
                 && netcdf.region.latitude_min.is_finite() && netcdf.region.latitude_max.is_finite(),
@@ -186,6 +237,10 @@ impl Config {
             if let Some(url) = &netcdf.hycom_url {
                 ensure!(url.starts_with("https://") || url.starts_with("http://"),
                     "input.netcdf.hycom_url は http(s) URL にしてください");
+            }
+            if let Some(time) = &netcdf.hycom_time {
+                ensure!(time.contains('T') && (time.ends_with('Z') || time.contains('+') || time.rfind('-').is_some()),
+                    "input.netcdf.hycom_time は ISO-8601 時刻（例: 2024-09-04T21:00:00Z）にしてください");
             }
             for (key, value) in &netcdf.variables {
                 ensure!(!key.trim().is_empty() && !value.trim().is_empty(),
@@ -216,7 +271,12 @@ impl Config {
             "simulation.bottom_drag_coefficient は0..=0.1の有限値にしてください");
         ensure!(self.render.contour_interval_m.is_finite() && self.render.contour_interval_m > 0.0,
             "render.contour_interval_m は正の有限値にしてください");
+        ensure!(self.render.flow_line_count > 0, "render.flow_line_count は1以上にしてください");
         ensure!(self.render.particle_trail_points >= 2, "render.particle_trail_points は2以上にしてください");
+        ensure!(self.render.particle_speed_multiplier.is_finite() && self.render.particle_speed_multiplier >= 0.0,
+            "render.particle_speed_multiplier は0以上の有限値にしてください");
+        ensure!(self.render.particle_disappear_speed_mps.is_finite() && self.render.particle_disappear_speed_mps >= 0.0,
+            "render.particle_disappear_speed_mps は0以上の有限値にしてください");
         ensure!(self.render.seed_stride_x > 0 && self.render.seed_stride_y > 0,
             "render.seed_stride_x / seed_stride_y は1以上にしてください");
         Ok(())
@@ -233,4 +293,24 @@ fn find_workspace_root(start: &Path) -> Option<PathBuf> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod study_tests {
+    use super::StudyConfig;
+
+    #[test]
+    fn each_study_goal_requests_the_required_hycom_fields() {
+        assert_eq!(StudyConfig { goal: "kuroshio_transport".into() }.requested_fields().unwrap(), vec!["u", "v", "w", "temperature", "salinity"]);
+        assert_eq!(StudyConfig { goal: "full_ocean_state".into() }.requested_fields().unwrap(), vec!["u", "v", "w", "temperature", "salinity"]);
+        assert_eq!(StudyConfig { goal: "current_field".into() }.requested_fields().unwrap(), vec!["u", "v"]);
+        assert_eq!(StudyConfig { goal: "temperature_distribution".into() }.requested_fields().unwrap(), vec!["u", "v", "temperature"]);
+        assert_eq!(StudyConfig { goal: "salinity_distribution".into() }.requested_fields().unwrap(), vec!["u", "v", "salinity"]);
+        assert_eq!(StudyConfig { goal: "water_mass".into() }.requested_fields().unwrap(), vec!["u", "v", "temperature", "salinity"]);
+    }
+
+    #[test]
+    fn unknown_study_goal_is_rejected() {
+        assert!(StudyConfig { goal: "not_a_goal".into() }.requested_fields().is_err());
+    }
 }

@@ -85,3 +85,11 @@ The editing environment used to prepare this stage has no Rust toolchain and no 
 - `cargo run -p simulator -- get --hycom [config.json] [--force]` retrieves a regional NetCDF response with `curl` from the configured public HYCOM NCSS endpoint.
 - The native pipeline writes the terrain via `s-sof::GridWriter`, writes the normalized ocean source bundle, and keeps final SOF package creation in the shared Rust pipeline.
 - All external preprocessing scripts, interpreter setup, and package requirements were removed. Rust compilation and live HYCOM retrieval must be verified on the target Mac.
+
+## Study-objective-driven HYCOM and projected GeoTIFF support (added)
+
+- `study.goal` now selects the scientific objective and HYCOM variables: `kuroshio_transport` and `full_ocean_state` request `water_u`, `water_v`, `water_w`, `water_temp`, and `salinity`; other goals request only their required fields. The native reader stores `water_w` as `w.bin` and includes it in the source bundle when the server provides it.
+- HYCOM output filenames are derived from the objective (`data/raw/hycom_<goal>.nc`). The previous `input.netcdf.ocean_file` remains an optional compatibility override, but is no longer in the default `simulator.json`.
+- `input.terrain_source` now names the public terrain source (NetCDF or GeoTIFF); `input.terrain_output` names the generated SNC grid consumed by the simulator.
+- Projected or rotated GeoTIFF inputs are automatically clipped/reprojected to EPSG:4326 using native GDAL `gdalwarp`; install with `brew install gdal`. No Python scripts or runtime dependencies are part of the project.
+- Added tests for objective-to-variable selection. Rust compilation and live HYCOM requests remain unverified in this environment because `cargo`/`rustc` are unavailable.

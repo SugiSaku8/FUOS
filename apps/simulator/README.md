@@ -77,3 +77,7 @@ cargo run -p simulator -- --all
 ```
 
 NetCDF ingestion is native Rust. GeoTIFF support requires GDAL (`brew install gdal` on macOS). HYCOM retrieval depends on the public NCSS service and may not represent real-time ocean conditions. See `docs/NETCDF_INPUT_PIPELINE.md`.
+
+### Kuroshio transport variables
+
+With `study.goal` set to `kuroshio_transport`, the HYCOM request includes `water_u`, `water_v`, `water_w`, `water_temp`, and `salinity`. When returned by the endpoint, `water_w` is normalized into `w.bin` and included in the source bundle. The GLBy0.08/expt_93.0 endpoint must actually expose `water_w`; if NCSS rejects that variable or the response lacks it, the download/preprocessing step will fail rather than silently treating `w=0` as downloaded data.

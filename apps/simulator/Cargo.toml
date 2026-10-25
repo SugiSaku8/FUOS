@@ -19,5 +19,5 @@ s-renderer = { path = "../../crates/s-renderer" }
 
 # Native NetCDF input; static feature avoids a separate NetCDF runtime install.
 netcdf = { version = "0.12", features = ["static"] }
-# GeoTIFF reader. Install GDAL with Homebrew on macOS: brew install gdal
-gdal = "0.18"
+# GeoTIFF reprojection/readback uses GDAL command-line tools (gdalwarp/gdal_translate),
+# avoiding gdal Rust binding incompatibilities across system GDAL releases.

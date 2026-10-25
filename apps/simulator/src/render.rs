@@ -2,15 +2,25 @@ use anyhow::{Context, Result, ensure};
 use s_field::Coordinates;
 use s_renderer::{
     GeoBounds, GeoConverter, GpuFlowMesh, HeightMap, Renderer, TerrainMesh, TerrainVertex,
-    camera_controller::CameraController,
-    contour::generate_bathymetry_contours_with_scale,
-    flow_generator::FlowParticleSystem,
-    terrain::OceanSurfaceMesh,
+    camera_controller::CameraController, contour::generate_bathymetry_contours_with_scale,
+    flow_generator::FlowParticleSystem, terrain::OceanSurfaceMesh,
 };
-use std::{collections::VecDeque, sync::{Arc, mpsc}, thread, time::{Duration, Instant}};
-use winit::{dpi::PhysicalSize, event::{ElementState, Event, MouseButton, WindowEvent}, event_loop::{ControlFlow, EventLoop}, window::WindowAttributes};
+use std::{
+    collections::VecDeque,
+    sync::{Arc, mpsc},
+    thread,
+    time::{Duration, Instant},
+};
+use winit::{
+    dpi::PhysicalSize,
+    event::{ElementState, Event, MouseButton, WindowEvent},
+    event_loop::{ControlFlow, EventLoop},
+    window::WindowAttributes,
+};
 
-use crate::{config::Config, dataset::TerrainData, engine::SimulationEngine, time_finder::TimeFinder};
+use crate::{
+    config::Config, dataset::TerrainData, engine::SimulationEngine, time_finder::TimeFinder,
+};
 
 struct SimulationSnapshot {
     step: u64,
@@ -21,7 +31,11 @@ struct SimulationSnapshot {
 }
 
 enum SimulationCommand {
-    Restore { field: s_field::OceanField, step: u64, time_seconds: f64 },
+    Restore {
+        field: s_field::OceanField,
+        step: u64,
+        time_seconds: f64,
+    },
     Finish,
 }
 
@@ -37,7 +51,11 @@ fn simulation_worker(
         let mut should_stop = false;
         while let Ok(command) = command_rx.try_recv() {
             match command {
-                SimulationCommand::Restore { field, step, time_seconds } => {
+                SimulationCommand::Restore {
+                    field,
+                    step,
+                    time_seconds,
+                } => {
                     engine.restore_snapshot(field, step, time_seconds);
                     last_publish = Instant::now() - publish_interval;
                 }
@@ -50,7 +68,9 @@ fn simulation_worker(
                 }
             }
         }
-        if should_stop { break; }
+        if should_stop {
+            break;
+        }
 
         if !engine.is_finished() {
             if let Err(error) = engine.advance(steps_per_batch) {
@@ -69,7 +89,9 @@ fn simulation_worker(
                 finished: engine.is_finished(),
                 published_at: Instant::now(),
             };
-            if snapshot_tx.send(snapshot).is_err() { break; }
+            if snapshot_tx.send(snapshot).is_err() {
+                break;
+            }
             last_publish = Instant::now();
         }
 
@@ -90,13 +112,15 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
 
     let event_loop = EventLoop::new()?;
     let window = Arc::new(event_loop.create_window(
-        WindowAttributes::default().with_title("Suruga Ocean Simulator — Live Simulation")
+        WindowAttributes::default().with_title("Suruga Ocean Simulator — Live Simulation"),
     )?);
-    let time_window = Arc::new(event_loop.create_window(
-        WindowAttributes::default()
-            .with_title("SOS 時間ファインダー")
-            .with_inner_size(PhysicalSize::new(820, 250)),
-    )?);
+    let time_window = Arc::new(
+        event_loop.create_window(
+            WindowAttributes::default()
+                .with_title("SOS 時間ファインダー")
+                .with_inner_size(PhysicalSize::new(820, 250)),
+        )?,
+    );
     // The time finder is an independent, visible top-level window.
     time_window.set_visible(true);
     let mut time_finder = pollster::block_on(TimeFinder::new(time_window.clone()))?;
@@ -111,39 +135,68 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
     let mut history: VecDeque<(u64, f64, s_field::OceanField)> = VecDeque::new();
 
     let terrain_mesh = TerrainMesh::from_heightmap_with_scale(
-        &heightmap, bounds, config.grid.terrain_vertical_scale, config.grid.world_scale,
+        &heightmap,
+        bounds,
+        config.grid.terrain_vertical_scale,
+        config.grid.world_scale,
     );
     let ocean_mesh = OceanSurfaceMesh::new_with_scale(&bounds, &heightmap, config.grid.world_scale);
-    println!("Terrain mesh: {} vertices / {} indices", terrain_mesh.vertex_count(), terrain_mesh.index_count());
+    println!(
+        "Terrain mesh: {} vertices / {} indices",
+        terrain_mesh.vertex_count(),
+        terrain_mesh.index_count()
+    );
 
     let mut renderer = Renderer::new(
         window.clone(),
         include_str!("../../../crates/s-renderer/src/terrain.wgsl"),
         &[TerrainVertex::layout()],
-    ).await?;
+    )
+    .await?;
     let gpu_terrain = terrain_mesh.upload(renderer.device());
     let gpu_ocean = ocean_mesh.upload(renderer.device());
 
     let contour_vertices = if config.render.show_bathymetry_contours {
         generate_bathymetry_contours_with_scale(
-            &heightmap, bounds, config.grid.terrain_vertical_scale,
-            config.render.contour_interval_m, config.grid.world_scale,
+            &heightmap,
+            bounds,
+            config.grid.terrain_vertical_scale,
+            config.render.contour_interval_m,
+            config.grid.world_scale,
         )
-    } else { Vec::new() };
+    } else {
+        Vec::new()
+    };
     let gpu_contours = GpuFlowMesh::from_flow_vertices(renderer.device(), &contour_vertices);
     println!("Bathymetry contours: {} vertices", contour_vertices.len());
 
     let converter = GeoConverter::new(bounds, config.grid.world_scale);
-    let coordinates = engine.field().velocity().coordinates()
-        .context("初期海流場に座標がありません")?.clone();
-    let seeds = generate_seeds(
-        &coordinates, &bounds, &terrain, config.render.seed_stride_x, config.render.seed_stride_y,
+    let coordinates = engine
+        .field()
+        .velocity()
+        .coordinates()
+        .context("初期海流場に座標がありません")?
+        .clone();
+    let all_seeds = generate_seeds(
+        &coordinates,
+        &bounds,
+        &terrain,
+        config.render.seed_stride_x,
+        config.render.seed_stride_y,
     );
-    ensure!(!seeds.is_empty(), "海底地形と海流格子が重なる領域に粒子の開始点がありません");
+    ensure!(
+        !all_seeds.is_empty(),
+        "海底地形と海流格子が重なる領域に粒子の開始点がありません"
+    );
+    let seeds = select_seed_subset(&all_seeds, config.render.flow_line_count);
     let seed_points = seeds.clone();
     let mut active_seeds = seed_points.clone();
     let last_flow_count = active_seeds.len();
-    let mut particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
+    let mut particles = FlowParticleSystem::new_with_vertical_scale(
+        &active_seeds,
+        config.render.particle_trail_points,
+        config.grid.terrain_vertical_scale,
+    );
     let initial_step = engine.step();
     let initial_time = engine.time_seconds();
     let initial_field = engine.snapshot();
@@ -158,16 +211,26 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
     let (snapshot_tx, snapshot_rx) = mpsc::channel();
     let (command_tx, command_rx) = mpsc::channel();
     let steps_per_batch = config.simulation.steps_per_frame.max(1);
-    let mut worker_handle = Some(thread::Builder::new().name("sos-simulation-worker".into()).spawn(move || {
-        simulation_worker(engine, steps_per_batch, snapshot_tx, command_rx);
-    }).context("シミュレーション計算スレッドを起動できません")?);
+    let mut worker_handle = Some(
+        thread::Builder::new()
+            .name("sos-simulation-worker".into())
+            .spawn(move || {
+                simulation_worker(engine, steps_per_batch, snapshot_tx, command_rx);
+            })
+            .context("シミュレーション計算スレッドを起動できません")?,
+    );
     let snapshot_interval = config.simulation.steps_per_frame.max(1) as u64 * 10;
     let render_delay = Duration::from_secs(3);
     let max_vertices = seeds.len() * ((config.render.particle_trail_points - 1) * 2 + 6);
     let mut gpu_flow = GpuFlowMesh::with_capacity(renderer.device(), max_vertices);
     let gpu_particle_dots = GpuFlowMesh::with_capacity(renderer.device(), seeds.len());
     let mut camera_controller = CameraController::new();
-    println!("Flow seeds: {}, depth levels: {}", seeds.len(), coordinates.depth_levels());
+    println!(
+        "Flow seeds: {} / configured maximum: {}, depth levels: {}",
+        seeds.len(),
+        config.render.flow_line_count,
+        coordinates.depth_levels()
+    );
     println!("[6/7] 計算スレッドと描画を分離して起動します（描画遅延3秒 / 最大100 FPS）");
 
     let mut last_frame = Instant::now();
@@ -179,44 +242,83 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
 
     event_loop.run(move |event, target| {
         match event {
-            Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == main_window_id => {
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CloseRequested,
+            } if window_id == main_window_id => {
                 let _ = command_tx.send(SimulationCommand::Finish);
                 if let Some(handle) = worker_handle.take() {
                     let _ = handle.join();
                 }
                 target.exit();
             }
-            Event::WindowEvent { window_id, event: WindowEvent::CloseRequested } if window_id == time_window_id => {
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CloseRequested,
+            } if window_id == time_window_id => {
                 // Closing the finder only hides the auxiliary view; simulation continues.
                 time_window.set_visible(false);
             }
-            Event::WindowEvent { window_id, event: WindowEvent::Resized(size) } if window_id == main_window_id => renderer.resize(size),
-            Event::WindowEvent { window_id, event: WindowEvent::Resized(size) } if window_id == time_window_id => time_finder.resize(size),
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::Resized(size),
+            } if window_id == main_window_id => renderer.resize(size),
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::Resized(size),
+            } if window_id == time_window_id => time_finder.resize(size),
             Event::AboutToWait => {
                 let now = Instant::now();
                 if now >= next_frame {
                     window.request_redraw();
-                    if time_window.is_visible().unwrap_or(false) { time_window.request_redraw(); }
+                    if time_window.is_visible().unwrap_or(false) {
+                        time_window.request_redraw();
+                    }
                     next_frame = now + frame_interval;
                 }
                 target.set_control_flow(ControlFlow::WaitUntil(next_frame));
-            },
-            Event::WindowEvent { window_id, event: WindowEvent::CursorMoved { position, .. } } if window_id == time_window_id => {
+            }
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::CursorMoved { position, .. },
+            } if window_id == time_window_id => {
                 time_cursor_x = position.x;
                 time_cursor_y = position.y;
                 if options_open && flow_slider_dragging {
                     let width = time_window.inner_size().width.max(1) as f64;
                     let nx = (position.x / width * 2.0 - 1.0) as f32;
-                    flow_fraction = (((nx + 0.60) / 1.42).clamp(0.0, 1.0) * 0.95 + 0.05).clamp(0.05, 1.0);
-                    let desired = ((seed_points.len() as f32 * flow_fraction).round() as usize).clamp(1, seed_points.len().max(1));
+                    flow_fraction =
+                        (((nx + 0.60) / 1.42).clamp(0.0, 1.0) * 0.95 + 0.05).clamp(0.05, 1.0);
+                    let desired = ((seed_points.len() as f32 * flow_fraction).round() as usize)
+                        .clamp(1, seed_points.len().max(1));
                     active_seeds = select_seed_subset(&seed_points, desired);
-                    particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
+                    particles = FlowParticleSystem::new_with_vertical_scale(
+                        &active_seeds,
+                        config.render.particle_trail_points,
+                        config.grid.terrain_vertical_scale,
+                    );
                 }
             }
-            Event::WindowEvent { window_id, event: WindowEvent::MouseInput { state: ElementState::Released, button: MouseButton::Left, .. } } if window_id == time_window_id => {
+            Event::WindowEvent {
+                window_id,
+                event:
+                    WindowEvent::MouseInput {
+                        state: ElementState::Released,
+                        button: MouseButton::Left,
+                        ..
+                    },
+            } if window_id == time_window_id => {
                 flow_slider_dragging = false;
             }
-            Event::WindowEvent { window_id, event: WindowEvent::MouseInput { state: ElementState::Pressed, button: MouseButton::Left, .. } } if window_id == time_window_id => {
+            Event::WindowEvent {
+                window_id,
+                event:
+                    WindowEvent::MouseInput {
+                        state: ElementState::Pressed,
+                        button: MouseButton::Left,
+                        ..
+                    },
+            } if window_id == time_window_id => {
                 let size = time_window.inner_size();
                 let width = size.width.max(1) as f64;
                 let height = size.height.max(1) as f64;
@@ -224,23 +326,48 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                 let ny = (1.0 - time_cursor_y / height * 2.0) as f32;
                 if nx >= 0.50 && ny >= 0.56 {
                     options_open = !options_open;
-                } else if options_open && (-0.94..=-0.78).contains(&nx) && (0.24..=0.48).contains(&ny) {
+                } else if options_open
+                    && (-0.94..=-0.78).contains(&nx)
+                    && (0.24..=0.48).contains(&ny)
+                {
                     show_temperature = !show_temperature;
-                    println!("OPTIONS: 温度可視化 {}", if show_temperature { "ON" } else { "OFF" });
-                } else if options_open && (-0.64..=0.86).contains(&nx) && (0.24..=0.48).contains(&ny) {
+                    println!(
+                        "OPTIONS: 温度可視化 {}",
+                        if show_temperature { "ON" } else { "OFF" }
+                    );
+                } else if options_open
+                    && (-0.64..=0.86).contains(&nx)
+                    && (0.24..=0.48).contains(&ny)
+                {
                     flow_slider_dragging = true;
-                    flow_fraction = (((nx + 0.60) / 1.42).clamp(0.0, 1.0) * 0.95 + 0.05).clamp(0.05, 1.0);
-                    let desired = ((seed_points.len() as f32 * flow_fraction).round() as usize).clamp(1, seed_points.len().max(1));
+                    flow_fraction =
+                        (((nx + 0.60) / 1.42).clamp(0.0, 1.0) * 0.95 + 0.05).clamp(0.05, 1.0);
+                    let desired = ((seed_points.len() as f32 * flow_fraction).round() as usize)
+                        .clamp(1, seed_points.len().max(1));
                     active_seeds = select_seed_subset(&seed_points, desired);
-                    particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
-                    println!("OPTIONS: 流線 {}本 / 全{}本", last_flow_count, seed_points.len());
+                    particles = FlowParticleSystem::new_with_vertical_scale(
+                        &active_seeds,
+                        config.render.particle_trail_points,
+                        config.grid.terrain_vertical_scale,
+                    );
+                    println!(
+                        "OPTIONS: 流線 {}本 / 全{}本",
+                        last_flow_count,
+                        seed_points.len()
+                    );
                 } else if ny >= -0.82 && ny <= -0.38 && nx >= -0.96 && nx <= 0.96 {
                     if history.len() > 1 {
                         let fraction = (time_cursor_x / width).clamp(0.0, 1.0);
                         let index = ((history.len() - 1) as f64 * fraction).round() as usize;
-                        if let Some((step, time, field)) = history.get(index).map(|(s, t, f)| (*s, *t, (*f).clone())) {
+                        if let Some((step, time, field)) =
+                            history.get(index).map(|(s, t, f)| (*s, *t, (*f).clone()))
+                        {
                             history.truncate(index + 1);
-                            let _ = command_tx.send(SimulationCommand::Restore { field: field.clone(), step, time_seconds: time });
+                            let _ = command_tx.send(SimulationCommand::Restore {
+                                field: field.clone(),
+                                step,
+                                time_seconds: time,
+                            });
                             while snapshot_rx.try_recv().is_ok() {}
                             delay_queue.clear();
                             displayed_field = field;
@@ -248,24 +375,38 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                             displayed_time = time;
                             latest_computed_step = step;
                             latest_computed_time = time;
-                            particles = FlowParticleSystem::new_with_vertical_scale(&active_seeds, config.render.particle_trail_points, config.grid.terrain_vertical_scale);
+                            particles = FlowParticleSystem::new_with_vertical_scale(
+                                &active_seeds,
+                                config.render.particle_trail_points,
+                                config.grid.terrain_vertical_scale,
+                            );
                             println!("Time Finder: seek to step={} t={:.3}s", step, time);
                         }
                     }
                 }
             }
-            Event::WindowEvent { window_id, event: WindowEvent::RedrawRequested } if window_id == time_window_id => {
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::RedrawRequested,
+            } if window_id == time_window_id => {
                 let max_time = config.simulation.duration_seconds.max(1.0);
                 let history_start = history.front().map(|(_, t, _)| *t).unwrap_or(0.0);
                 let history_end = history.back().map(|(_, t, _)| *t).unwrap_or(max_time);
                 let span = (history_end - history_start).max(1.0e-9);
                 time_finder.render(
                     ((displayed_time - history_start) / span) as f32,
-                    history.len(), displayed_time, max_time,
-                    options_open, show_temperature, flow_fraction,
+                    history.len(),
+                    displayed_time,
+                    max_time,
+                    options_open,
+                    show_temperature,
+                    flow_fraction,
                 );
             }
-            Event::WindowEvent { window_id, event: WindowEvent::RedrawRequested } if window_id == main_window_id => {
+            Event::WindowEvent {
+                window_id,
+                event: WindowEvent::RedrawRequested,
+            } if window_id == main_window_id => {
                 let now = Instant::now();
                 let wall_dt = now.duration_since(last_frame).as_secs_f32();
                 last_frame = now;
@@ -275,15 +416,31 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                     latest_computed_time = snapshot.time_seconds;
                     latest_computed_finished = snapshot.finished;
                     let should_push = snapshot.step > 0
-                        && snapshot.step / snapshot_interval > history.back().map(|(step, _, _)| *step / snapshot_interval).unwrap_or(0);
+                        && snapshot.step / snapshot_interval
+                            > history
+                                .back()
+                                .map(|(step, _, _)| *step / snapshot_interval)
+                                .unwrap_or(0);
                     if should_push {
-                        history.push_back((snapshot.step, snapshot.time_seconds, snapshot.field.clone()));
-                        while history.len() > 180 { history.pop_front(); }
+                        history.push_back((
+                            snapshot.step,
+                            snapshot.time_seconds,
+                            snapshot.field.clone(),
+                        ));
+                        while history.len() > 180 {
+                            history.pop_front();
+                        }
                     }
                     delay_queue.push_back(snapshot);
-                    while delay_queue.len() > 45 { delay_queue.pop_front(); }
+                    while delay_queue.len() > 45 {
+                        delay_queue.pop_front();
+                    }
                 }
-                while delay_queue.front().map(|snapshot| snapshot.published_at.elapsed() >= render_delay).unwrap_or(false) {
+                while delay_queue
+                    .front()
+                    .map(|snapshot| snapshot.published_at.elapsed() >= render_delay)
+                    .unwrap_or(false)
+                {
                     if let Some(snapshot) = delay_queue.pop_front() {
                         displayed_step = snapshot.step;
                         displayed_time = snapshot.time_seconds;
@@ -291,19 +448,32 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                     }
                 }
                 if show_temperature {
-                    particles.update_with_temperature(
-                        displayed_field.velocity(), displayed_field.temperature().field().as_slice(), &converter, wall_dt.min(0.05),
-                        config.render.particle_speed_multiplier, displayed_time,
+                    particles.update_with_temperature_and_disappear_speed(
+                        displayed_field.velocity(),
+                        displayed_field.temperature().field().as_slice(),
+                        &converter,
+                        wall_dt.min(0.05),
+                        config.render.particle_speed_multiplier,
+                        displayed_time,
+                        config.render.particle_disappear_speed_mps,
                     );
                 } else {
-                    particles.update(
-                        displayed_field.velocity(), &converter, wall_dt.min(0.05),
-                        config.render.particle_speed_multiplier, displayed_time,
+                    particles.update_with_disappear_speed(
+                        displayed_field.velocity(),
+                        &converter,
+                        wall_dt.min(0.05),
+                        config.render.particle_speed_multiplier,
+                        displayed_time,
+                        config.render.particle_disappear_speed_mps,
                     );
                 }
                 let flow_vertices = particles.vertices();
-                if !gpu_flow.update_vertices(renderer.queue(), &flow_vertices) {
-                    eprintln!("Flow vertex capacity exceeded: {} > {}", flow_vertices.len(), max_vertices);
+                if !gpu_flow.update_vertices(renderer.device(), renderer.queue(), &flow_vertices) {
+                    eprintln!(
+                        "Flow vertex capacity exceeded: {} > {}",
+                        flow_vertices.len(),
+                        max_vertices
+                    );
                 }
                 camera_controller.update_with_dt(renderer.camera_mut(), wall_dt.min(0.05));
                 // Terrain is the only collision boundary. The camera can pass through
@@ -315,9 +485,14 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                     && camera.position.z >= 0.0
                     && camera.position.z <= world_scale;
                 if inside_terrain && terrain.width > 0 && terrain.height > 0 {
-                    let tx = ((camera.position.x / world_scale) * (terrain.width.saturating_sub(1)) as f32).round() as usize;
-                    let ty = ((camera.position.z / world_scale) * (terrain.height.saturating_sub(1)) as f32).round() as usize;
-                    let seabed_y = terrain.bathymetry[ty.min(terrain.height - 1) * terrain.width + tx.min(terrain.width - 1)]
+                    let tx = ((camera.position.x / world_scale)
+                        * (terrain.width.saturating_sub(1)) as f32)
+                        .round() as usize;
+                    let ty = ((camera.position.z / world_scale)
+                        * (terrain.height.saturating_sub(1)) as f32)
+                        .round() as usize;
+                    let seabed_y = terrain.bathymetry
+                        [ty.min(terrain.height - 1) * terrain.width + tx.min(terrain.width - 1)]
                         * config.grid.terrain_vertical_scale;
                     camera.position.y = camera.position.y.max(seabed_y + 250.0);
                 }
@@ -325,30 +500,57 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
                 report_frames += 1;
                 title_elapsed += wall_dt;
                 if title_elapsed >= 0.5 {
-                    let state = if latest_computed_finished { "完了" } else { "計算中" };
+                    let state = if latest_computed_finished {
+                        "完了"
+                    } else {
+                        "計算中"
+                    };
                     window.set_title(&format!(
                         "Suruga Ocean Simulator | {} | step {} | t={:.2}/{:.2}s",
-                        state, latest_computed_step, latest_computed_time, config.simulation.duration_seconds
+                        state,
+                        latest_computed_step,
+                        latest_computed_time,
+                        config.simulation.duration_seconds
                     ));
                     title_elapsed = 0.0;
                 }
                 if report_elapsed >= 2.0 {
-                    println!("FPS: {:.1} | step: {} | sim t: {:.2}s / {:.2}s | flow vertices: {}",
-                        report_frames as f32 / report_elapsed, displayed_step, displayed_time,
-                        config.simulation.duration_seconds, flow_vertices.len());
+                    println!(
+                        "FPS: {:.1} | step: {} | sim t: {:.2}s / {:.2}s | flow vertices: {}",
+                        report_frames as f32 / report_elapsed,
+                        displayed_step,
+                        displayed_time,
+                        config.simulation.duration_seconds,
+                        flow_vertices.len()
+                    );
                     report_elapsed = 0.0;
                     report_frames = 0;
                 }
 
-                let ocean = if config.render.show_ocean_surface { Some(&gpu_ocean) } else { None };
-                let contours = if config.render.show_bathymetry_contours { Some(&gpu_contours) } else { None };
+                let ocean = if config.render.show_ocean_surface {
+                    Some(&gpu_ocean)
+                } else {
+                    None
+                };
+                let contours = if config.render.show_bathymetry_contours {
+                    Some(&gpu_contours)
+                } else {
+                    None
+                };
                 if let Err(error) = renderer.render_with_ocean_and_particles(
-                    &gpu_terrain, ocean, contours, Some(&gpu_flow), Some(&gpu_particle_dots), None,
+                    &gpu_terrain,
+                    ocean,
+                    contours,
+                    Some(&gpu_flow),
+                    Some(&gpu_particle_dots),
+                    None,
                 ) {
                     eprintln!("Render error: {error:#}");
                 }
             }
-            Event::WindowEvent { window_id, event } if window_id == main_window_id => camera_controller.process(&event),
+            Event::WindowEvent { window_id, event } if window_id == main_window_id => {
+                camera_controller.process(&event)
+            }
             _ => {}
         }
     })?;
@@ -356,21 +558,43 @@ pub async fn run(config: Config, mut engine: SimulationEngine) -> Result<()> {
 }
 
 fn select_seed_subset(seeds: &[[f32; 3]], desired: usize) -> Vec<[f32; 3]> {
-    if seeds.is_empty() || desired == 0 { return Vec::new(); }
-    if desired >= seeds.len() { return seeds.to_vec(); }
+    if seeds.is_empty() || desired == 0 {
+        return Vec::new();
+    }
+    if desired >= seeds.len() {
+        return seeds.to_vec();
+    }
     // Evenly distribute selected seeds across the full depth/area rather than
     // merely truncating the list and biasing the display toward shallow cells.
-    (0..desired).map(|i| {
-        let index = i.saturating_mul(seeds.len() - 1) / desired.saturating_sub(1).max(1);
-        seeds[index]
-    }).collect()
+    (0..desired)
+        .map(|i| {
+            let index = i.saturating_mul(seeds.len() - 1) / desired.saturating_sub(1).max(1);
+            seeds[index]
+        })
+        .collect()
 }
 
 fn bounds_of(terrain: &TerrainData) -> GeoBounds {
-    let lon_min = terrain.longitude.iter().copied().fold(f32::INFINITY, f32::min) as f64;
-    let lon_max = terrain.longitude.iter().copied().fold(f32::NEG_INFINITY, f32::max) as f64;
-    let lat_min = terrain.latitude.iter().copied().fold(f32::INFINITY, f32::min) as f64;
-    let lat_max = terrain.latitude.iter().copied().fold(f32::NEG_INFINITY, f32::max) as f64;
+    let lon_min = terrain
+        .longitude
+        .iter()
+        .copied()
+        .fold(f32::INFINITY, f32::min) as f64;
+    let lon_max = terrain
+        .longitude
+        .iter()
+        .copied()
+        .fold(f32::NEG_INFINITY, f32::max) as f64;
+    let lat_min = terrain
+        .latitude
+        .iter()
+        .copied()
+        .fold(f32::INFINITY, f32::min) as f64;
+    let lat_max = terrain
+        .latitude
+        .iter()
+        .copied()
+        .fold(f32::NEG_INFINITY, f32::max) as f64;
     GeoBounds::new(lon_min, lon_max, lat_min, lat_max)
 }
 
@@ -392,17 +616,29 @@ fn generate_seeds(
     for &depth in coordinates.depth() {
         for y in (0..coordinates.height()).step_by(stride_y) {
             for x in (0..coordinates.width()).step_by(stride_x) {
-                let (Some(lon), Some(lat)) = (coordinates.longitude_at(x), coordinates.latitude_at(y)) else { continue; };
+                let (Some(lon), Some(lat)) =
+                    (coordinates.longitude_at(x), coordinates.latitude_at(y))
+                else {
+                    continue;
+                };
                 push_seed_if_wet(&mut seeds, lon, lat, depth, bounds, terrain);
             }
         }
 
         if coordinates.width() > 1 && coordinates.height() > 1 {
             for y in 0..coordinates.height() - 1 {
-                let (Some(lat0), Some(lat1)) = (coordinates.latitude_at(y), coordinates.latitude_at(y + 1)) else { continue; };
+                let (Some(lat0), Some(lat1)) =
+                    (coordinates.latitude_at(y), coordinates.latitude_at(y + 1))
+                else {
+                    continue;
+                };
                 let lat = (lat0 + lat1) * 0.5;
                 for x in 0..coordinates.width() - 1 {
-                    let (Some(lon0), Some(lon1)) = (coordinates.longitude_at(x), coordinates.longitude_at(x + 1)) else { continue; };
+                    let (Some(lon0), Some(lon1)) =
+                        (coordinates.longitude_at(x), coordinates.longitude_at(x + 1))
+                    else {
+                        continue;
+                    };
                     let lon = (lon0 + lon1) * 0.5;
                     push_seed_if_wet(&mut seeds, lon, lat, depth, bounds, terrain);
                 }
@@ -420,7 +656,8 @@ fn push_seed_if_wet(
     bounds: &GeoBounds,
     terrain: &TerrainData,
 ) {
-    if lon < bounds.lon_min || lon > bounds.lon_max || lat < bounds.lat_min || lat > bounds.lat_max {
+    if lon < bounds.lon_min || lon > bounds.lon_max || lat < bounds.lat_min || lat > bounds.lat_max
+    {
         return;
     }
     let tx = nearest_index(&terrain.longitude, lon as f32).min(terrain.width - 1);
@@ -433,7 +670,10 @@ fn push_seed_if_wet(
 }
 
 fn nearest_index(values: &[f32], value: f32) -> usize {
-    values.iter().enumerate()
+    values
+        .iter()
+        .enumerate()
         .min_by(|(_, a), (_, b)| (**a - value).abs().total_cmp(&(**b - value).abs()))
-        .map(|(index, _)| index).unwrap_or(0)
+        .map(|(index, _)| index)
+        .unwrap_or(0)
 }

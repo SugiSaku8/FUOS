@@ -1,0 +1,12 @@
+{
+  "note": "w is estimated from horizontal u/v via incompressible continuity when source w is unavailable; shallowest depth is constrained to w=0. This is an estimate, not a source-provided or observed field. Known packed HYCOM variables are unpacked using their documented scale_factor/add_offset; -30000 fill markers are retained for masking.",
+  "shape_depth_lat_lon": [
+    40,
+    35,
+    24
+  ],
+  "sos_cache_signature": "782bf17fc48fd193",
+  "source_ocean": "/Users/sugisaku/Developer/Suruga-Wan/data/raw/hycom_kuroshio_transport.nc",
+  "source_terrain": "/Users/sugisaku/Developer/Suruga-Wan/data/raw/gebco_2026_n35.9_s33.2_w137.5_e139.4.nc",
+  "variables": "Rust native NetCDF reader"
+}

@@ -28,9 +28,9 @@ pub fn run_with_auto_yes(config_arg: Option<&str>, auto_yes: bool) -> Result<()>
     println!(" Suruga Ocean Simulator / Data Generator");
     println!("============================================\n");
     println!("入力を1つのソースバンドルにまとめ、Grid・各物理場・SOFパッケージを生成します。\n");
-    let terrain_source = config.input.terrain_source.as_ref().or(config.input.terrain_grid.as_ref())
-        .ok_or_else(|| anyhow::anyhow!("input.terrain_source が必要です（旧設定 terrain_grid も利用できます）"))?;
-    println!("地形データは独立した入力として維持します: {}", config.resolve(terrain_source).display());
+    let terrain_source = config.input.terrain_output.as_ref()
+        .ok_or_else(|| anyhow::anyhow!("input.terrain_output が必要です"))?;
+    println!("生成済み地形SNC: {}", config.resolve(terrain_source).display());
 
     let default_bundle = config.input.source_bundle.clone()
         .unwrap_or_else(|| PathBuf::from("crates/s-builder/suruga_raw/ocean_source.sosdata"));
@@ -63,9 +63,9 @@ pub fn run_with_auto_yes(config_arg: Option<&str>, auto_yes: bool) -> Result<()>
     let input = json.get_mut("input").and_then(Value::as_object_mut)
         .ok_or_else(|| anyhow::anyhow!("設定ファイルに input オブジェクトがありません"))?;
     input.insert("source_bundle".to_string(), Value::String(bundle_config_path.to_string_lossy().to_string()));
-    if !input.contains_key("terrain_source") {
+    if !input.contains_key("terrain_output") {
         if let Some(old_terrain) = input.remove("terrain_grid") {
-            input.insert("terrain_source".to_string(), old_terrain);
+            input.insert("terrain_output".to_string(), old_terrain);
         }
     }
     for key in ["source_coordinates", "velocity_u", "velocity_v", "temperature", "salinity"] {
@@ -108,8 +108,8 @@ fn run_netcdf_wizard(config: &Config, config_path: &Path, config_arg: &str, auto
     println!(" SOS NetCDF → SOF データ生成");
     println!("============================================\n");
     let netcdf = config.input.netcdf.as_ref().expect("caller checks NetCDF config");
-    println!("海底地形 NetCDF : {}", config.resolve(&netcdf.terrain_file).display());
-    println!("海洋物理場 NetCDF: {}", config.resolve(&netcdf.ocean_file).display());
+    println!("地形ソース      : {}", config.input.terrain_source.as_ref().or(netcdf.terrain_file.as_ref()).map(|p| config.resolve(p).display().to_string()).unwrap_or_else(|| "未設定".into()));
+    println!("海洋物理場 NetCDF: {}", config.resolve(config.hycom_output_path(netcdf)).display());
     println!("前処理キャッシュ : {}", config.resolve(&netcdf.prepared_dir).display());
     println!("\n処理順: 公開NetCDF → 座標/単位/欠損値の前処理 → Grid/物理場 → s-sof → input.sof");
     if !ask_yes_no("この設定でNetCDFを前処理し、SOFを生成しますか？", true, auto_yes)? {

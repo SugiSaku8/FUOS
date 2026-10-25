@@ -61,11 +61,18 @@ impl GpuFlowMesh {
     /// CPU側で更新した頂点データをGPUへ転送する。
     ///
     /// バッファの容量を超えた場合は false を返す。
-    pub fn update_vertices(&mut self, queue: &wgpu::Queue, vertices: &[FlowVertex]) -> bool {
+    pub fn update_vertices(&mut self, device: &wgpu::Device, queue: &wgpu::Queue, vertices: &[FlowVertex]) -> bool {
         let required_bytes = (vertices.len() * std::mem::size_of::<FlowVertex>()) as u64;
 
         if required_bytes > self.capacity_bytes {
-            return false;
+            let new_capacity_bytes = required_bytes.max(self.capacity_bytes.saturating_mul(2)).max(256);
+            self.vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("dynamic_flow_vertex_buffer_grown"),
+                size: new_capacity_bytes,
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            });
+            self.capacity_bytes = new_capacity_bytes;
         }
 
         if !vertices.is_empty() {

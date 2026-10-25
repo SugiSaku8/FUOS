@@ -91,9 +91,9 @@ pub fn load_existing_sof(config: &Config) -> Result<DatasetBundle> {
 
 pub fn build_from_validated(config: &Config) -> Result<DatasetBundle> {
     println!("[1/7] 設定・入力データを読み込みます");
-    let terrain_source = config.input.terrain_source.as_ref()
-        .or(config.input.terrain_grid.as_ref())
-        .ok_or_else(|| anyhow::anyhow!("input.terrain_source が必要です（terrain_grid は旧設定名です）"))?;
+    let terrain_source = config.input.terrain_output.as_ref()
+        
+        .ok_or_else(|| anyhow::anyhow!("input.terrain_output が必要です"))?;
     let terrain_path = config.resolve(terrain_source);
     let mut terrain_reader = GridReader::open(&terrain_path)
         .with_context(|| format!("地形SOFを開けません: {}", terrain_path.display()))?;
@@ -164,7 +164,7 @@ pub fn build_from_validated(config: &Config) -> Result<DatasetBundle> {
     metadata.set_title("Suruga Bay ocean simulation initial state");
     metadata.set_institution("Suruga Ocean Simulator");
     let source_description = if let Some(netcdf) = &config.input.netcdf {
-        format!("Public NetCDF inputs: terrain={}, ocean={}", netcdf.terrain_file.display(), netcdf.ocean_file.display())
+        format!("Public input terrain={}, HYCOM output={}", config.input.terrain_source.as_ref().or(netcdf.terrain_file.as_ref()).map(|p| p.display().to_string()).unwrap_or_else(|| "not set".into()), config.hycom_output_path(netcdf).display())
     } else {
         "Configured source bundle / raw velocity, temperature, salinity and bathymetry inputs".to_string()
     };

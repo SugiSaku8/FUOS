@@ -1,10 +1,1 @@
-# Public NetCDF input files
-
-Place the downloaded public datasets here, or change `input.netcdf.terrain_file` and `input.netcdf.ocean_file` in `apps/simulator/config/simulator.json`.
-
-Default filenames expected by the config:
-
-- `gebco_suruga.nc`: GEBCO gridded bathymetry NetCDF
-- `hycom_suruga.nc`: HYCOM (or a compatible ocean product) NetCDF containing u, v, temperature, salinity and depth coordinates
-
-The files are intentionally not committed because public gridded ocean datasets can be large and are distributed separately by their providers.
+Place public terrain data here, for example `gebco_suruga.nc` or `gebco_suruga.tif`. Configure its path in `input.terrain_source` in `apps/simulator/config/simulator.json`. HYCOM data is downloaded automatically to `data/raw/hycom_<study.goal>.nc`; you normally do not need to configure an ocean filename.
